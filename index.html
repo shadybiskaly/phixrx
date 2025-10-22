@@ -279,7 +279,7 @@
         <p class="mt-4">&copy; 2025 Social Phix. All rights reserved. | Natural Supplement for Social Confidence and Calmness.</p>
     </footer>
 
-    <!-- AI Logic Script: Debugging additions for better error reporting -->
+    <!-- AI Logic Script: Fixed API Key -->
     <script>
         const AI_MODEL = 'gemini-2.5-flash-preview-09-2025';
         const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
@@ -338,7 +338,16 @@
                 </div>
             `;
 
-            const apiKey = ""; 
+            // CRITICAL FIX: Use the globally provided API key here.
+            const apiKey = typeof __ai_api_key !== 'undefined' ? __ai_api_key : ''; 
+
+            if (!apiKey) {
+                responseArea.innerHTML = '<p class="text-red-400">Configuration Error: API Key is missing. The AI service cannot be reached.</p>';
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Receive Reflection';
+                return;
+            }
+
             const apiUrl = `${API_BASE}${AI_MODEL}:generateContent?key=${apiKey}`;
 
             // System prompt remains focused on Christian principles to provide the requested content.
