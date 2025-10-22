@@ -338,11 +338,17 @@
                 </div>
             `;
 
-            // CRITICAL FIX: Use the globally provided API key here.
-            const apiKey = typeof __ai_api_key !== 'undefined' ? __ai_api_key : ''; 
+            // *******************************************************************
+            // !!! API KEY INSERTED !!!
+            // The API key from your curl command has been pasted here.
+            // *******************************************************************
+            const userProvidedKey = "AIzaSyCwBBPzmQ24B-yz5yBRxNvzyLPSxpLIm5c"; // Your key is now here.
+            
+            // This logic will use your key first, but fall back to the environment key if yours is empty.
+            const apiKey = userProvidedKey || (typeof __ai_api_key !== 'undefined' ? __ai_api_key : ''); 
 
             if (!apiKey) {
-                responseArea.innerHTML = '<p class="text-red-400">Configuration Error: API Key is missing. The AI service cannot be reached.</p>';
+                responseArea.innerHTML = '<p class="text-red-400">Configuration Error: API Key is missing. Please paste your key into the code where marked.</p>';
                 submitButton.disabled = false;
                 submitButton.innerHTML = 'Receive Reflection';
                 return;
@@ -449,4 +455,3 @@
     </script>
 </body>
 </html>
-
