@@ -43,7 +43,8 @@
 </head>
 <body class="bg-[#2D184E] text-white">
 
-    <!-- Header --><header class="p-6 md:p-8 flex justify-between items-center bg-[#2D184E] relative z-20">
+    <!-- Header -->
+    <header class="p-6 md:p-8 flex justify-between items-center bg-[#2D184E] relative z-20">
         <!-- H1: Brand Name -->
         <h1 class="text-3xl font-bold text-[#6EC9F1] tracking-wide">Social Phix</h1>
         <a href="#waitlist" class="hidden sm:inline-block bg-[#6EC9F1] text-[#2D184E] font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-sky-400 transition-colors duration-300">Get Your Phix Now</a>
@@ -141,40 +142,8 @@
         </div>
     </section>
     
-    <!-- AI Assistant Section: Neutral Look, Christian Backend -->
-    <section id="ai-chat" class="py-16 md:py-24 bg-[#3E216B]">
-        <div class="container mx-auto px-4 max-w-4xl">
-            <!-- Neutral Heading -->
-            <h3 class="text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center">
-                <!-- Neutral Icon -->
-                <svg class="w-8 h-8 mr-2 text-[#F1E0B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v4m0 0a1 1 0 00-1-1 1 1 0 00-1 1 1 1 0 001 1 1 1 0 001-1zm0 0l-1.5 1.5M10.5 19.5L9 21M12 21h.01M16 12a4 4 0 10-8 0 4 4 0 008 0zM5.9 7.8c-1.3-.9-2.3-2-2.9-3.2-.2-.5-.1-.8.2-1.1s.8-.2 1.3-.1c1.2.3 2.3 1.2 3.2 2.6l1.2 1.6zM18.1 7.8c1.3-.9 2.3-2 2.9-3.2.2-.5.1-.8-.2-1.1s-.8-.2-1.3-.1c-1.2.3-2.3 1.2-3.2 2.6l-1.2 1.6z"></path></svg>
-                <span class="text-[#F1E0B3]">Guided Reflection: Finding Your Inner Anchor</span>
-            </h3>
-            <!-- Neutral Description -->
-            <p class="text-lg max-w-2xl mx-auto mb-8 text-white/80">Need encouragement? The Assistant offers supportive words and guided reflection to help you find clarity and peace when dealing with feelings of worry or nervousness.</p>
-
-            <div class="bg-white/5 p-6 rounded-3xl shadow-2xl">
-                <!-- AI Input Form -->
-                <div class="flex flex-col sm:flex-row gap-3 mb-6">
-                    <!-- Neutral Placeholder -->
-                    <input type="text" id="ai-question" placeholder="Ask, 'How can I stay calm before a big event?' or 'Give me a positive thought for today.'" 
-                           class="flex-grow p-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#6EC9F1]">
-                    <!-- Neutral Button Text -->
-                    <button id="ask-ai-button" class="btn-primary flex-shrink-0 bg-[#6EC9F1] text-[#2D184E] font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-sky-400 transition-all duration-300" onclick="askAI()">
-                        Receive Reflection
-                    </button>
-                </div>
-
-                <!-- AI Response Area -->
-                <div id="ai-response" class="min-h-[100px] text-left p-4 rounded-xl border border-white/10 bg-[#2D184E]/50 text-white/90">
-                    <p class="text-white/50">Your personal reflection and support will appear here.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Ingredients Section -->
-    <section class="py-16 md:py-24 bg-[#2D184E]">
+    <section class="py-16 md:py-24 bg-[#3E216B]">
         <div class="container mx-auto px-4 text-center">
             <!-- H3 with compliant keyword 'natural support' -->
             <h3 class="text-3xl md:text-4xl font-bold mb-8">Natural Ingredients for Social Support</h3>
@@ -221,7 +190,7 @@
     </section>
 
     <!-- NEW: FAQ Section to build trust -->
-    <section id="faq" class="py-16 md:py-24 bg-[#3E216B]">
+    <section id="faq" class="py-16 md:py-24 bg-[#2D184E]">
         <div class="container mx-auto px-4 max-w-4xl">
             <!-- H3 with keyword 'confidence supplement' -->
             <h3 class="text-center text-3xl md:text-4xl font-bold mb-12">FAQ: Get The Facts on Social Phix</h3>
@@ -253,7 +222,7 @@
     </section>
 
     <!-- Waitlist Section (Background changed to alternate) -->
-    <section id="waitlist" class="py-16 md:py-24 bg-[#2D184E]">
+    <section id="waitlist" class="py-16 md:py-24 bg-[#3E216B]">
         <div class="container mx-auto px-4 text-center">
             <!-- H3: Compliant Call to Action -->
             <h3 class="text-3xl md:text-4xl font-bold mb-4">Support Your Social Confidence with Social Phix.</h3>
@@ -270,7 +239,7 @@
     </section>
 
     <!-- Footer with Mandatory FDA Disclaimer -->
-    <footer class="p-6 md:p-8 text-center text-white/60 text-sm">
+    <footer class="p-6 md:p-8 text-center text-white/60 text-sm bg-[#2D184E]">
         <p class="mb-4">Social Phix is a dietary supplement.</p>
         <!-- MANDATORY FDA DISCLAIMER FOR DIETARY SUPPLEMENTS -->
         <p class="text-xs text-red-300/80 max-w-3xl mx-auto">
@@ -279,179 +248,5 @@
         <p class="mt-4">&copy; 2025 Social Phix. All rights reserved. | Natural Supplement for Social Confidence and Calmness.</p>
     </footer>
 
-    <!-- AI Logic Script: Fixed API Key -->
-    <script>
-        const AI_MODEL = 'gemini-2.5-flash-preview-09-2025';
-        const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
-
-        // Helper function for exponential backoff retry logic
-        async function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        // Updated: Added logic to read the response text on failure for better debugging
-        async function fetchWithRetry(url, options, maxRetries = 5) {
-            let lastError = null;
-            for (let i = 0; i < maxRetries; i++) {
-                const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
-                try {
-                    const response = await fetch(url, options);
-                    
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        // Throw a detailed error including status and response text
-                        throw new Error(`HTTP error! Status: ${response.status}. Response body: ${errorText}`);
-                    }
-                    return response;
-                } catch (error) {
-                    lastError = error;
-                    if (i < maxRetries - 1) {
-                        // We intentionally don't log the retries to keep the console clean
-                        await sleep(delay);
-                    }
-                }
-            }
-            throw new Error(`Failed to fetch after ${maxRetries} attempts. Last error details: ${lastError ? lastError.message : 'Unknown network error'}`);
-        }
-
-        async function askAI() {
-            const questionInput = document.getElementById('ai-question');
-            const responseArea = document.getElementById('ai-response');
-            const submitButton = document.getElementById('ask-ai-button');
-            
-            const userQuery = questionInput.value.trim();
-            if (!userQuery) {
-                responseArea.innerHTML = '<p class="text-yellow-400">Please enter your question.</p>';
-                return;
-            }
-
-            // --- Set Loading State ---
-            submitButton.disabled = true;
-            submitButton.innerHTML = 'Reflecting...';
-            responseArea.innerHTML = `
-                <div class="text-center py-4 space-y-2">
-                    <svg class="animate-spin h-6 w-6 text-[#F1E0B3] mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="text-sm">The Assistant is searching for wisdom and encouragement...</p>
-                </div>
-            `;
-
-            // *******************************************************************
-            // !!! API KEY INSERTED !!!
-            // The API key from your curl command has been pasted here.
-            // *******************************************************************
-            const userProvidedKey = "AIzaSyCwBBPzmQ24B-yz5yBRxNvzyLPSxpLIm5c"; // Your key is now here.
-            
-            // This logic will use your key first, but fall back to the environment key if yours is empty.
-            const apiKey = userProvidedKey || (typeof __ai_api_key !== 'undefined' ? __ai_api_key : ''); 
-
-            if (!apiKey) {
-                responseArea.innerHTML = '<p class="text-red-400">Configuration Error: API Key is missing. Please paste your key into the code where marked.</p>';
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Receive Reflection';
-                return;
-            }
-
-            const apiUrl = `${API_BASE}${AI_MODEL}:generateContent?key=${apiKey}`;
-
-            // System prompt remains focused on Christian principles to provide the requested content.
-            const systemPrompt = "You are a kind, gentle, Christian spiritual mentor and emotional support assistant. Your core mission is to share the good news of Jesus Christ by offering comfort, hope, and supportive advice to users dealing with worry, anxiety, or nervousness. Your tone must be deeply empathetic, non-judgemental, and welcoming to all, irrespective of their current beliefs. When responding: 1. Acknowledge the user's feelings with compassion. 2. Offer encouraging spiritual advice rooted in Christian principles (like peace, hope, and trust in God), often using relevant, comforting Bible verses (from a standard modern translation like NIV or KJV, but do not state the version). 3. Never be pushy, demanding, or heavy-handed; present faith suggestions as gentle, optional reflections. 4. Always maintain a soft, calming, and conversational tone. 5. Do not make medical or diagnostic claims, and never suggest replacing professional mental health or medical help. Do not mention that you are an AI assistant.";
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                tools: [{ "google_search": {} }], 
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-            };
-
-            try {
-                const response = await fetchWithRetry(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
-                
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    const text = candidate.content.parts[0].text;
-                    let sources = [];
-                    const groundingMetadata = candidate.groundingMetadata;
-                    
-                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                        sources = groundingMetadata.groundingAttributions
-                            .map(attr => ({
-                                uri: attr.web?.uri,
-                                title: attr.web?.title,
-                            }))
-                            .filter(source => source.uri && source.title);
-                    }
-
-                    // Format the AI response text
-                    let htmlOutput = `<div class="bg-white/10 p-4 rounded-xl shadow-inner mb-4 text-left">${text.replace(/\n/g, '<br>')}</div>`;
-                    
-                    if (sources.length > 0) {
-                        htmlOutput += '<div class="text-xs text-white/50 mt-4 text-left">';
-                        htmlOutput += '<p class="font-semibold mb-1">Sources consulted:</p>';
-                        sources.forEach((source) => {
-                            htmlOutput += `<p class="text-xs"><a href="${source.uri}" target="_blank" class="hover:text-[#6EC9F1] truncate block">${source.title || source.uri}</a></p>`;
-                        });
-                        htmlOutput += '</div>';
-                    }
-                    
-                    responseArea.innerHTML = htmlOutput;
-                } else {
-                     responseArea.innerHTML = '<p class="text-red-400">Sorry, I couldn\'t generate a response. Please try rephrasing your question.</p>';
-                }
-
-            } catch (error) {
-                // IMPORTANT: Logging the full error object for better diagnostics
-                console.error('AI API Error (Detailed):', error);
-                
-                let errorMessage = 'An error occurred while connecting to the AI service. Please try again later.';
-                
-                // If we captured a specific HTTP error message from fetchWithRetry, use it
-                if (error.message && error.message.includes('HTTP error!')) {
-                    errorMessage = `Connection failed: ${error.message.substring(error.message.indexOf('Status:'))}`;
-                }
-                
-                responseArea.innerHTML = `<p class="text-red-400">${errorMessage}</p>`;
-
-            } finally {
-                // --- Reset State ---
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Receive Reflection';
-            }
-        }
-
-        // Add event listener on window load
-        document.addEventListener('DOMContentLoaded', function() {
-            const button = document.getElementById('ask-ai-button');
-            const input = document.getElementById('ai-question');
-            
-            // Set logging level to debug for more console detail on Firestore, etc.
-            if (typeof setLogLevel === 'function') {
-                setLogLevel('Debug');
-            }
-            
-            if (button) {
-                button.addEventListener('click', askAI);
-            }
-            // Allow pressing Enter key to submit the question
-            if (input) {
-                input.addEventListener('keypress', function(e) {
-                    const submitButton = document.getElementById('ask-ai-button');
-                    if (e.key === 'Enter' && !submitButton.disabled) {
-                        e.preventDefault(); // Prevent default form submit behavior
-                        askAI();
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>
