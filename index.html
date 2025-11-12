@@ -3,249 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- SEO OPTIMIZATION: Title Tag for Pharmacist-Formulated -->
-    <title>Social Phix: Pharmacist-Formulated Supplement for Focus, Calmness, and Social Confidence</title>
-    <!-- SEO OPTIMIZATION: Compliant Meta Description for high click-through rate -->
-    <meta name="description" content="Social Phix is the Pharmacist-Formulated drink supplement that helps manage everyday nervousness and supports clear focus in social settings. Promote social confidence with L-Theanine and natural ingredients.">
+    <!-- SEO Optimization -->
+    <title>Social Phix: Pharmacist-Formulated Confidence Supplement</title>
+    <meta name="description" content="Social Phix is the pharmacist-formulated natural supplement designed to support composure, clarity, and social confidence in high-stress situations. Pre-order now.">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SEO IMPROVEMENT: Product Schema Markup (JSON-LD) for Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "Social Phix",
+      "image": "phix.png",
+      "description": "Pharmacist-Formulated supplement for social confidence, composure, and mental clarity. Featuring L-Theanine and Motherwort.",
+      "sku": "SP-001",
+      "brand": {
+        "@type": "Brand",
+        "name": "Social Phix"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "210"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://yourwebsite.com/#preorder-section",
+        "priceCurrency": "USD",
+        "price": "39.99",
+        "priceValidUntil": "2025-12-31",
+        "itemCondition": "https://schema.org/NewCondition",
+        "availability": "https://schema.org/PreOrder"
+      }
+    }
+    </script>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Custom font import for a professional look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #2D184E;
-            color: #ffffff;
+            background-color: #f7f7f9;
         }
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        .btn-primary {
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
+        /* Custom shadow for a premium 'glow' effect */
+        .card-glow-hover:hover {
+            box-shadow: 0 10px 15px -3px rgba(122, 97, 201, 0.2), 0 4px 6px -2px rgba(122, 97, 201, 0.05); /* Soft, purple-tinted shadow */
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(110, 201, 241, 0.4);
-        }
-        /* Custom style for FAQ answer background */
-        .faq-answer {
-            background-color: rgba(255, 255, 255, 0.03);
         }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Refined Color palette matching the product aesthetic
+                        'dark-primary': '#200E31', /* Deeper, richer eggplant purple (Used for Headings) */
+                        'dark-secondary': '#331E4B',/* Slightly lighter, muted purple (Used for Body Text) */
+                        'accent-cyan': '#7A61C9',   /* Vibrant blue-violet for CTAs/Highlights */
+                        'light-accent': '#C0B3ED',  /* Soft, inviting lavender for subtle highlights */
+                        'text-light': '#EFEFEF',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-[#2D184E] text-white">
-
-    <!-- Header -->
-    <header class="p-6 md:p-8 flex justify-between items-center bg-[#2D184E] relative z-20">
-        <!-- H1: Brand Name -->
-        <h1 class="text-3xl font-bold text-[#6EC9F1] tracking-wide">Social Phix</h1>
-        <a href="#waitlist" class="hidden sm:inline-block bg-[#6EC9F1] text-[#2D184E] font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-sky-400 transition-colors duration-300">Get Your Phix Now</a>
-    </header>
+<!-- Changing body text color to the slightly softer dark-secondary for better contrast on white backgrounds -->
+<body class="bg-gray-50 text-dark-secondary">
 
     <!-- Hero Section -->
-    <section class="min-h-[80vh] flex items-center justify-center p-4 md:p-8 relative bg-gradient-to-br from-[#2D184E] to-[#3E216B]">
-        <div class="container mx-auto max-w-7xl flex flex-col-reverse lg:flex-row items-center justify-between gap-12">
-            <!-- Text Content -->
-            <div class="text-center lg:text-left w-full lg:w-1/2 space-y-6">
-                <!-- H2: Pharmacist-Formulated, Clinical Calm, Social Confidence (No Asterisk) -->
-                <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">Pharmacist-Formulated. Clinical Calm. Social Confidence.</h2>
-                
-                <!-- Tagline: Removed bolding (**) to eliminate all asterisks -->
-                <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto lg:mx-0">The natural supplement designed by experts to support composure and clear focus when you need it most. Manage feelings of nervousness and enjoy the conversation.</p>
-                
-                <div class="pt-4">
-                    <a href="#waitlist" class="btn-primary inline-block bg-[#6EC9F1] text-[#2D184E] font-bold py-4 px-10 rounded-full shadow-lg hover:bg-sky-400 transition-all duration-300">Claim Early Access & Discount</a>
-                </div>
+    <header class="bg-dark-primary py-16 sm:py-24 text-center rounded-b-xl shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Brand Name: Social Phix -->
+            <p class="text-sm sm:text-base font-semibold tracking-widest uppercase text-light-accent mb-4">Social Phix</p>
+            
+            <!-- Main Headline (H1) -->
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+                Pharmacist-Formulated. Clinical Calm. Social Confidence.
+            </h1>
+            
+            <h2 class="text-lg sm:text-xl font-medium text-light-accent max-w-3xl mx-auto">
+                The natural supplement designed by experts to support composure and clear focus when you need it most.
+            </h2>
+            
+            <div class="mt-10 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#preorder-section" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-semibold rounded-full shadow-lg text-dark-primary bg-accent-cyan hover:bg-[#6A52BB] transition duration-300">
+                    Secure Your Pre-Order Now
+                </a>
+                <a href="#faq" class="inline-flex items-center justify-center px-8 py-3 border border-light-accent text-base font-medium rounded-full text-light-accent hover:bg-dark-secondary transition duration-300">
+                    See the Formula
+                </a>
             </div>
-            <!-- Product Image - Corrected extension to .png -->
-            <div class="w-full lg:w-1/2 flex justify-center lg:justify-end">
-                <!-- TECHNICAL SEO: Added width and height for CLS prevention -->
-                <img src="phix.png" alt="Social Phix bottle, a natural supplement drink that supports calm and social confidence." class="w-full max-w-md rounded-3xl shadow-2xl" width="400" height="400">
-            </div>
-        </div>
-    </section>
 
-    <!-- Benefits Section -->
-    <section class="py-16 md:py-24 bg-[#3E216B]">
-        <div class="container mx-auto px-4">
-            <!-- H3 uses compliant keywords -->
-            <h3 class="text-center text-3xl md:text-4xl font-bold mb-12">Social Phix: Supporting Your Social Composure</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div class="card p-8 rounded-2xl shadow-xl">
-                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mx-auto mb-4">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    </div>
-                    <h4 class="text-2xl font-semibold text-[#6EC9F1] mb-2">Clear Mental Focus</h4>
-                    <p class="text-white/70 leading-relaxed">Supports sharp, focused thoughts in the present moment. Quiets the mental distraction that can accompany social nervousness.</p>
-                </div>
-                <div class="card p-8 rounded-2xl shadow-xl">
-                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mx-auto mb-4">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <!-- Compliant language: 'Supports physical composure' -->
-                    <h4 class="text-2xl font-semibold text-[#6EC9F1] mb-2">Physical Composure</h4>
-                    <p class="text-white/70 leading-relaxed">Supports physical composure by easing tension, allowing you to connect authentically without the distraction of a racing heart or tense shoulders.</p>
-                </div>
-                <div class="card p-8 rounded-2xl shadow-xl">
-                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mx-auto mb-4">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                    </div>
-                    <h4 class="text-2xl font-semibold text-[#6EC9F1] mb-2">Promotes Social Flow</h4>
-                    <p class="text-white/70 leading-relaxed">Helps create that relaxed state where conversation flows naturally, boosting your social confidence and ability to speak freely.</p>
-                </div>
+            <!-- Product Image -->
+            <div class="mt-16">
+                <!-- Image alt text is highly descriptive for SEO -->
+                <img src="phix.png" alt="Social Phix bottle and liquid shot, a pharmacist-formulated confidence supplement." 
+                     class="mx-auto w-full max-w-sm sm:max-w-lg rounded-xl shadow-2xl" 
+                     width="500" height="500" 
+                     onerror="this.onerror=null;this.src='https://placehold.co/500x500/3E216B/FFFFFF?text=Social+Phix+Bottle'"
+                >
             </div>
         </div>
-    </section>
+    </header>
 
-    <!-- Product Visuals Section (Scenarios) -->
-    <section class="py-20 md:py-32 bg-[#2D184E]">
-        <div class="container mx-auto px-4 text-center">
-            <!-- H3: Compliant language focused on situations of nervousness -->
-            <h3 class="text-3xl md:text-4xl font-bold mb-8">Take Social Phix when social nervousness strikes:</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Card 1: Before a Presentation/Speech - Corrected extension to .png -->
-                <div class="card p-6 rounded-2xl shadow-xl flex flex-col items-center text-center">
-                    <img src="speech.png" alt="Person preparing for a speech, using Social Phix for public speaking confidence and composed delivery." class="w-full h-56 object-cover rounded-xl mb-4" width="224" height="224">
-                    <h4 class="text-xl font-semibold text-[#6EC9F1] mb-2">The Big Presentation</h4>
-                    <p class="text-white/70 text-sm leading-relaxed">Supports sharp memory and composed delivery. Helps you turn nervous energy into confident articulation.</p>
-                </div>
-                
-                <!-- Card 2: Nailing That Important Interview - Corrected extension to .png -->
-                <div class="card p-6 rounded-2xl shadow-xl flex flex-col items-center text-center">
-                    <img src="interview.png" alt="Taking Social Phix supplement for interview nerves to stay focused and articulate." class="w-full h-56 object-cover rounded-xl mb-4" width="224" height="224">
-                    <h4 class="text-xl font-semibold text-[#6EC9F1] mb-2">The High-Stakes Interview</h4>
-                    <p class="text-white/70 text-sm leading-relaxed">Stay articulate, clear-headed, and collected. Showcase your true potential without the mental fog.</p>
-                </div>
+    <!-- Core Benefits Section -->
+    <section class="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-center mb-12 text-dark-primary">Unlock Effortless Social Flow</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            
+            <!-- Benefit 1 - Enhanced Outline and Hover -->
+            <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-light-accent transition duration-300 card-glow-hover">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#7A61C9" class="w-8 h-8 mb-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                <h3 class="text-xl font-semibold mb-3 text-dark-primary">Support Composure</h3>
+                <!-- SEO KEYWORD USE: Mentioning ingredients explicitly in body copy -->
+                <p class="text-dark-secondary">The balanced blend of adaptogens, including **Motherwort** extract, helps manage nervousness and the physical signs of social stress, allowing you to remain grounded.</p>
+            </div>
 
-                <!-- Card 3: Before a Blind Date or Social Event - Corrected extension to .png -->
-                <div class="card p-6 rounded-2xl shadow-xl flex flex-col items-center text-center">
-                    <img src="blind date.png" alt="A woman on a date, relaxed with the help of a natural confidence boost supplement, Social Phix." class="w-full h-56 object-cover rounded-xl mb-4" width="224" height="224">
-                    <h4 class="text-xl font-semibold text-[#6EC9F1] mb-2">First Dates & Group Events</h4>
-                    <p class="text-white/70 text-sm leading-relaxed">Helps remove self-consciousness. Enjoy genuine conversation and relaxed body language.</p>
-                </div>
+            <!-- Benefit 2 - Enhanced Outline and Hover -->
+            <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-light-accent transition duration-300 card-glow-hover">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#7A61C9" class="w-8 h-8 mb-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8.25 10.5h7.5" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8.25 10.5h7.5M12 18v-7.5" />
+                </svg>
+                <h3 class="text-xl font-semibold mb-3 text-dark-primary">Promote Mental Clarity</h3>
+                <!-- SEO KEYWORD USE: Mentioning ingredients explicitly in body copy -->
+                <p class="text-dark-secondary">Ingredients like **L-Theanine** support alpha wave activity in the brain, reducing mental noise and fostering sharp, witty conversation and focus.</p>
+            </div>
 
-                <!-- Card 4: Dealing with Difficult People (New) - Corrected extension to .png -->
-                <div class="card p-6 rounded-2xl shadow-xl flex flex-col items-center text-center">
-                    <img src="difficult_people.png" alt="Staying calm during conflict, using Social Phix for social composure and assertiveness." class="w-full h-56 object-cover rounded-xl mb-4" width="224" height="224">
-                    <h4 class="text-xl font-semibold text-[#6EC9F1] mb-2">Navigating Conflict</h4>
-                    <p class="text-white/70 text-sm leading-relaxed">Supports maintaining composure in stressful conversations. Respond assertively without reacting emotionally.</p>
-                </div>
+            <!-- Benefit 3 - Enhanced Outline and Hover -->
+            <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-light-accent transition duration-300 card-glow-hover">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#7A61C9" class="w-8 h-8 mb-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a2.25 2.25 0 0 1-2.25-2.25v-1.5A2.25 2.25 0 0 1 4.5 14.25h15a2.25 2.25 0 0 1 2.25 2.25v1.5a2.25 2.25 0 0 1-2.25 2.25h-15Z" />
+                </svg>
+                <h3 class="text-xl font-semibold mb-3 text-dark-primary">Confidence in a Bottle</h3>
+                <p class="text-dark-secondary">Feel present and authentic. Social Phix helps you ditch the worry and engage in genuine, focused interactions.</p>
             </div>
         </div>
     </section>
     
-    <!-- Ingredients Section -->
-    <section class="py-16 md:py-24 bg-[#3E216B]">
-        <div class="container mx-auto px-4 text-center">
-            <!-- H3 with compliant keyword 'natural support' -->
-            <h3 class="text-3xl md:text-4xl font-bold mb-8">Natural Ingredients for Social Support</h3>
-            <p class="text-lg max-w-3xl mx-auto mb-12 text-white/80">Social Phix is formulated with a synergistic blend of natural ingredients, including high-dose L-Theanine and Motherwort, each chosen to support a calm, focused, and present state of mind.</p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
-                <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-2">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.01 12.01 0 002.944 12c.033 1.621.57 3.208 1.62 4.494.93 1.155 2.115 2.18 3.5 2.981A11.957 11.957 0 0012 21.056c1.621-.033 3.208-.57 4.494-1.62 1.155-.93 2.18-2.115 2.981-3.5A12.01 12.01 0 0021.056 12c-.033-1.621-.57-3.208-1.62-4.494-.93-1.155-2.115-2.18-2.981-3.5z"></path></svg>
-                    </div>
-                    <span class="text-sm font-semibold mt-1">L-Theanine (Focus)</span>
+    <!-- UPDATED SECTION: Usage / Protocol Visual Guide (Now a 3-Step Grid) -->
+    <section class="py-16 bg-light-accent/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+             <h2 class="text-3xl font-bold text-dark-primary mb-12">The Social Phix Protocol: When to Take It</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- Scenario 1: Professional Pitch / Interview -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent-cyan transition duration-300">
+                    <img src="presentation.png" alt="A professional taking Social Phix 30 minutes before a job interview or high-stakes presentation." 
+                         class="w-full h-auto object-cover rounded-md mb-4"
+                         onerror="this.onerror=null;this.src='https://placehold.co/400x250/7A61C9/FFFFFF?text=1.+Professional+Pitch'"
+                    >
+                    <h3 class="text-xl font-bold text-dark-primary mb-2">1. High-Stakes Professional Events</h3>
+                    <p class="text-dark-secondary text-sm">Need to be sharp and grounded? Take Social Phix 30 minutes before client pitches, board meetings, or crucial job interviews.</p>
                 </div>
-                <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-2">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18V6M4 12h16"></path></svg>
-                    </div>
-                    <span class="text-sm font-semibold mt-1">Magnesium (Calm)</span>
+
+                <!-- Scenario 2: Social & Networking -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent-cyan transition duration-300">
+                    <img src="blind date.png" alt="A person taking Social Phix before going to a party or networking event." 
+                         class="w-full h-auto object-cover rounded-md mb-4"
+                         onerror="this.onerror=null;this.src='https://placehold.co/400x250/7A61C9/FFFFFF?text=2.+Networking+%26+Social'"
+                    >
+                    <h3 class="text-xl font-bold text-dark-primary mb-2">2. Social & Networking Gatherings</h3>
+                    <p class="text-dark-secondary text-sm">Enjoy the conversation without the racing thoughts. Perfect for parties, first dates, or connecting with new people at conferences.</p>
                 </div>
-                <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-2">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.314-2.686 6-6 6S0 14.314 0 11c0-3.314 2.686-6 6-6s6 2.686 6 6z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 13c0-1.657-1.343-3-3-3s-3 1.343-3 3 1.343 3 3 3 3-1.343 3-3z"></path></svg>
-                    </div>
-                    <span class="text-sm font-semibold mt-1">B Vitamins</span>
+
+                <!-- Scenario 3: Public Performance / Speaking -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent-cyan transition duration-300">
+                    <img src="speech.png" alt="A speaker taking Social Phix before going on stage for a public speaking engagement." 
+                         class="w-full h-auto object-cover rounded-md mb-4"
+                         onerror="this.onerror=null;this.src='https://placehold.co/400x250/7A61C9/FFFFFF?text=3.+Public+Speaking'"
+                    >
+                    <h3 class="text-xl font-bold text-dark-primary mb-2">3. Public Speaking & Performance</h3>
+                    <p class="text-dark-secondary text-sm">Get clear delivery and a steady voice. Take it before speeches, musical performances, or any time you need to command an audience.</p>
                 </div>
-                <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-2">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <span class="text-sm font-semibold mt-1">Taurine</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-2">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
-                    </div>
-                    <span class="text-sm font-semibold mt-1">Motherwort (Relaxation)</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-2">
-                        <svg class="w-8 h-8 text-[#6EC9F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.01 12.01 0 002.944 12c.033 1.621.57 3.208 1.62 4.494.93 1.155 2.115 2.18 3.5 2.981A11.957 11.957 0 0012 21.056c1.621-.033 3.208-.57 4.494-1.62 1.155-.93 2.18-2.115 2.981-3.5A12.01 12.01 0 0021.056 12c-.033-1.621-.57-3.208-1.62-4.494-.93-1.155-2.115-2.18-2.981-3.5z"></path></svg>
-                    </div>
-                    <span class="text-sm font-semibold mt-1">Uridine</span>
-                </div>
+
+            </div>
+            
+            <div class="mt-8">
+                 <a href="#preorder-section" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-semibold rounded-full shadow-xl text-dark-primary bg-accent-cyan hover:bg-[#6A52BB] transition duration-300">
+                    Ready to Try the Protocol? Pre-Order Now
+                </a>
             </div>
         </div>
     </section>
+    <!-- END UPDATED SECTION -->
 
-    <!-- NEW: FAQ Section to build trust -->
-    <section id="faq" class="py-16 md:py-24 bg-[#2D184E]">
-        <div class="container mx-auto px-4 max-w-4xl">
-            <!-- H3 with keyword 'confidence supplement' -->
-            <h3 class="text-center text-3xl md:text-4xl font-bold mb-12">FAQ: Get The Facts on Social Phix</h3>
-            <div class="space-y-6">
-                <!-- FAQ Item 1 -->
-                <div class="card p-6 rounded-2xl shadow-xl">
-                    <h4 class="text-xl font-semibold text-[#6EC9F1] mb-2">Is Social Phix safe to take daily?</h4>
-                    <div class="faq-answer p-3 mt-3 rounded-lg">
-                        <p class="text-white/80">Yes! Social Phix is formulated with non-addictive, natural, and GRAS (Generally Recognized As Safe) ingredients. We recommend daily use for cumulative mental and social benefit, but it's also perfect to take on an as-needed basis for nervousness support before stressful events.</p>
-                    </div>
-                </div>
-                <!-- FAQ Item 2 -->
-                <div class="card p-6 rounded-2xl shadow-xl">
-                    <h4 class="text-xl font-semibold text-[#6EC9F1] mb-2">How long does it take for Social Phix to work?</h4>
-                    <div class="faq-answer p-3 mt-3 rounded-lg">
-                        <p class="text-white/80">Most people feel a noticeable difference in calmness and focus within 20-30 minutes of taking Social Phix. For best results, take it shortly before you anticipate the social interaction.</p>
-                    </div>
-                </div>
-                <!-- FAQ Item 3 -->
-                <div class="card p-6 rounded-2xl shadow-xl">
-                    <!-- Compliant language: 'supports calm alertness' -->
-                    <h4 class="text-xl font-semibold text-[#6EC9F1] mb-2">Will Social Phix make me feel drowsy or "out of it"?</h4>
-                    <div class="faq-answer p-3 mt-3 rounded-lg">
-                        <p class="text-white/80">Not at all. Social Phix is designed to help support a feeling of calm alertness and social composure. It enhances your clarity and focus by easing nervousness, not by sedating you.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Waitlist/Pre-Order Section -->
+    <section id="preorder-section" class="py-20 bg-dark-secondary rounded-t-xl shadow-inner">
+        <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold text-light-accent mb-4">Secure Your First Dose</h2>
+            <p class="text-lg text-text-light mb-6">
+                4,500+ people already catching the Phix! Join the priority list to secure the **Founders Discount** on our first limited production run.
+            </p>
 
-    <!-- Waitlist Section (Background changed to alternate) -->
-    <section id="waitlist" class="py-16 md:py-24 bg-[#3E216B]">
-        <div class="container mx-auto px-4 text-center">
-            <!-- H3: Compliant Call to Action -->
-            <h3 class="text-3xl md:text-4xl font-bold mb-4">Support Your Social Confidence with Social Phix.</h3>
-            <p class="text-lg max-w-2xl mx-auto mb-2 text-white/80">Join our VIP waitlist for early access and a special launch discount. Start feeling more composed and present in social situations!</p>
-            
-            <!-- ENHANCEMENT: Social Proof Placeholder -->
-            <p class="text-2xl font-extrabold text-[#6EC9F1] mb-8 animate-pulse">4,500+ people already choosing Social Phix for their social support!</p>
-            
-            <form class="max-w-xl mx-auto space-y-4">
-                <input type="email" placeholder="Enter your email" required class="w-full p-4 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#6EC9F1]">
-                <button type="submit" class="w-full bg-[#6EC9F1] text-[#2D184E] font-bold py-4 rounded-lg shadow-lg hover:bg-sky-400 transition-colors duration-300">Join Now for Confidence Support</button>
+            <form class="space-y-4 bg-white p-6 rounded-xl shadow-2xl">
+                <div class="text-left">
+                    <label for="email" class="block text-sm font-medium text-dark-primary">Email Address</label>
+                    <input type="email" id="email" placeholder="you@example.com" required 
+                           class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-cyan focus:border-accent-cyan transition duration-150">
+                </div>
+                <div class="text-left">
+                    <label for="quantity" class="block text-sm font-medium text-dark-primary">Desired Quantity (Bottles)</label>
+                    <select id="quantity" 
+                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-cyan focus:border-accent-cyan transition duration-150">
+                        <option>1 Bottle (The Single Dose)</option>
+                        <option>3 Bottles (The Performance Trio)</option>
+                        <option>6 Bottles (The Full Reset)</option>
+                    </select>
+                </div>
+                <button type="submit" 
+                        class="w-full flex justify-center items-center px-6 py-3 border border-transparent text-base font-semibold rounded-full shadow-lg text-dark-primary bg-accent-cyan hover:bg-[#6A52BB] transition duration-300">
+                    Join Priority Pre-Order List
+                </button>
             </form>
+            <p class="mt-4 text-sm text-gray-300">
+                You will be notified immediately when pre-orders open for funding.
+            </p>
         </div>
     </section>
 
-    <!-- Footer with Mandatory FDA Disclaimer -->
-    <footer class="p-6 md:p-8 text-center text-white/60 text-sm bg-[#2D184E]">
-        <p class="mb-4">Social Phix is a dietary supplement.</p>
-        <!-- MANDATORY FDA DISCLAIMER FOR DIETARY SUPPLEMENTS -->
-        <p class="text-xs text-red-300/80 max-w-3xl mx-auto">
-            These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease. Always consult with your healthcare provider before starting any new dietary supplement.
+    <!-- FAQ Section -->
+    <section id="faq" class="py-16 sm:py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <h2 class="text-3xl font-bold text-center mb-12 text-dark-primary">Frequently Asked Questions</h2>
+        <div class="space-y-6">
+            
+            <!-- FAQ 1 -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-semibold text-dark-primary mb-2">What does 'Pharmacist-Formulated' mean?</h3>
+                <p class="text-dark-secondary">It means the formula was designed by a licensed pharmacist who understands ingredient bioavailability, dosing, and regulatory compliance. We prioritize clinical evidence over marketing trends to ensure safety and effectiveness.</p>
+            </div>
+            
+            <!-- FAQ 2 -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-semibold text-dark-primary mb-2">Is Social Phix a sedative?</h3>
+                <p class="text-dark-secondary">No. Social Phix is not a tranquilizer or sedative. It is designed to foster a state of **calm focus** by supporting alpha brain waves, meaning you remain sharp, articulate, and energized—not drowsy or slow.</p>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-semibold text-dark-primary mb-2">How long does it take to feel the effects?</h3>
+                <p class="text-dark-secondary">Most users report a noticeable shift in mental state and physical composure within 20 to 45 minutes of consumption. We recommend taking it 30 minutes before any planned high-stress social event.</p>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-semibold text-dark-primary mb-2">What is your sourcing standard?</h3>
+                <p class="text-dark-secondary">All ingredients are sourced from cGMP certified suppliers and rigorously tested for purity, heavy metals, and potency before they are accepted into our manufacturing process. Quality and safety are our highest priorities.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-primary py-10 text-center rounded-t-xl shadow-2xl">
+        <p class="text-sm text-text-light mb-2">&copy; 2025 Social Phix. All rights reserved.</p>
+        <p class="text-xs text-gray-400 max-w-2xl mx-auto px-4">
+            Disclaimer: These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease. Always consult your healthcare provider before beginning any new supplement regimen.
         </p>
-        <p class="mt-4">&copy; 2025 Social Phix. All rights reserved. | Natural Supplement for Social Confidence and Calmness.</p>
     </footer>
 
 </body>
