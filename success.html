@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Confirmed | Social Phix</title>
+    <meta name="robots" content="noindex, nofollow"> <!-- Prevents search engines from indexing the thank you page -->
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Modern Tech-Forward Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-bg': '#050B14',      
+                        'brand-surface': '#0A192F', 
+                        'brand-card': '#112240',    
+                        'accent-cyan': '#00E5FF',   
+                        'accent-orange': '#FF5722', 
+                        'accent-orange-hover': '#E64A19'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0A192F;
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+
+        .cyan-glow-bottom {
+            position: relative;
+        }
+        .cyan-glow-bottom::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #00E5FF;
+            box-shadow: 0 -2px 15px 2px rgba(0, 229, 255, 0.6);
+            z-index: 10;
+        }
+        
+        .bg-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Simple fade-in animation for the card */
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.5, 0, 0, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="antialiased font-sans cyan-glow-bottom min-h-screen flex flex-col relative bg-brand-bg">
+
+    <div class="bg-grid"></div>
+    <div class="absolute w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[120px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+
+    <!-- Glassmorphic Simple Nav -->
+    <nav class="fixed w-full top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-center items-center">
+            <a href="/" class="font-heading text-2xl font-extrabold tracking-tight text-white hover:opacity-80 transition">
+                SOCIAL<span class="text-accent-orange">PHIX</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center px-6 relative z-10 pt-20 pb-20">
+        <div class="bg-brand-card p-10 sm:p-16 rounded-2xl border border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.6)] text-center max-w-lg w-full fade-in-up">
+            
+            <!-- Success Icon -->
+            <div class="w-20 h-20 mx-auto bg-brand-surface rounded-full flex items-center justify-center mb-8 border border-accent-cyan/30 shadow-[0_0_20px_rgba(0,229,255,0.2)]">
+                <svg class="w-10 h-10 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+
+            <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">Status: Confirmed</span>
+            <h1 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">You're on the List.</h1>
+            
+            <p class="text-slate-300 font-normal leading-relaxed mb-10">
+                Your sample request has been securely logged. Keep an eye on your inbox—we’ll reach out the moment your batch is ready to ship. 
+            </p>
+
+            <a href="/" class="inline-block w-full py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300">
+                Return to Homepage
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer Minimal -->
+    <footer class="w-full py-8 text-center relative z-10">
+        <p class="text-[10px] font-bold tracking-widest uppercase text-slate-600">
+            &copy; 2026 Social Phix. All Rights Reserved.
+        </p>
+    </footer>
+
+</body>
+</html>
