@@ -192,7 +192,7 @@
             
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <a href="#preorder" class="w-full sm:w-auto px-10 py-4 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_0_20px_rgba(255,87,34,0.3)] transition-all duration-300">
-                    Get on the List
+                    Request Early Sample
                 </a>
                 <a href="#formula" class="w-full sm:w-auto px-10 py-4 border-2 border-slate-600 text-sm font-bold tracking-widest uppercase rounded-md text-white hover:border-accent-cyan hover:text-accent-cyan transition-all duration-300">
                     See How It Works
@@ -370,20 +370,21 @@
         </div>
     </section>
 
-    <!-- Waitlist / Request Engine -->
+    <!-- Loops Request Engine -->
     <section id="preorder" class="py-32 bg-brand-surface relative overflow-hidden cyan-glow-bottom">
         <div class="absolute w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[120px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
         
         <div class="max-w-xl mx-auto px-6 text-center relative z-10 reveal">
-            <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">Join the Exclusive Waitlist</h2>
+            <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">Secure Your Sample</h2>
             <p class="text-slate-300 font-normal mb-10 leading-relaxed">
-                Spots for our pre-launch sample run are extremely limited. Drop your email below to secure your place in line and be the first to experience clinical calm.
+                Spots for our pre-launch sample run are extremely limited. Drop your email below to request your sample and be the first to experience pure calm and perfect focus.
             </p>
 
-            <form class="space-y-5 bg-brand-card p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left">
+            <!-- Loops Form Integration -->
+            <form action="https://app.loops.so/api/newsletter-form/cmrjkzmpw010r0iz4qp4xrssn" method="POST" class="space-y-5 bg-brand-card p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left">
                 <div>
                     <label for="email" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Email</label>
-                    <input type="email" id="email" placeholder="name@domain.com" required 
+                    <input type="email" id="email" name="email" placeholder="name@domain.com" required 
                            class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 placeholder-slate-600">
                 </div>
                 
@@ -392,7 +393,7 @@
 
                 <button type="submit" 
                         class="w-full py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300 mt-4">
-                    Claim My Spot
+                    Secure My Sample
                 </button>
             </form>
         </div>
