@@ -380,8 +380,8 @@
                 Spots for our pre-launch sample run are extremely limited. Join our email list below for a chance to receive a sample and be among the first to experience pure calm and perfect focus.
             </p>
 
-            <!-- Loops Form Integration -->
-            <form action="https://app.loops.so/api/newsletter-form/cmrjkzmpw010r0iz4qp4xrssn" method="POST" class="space-y-5 bg-brand-card p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left">
+            <!-- Added id="loops-form" for javascript handling -->
+            <form id="loops-form" action="https://app.loops.so/api/newsletter-form/cmrjkzmpw010r0iz4qp4xrssn" method="POST" class="space-y-5 bg-brand-card p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left">
                 <div>
                     <label for="email" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Email</label>
                     <input type="email" id="email" name="email" placeholder="name@domain.com" required 
@@ -391,6 +391,7 @@
                 <!-- Cloudflare Turnstile Integration -->
                 <div class="cf-turnstile mt-2" data-sitekey="0x4AAAAAAD1HuD0kItdoQfz0" data-theme="dark"></div>
 
+                <!-- Submit button with text corrected -->
                 <button type="submit" 
                         class="w-full py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300 mt-4">
                     Request My Sample
@@ -412,11 +413,11 @@
         </p>
     </footer>
 
-    <!-- Intersection Observer Script -->
+    <!-- Scripts: Animation & Form Redirection -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Scroll Animation
             const reveals = document.querySelectorAll('.reveal');
-
             const revealOnScroll = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -427,8 +428,36 @@
                 threshold: 0.15,
                 rootMargin: "0px 0px -50px 0px"
             });
-
             reveals.forEach(reveal => revealOnScroll.observe(reveal));
+
+            // Form Submit and Redirect Script
+            const loopsForm = document.getElementById('loops-form');
+            if (loopsForm) {
+                loopsForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Stop standard redirect
+                    
+                    const form = event.target;
+                    const formData = new FormData(form);
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    
+                    // Visual feedback to let user know it's working
+                    submitBtn.innerText = "Requesting...";
+                    submitBtn.disabled = true;
+
+                    // Send the data via Javascript Fetch API
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    }).then(() => {
+                        // On success, redirect to your new page
+                        window.location.href = "https://socialphix.com/success.html";
+                    }).catch((error) => {
+                        console.error("Submission Error:", error);
+                        // Failsafe redirect even if an error gets thrown
+                        window.location.href = "https://socialphix.com/success.html";
+                    });
+                });
+            }
         });
     </script>
 </body>
