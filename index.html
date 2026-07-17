@@ -2,61 +2,76 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0QQKCJJEPB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0QQKCJJEPB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-0QQKCJJEPB');
+    </script>
 
-  gtag('config', 'G-0QQKCJJEPB');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Phix | Pharmacist-Formulated Liquid Confidence</title>
-    <meta name="description" content="Social Phix is a pharmacist-formulated 100ml liquid wellness shot designed to help you stay calm, focused, and confident in high-pressure moments.">
-    <meta name="keywords" content="Social Phix, liquid confidence, performance anxiety supplement, pharmacist formulated focus, motherwort, l-theanine">
+    <meta name="description" content="Social Phix is a 100ml pharmacist-formulated clinical matrix designed to ease nervous tension, quiet overthinking, and lock in alpha-state focus during high-pressure moments.">
+    <meta name="keywords" content="Social Phix, liquid confidence, performance focus supplement, pharmacist formulated focus, motherwort, l-theanine, biohack focus">
     
-    <!-- Comprehensive SEO, GEO & AEO Schema -->
+    <!-- Open Graph tags to force Google to recognize the Brand Name -->
+    <meta property="og:site_name" content="Social Phix">
+    <meta property="og:title" content="Social Phix">
+    <meta property="og:url" content="https://socialphix.com/">
+    <meta property="og:type" content="website">
+
+    <!-- Comprehensive SEO, GEO, AEO & Site Name Schema -->
     <script type="application/ld+json">
-    [{
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      "name": "Social Phix",
-      "image": "phix2.png",
-      "description": "Premium pharmacist-formulated 100ml liquid supplement matrix featuring L-Theanine, Caffeine, Motherwort, Uridine Monophosphate, and Acetyl L-Tyrosine.",
-      "sku": "SP-100ML",
-      "brand": {
-        "@type": "Brand",
-        "name": "Social Phix"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Social Phix",
+        "alternateName": "SocialPhix",
+        "url": "https://socialphix.com/"
       },
-      "offers": {
-        "@type": "Offer",
-        "url": "https://socialphix.com/#preorder",
-        "priceCurrency": "USD",
-        "price": "39.99",
-        "priceValidUntil": "2027-12-31",
-        "availability": "https://schema.org/PreOrder"
+      {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": "Social Phix",
+        "image": "phix2.png",
+        "description": "A precise, pharmacist-formulated 100ml liquid matrix featuring L-Theanine, Caffeine, Motherwort, Uridine Monophosphate, and Acetyl L-Tyrosine to ease physical tension.",
+        "sku": "SP-100ML",
+        "brand": {
+          "@type": "Brand",
+          "name": "Social Phix"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://socialphix.com/#preorder",
+          "priceCurrency": "USD",
+          "price": "39.99",
+          "priceValidUntil": "2027-12-31",
+          "availability": "https://schema.org/PreOrder"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+          "@type": "Question",
+          "name": "What is Social Phix?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Social Phix is a 100ml pharmacist-formulated functional wellness shot designed to support calm confidence, social ease, and mental clarity during high-pressure moments."
+          }
+        }, {
+          "@type": "Question",
+          "name": "What are the ingredients in Social Phix?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The clinical matrix includes pure L-theanine, micro-dosed caffeine, motherwort extract, uridine monophosphate, and acetyl L-tyrosine."
+          }
+        }]
       }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [{
-        "@type": "Question",
-        "name": "What is Social Phix?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Social Phix is a 100ml pharmacist-formulated functional wellness shot designed to support calm confidence, social ease, and mental clarity during high-pressure moments like interviews, presentations, and networking."
-        }
-      }, {
-        "@type": "Question",
-        "name": "What are the ingredients in Social Phix?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "The formulation includes L-theanine, caffeine, motherwort, uridine monophosphate, and acetyl L-tyrosine."
-        }
-      }]
-    }]
+    ]
     </script>
     
     <!-- Cloudflare Turnstile API -->
@@ -167,8 +182,8 @@
             <div class="font-heading text-2xl font-extrabold tracking-tight text-white">
                 SOCIAL<span class="text-accent-orange">PHIX</span>
             </div>
-            <div class="hidden sm:flex items-center space-x-8">
-                <a href="#formula" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">How It Works</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="science.html" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">How It Works</a>
                 <a href="#protocol" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">When To Use</a>
                 <a href="#story" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">Our Story</a>
                 <a href="#faq" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">FAQ</a>
@@ -196,23 +211,23 @@
             </h1>
             
             <p class="font-sans text-lg sm:text-xl font-normal text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed">
-                Confidence for the moments that matter. Meet the 100ml wellness shot that helps you ditch the jitters and lock in your focus when the stakes are highest.
+                High stakes require absolute control. When the pressure peaks, ordinary preparation isn't enough—you need a physiological advantage. Meet the 100ml formula engineered to promote a sense of calm and keep your execution flawless.
             </p>
             
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <a href="#preorder" class="w-full sm:w-auto px-10 py-4 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_0_20px_rgba(255,87,34,0.3)] transition-all duration-300">
                     Request Early Sample
                 </a>
-                <a href="#formula" class="w-full sm:w-auto px-10 py-4 border-2 border-slate-600 text-sm font-bold tracking-widest uppercase rounded-md text-white hover:border-accent-cyan hover:text-accent-cyan transition-all duration-300">
-                    See How It Works
+                <a href="science.html" class="w-full sm:w-auto px-10 py-4 border-2 border-slate-600 text-sm font-bold tracking-widest uppercase rounded-md text-white hover:border-accent-cyan hover:text-accent-cyan transition-all duration-300">
+                    See The Science
                 </a>
             </div>
         </div>
 
-        <div class="mt-20 w-full relative z-10 reveal delay-200 active">
+        <div class="mt-20 max-w-4xl mx-auto px-6 relative z-10 reveal delay-200 active">
             <img src="phix2.png" alt="Sleek premium 100ml Social Phix clinical container" 
-                 class="w-full h-auto shadow-[0_20px_50px_rgba(0,229,255,0.1)] border-y border-slate-800"
-                 onerror="this.onerror=null;this.src='https://placehold.co/1920x600/050B14/FFFFFF?text=Social+Phix+100ml+Shot'"
+                 class="w-full h-auto rounded-2xl shadow-[0_20px_50px_rgba(0,229,255,0.1)] border border-slate-800"
+                 onerror="this.onerror=null;this.src='https://placehold.co/1024x600/050B14/FFFFFF?text=Social+Phix+100ml+Shot'"
             >
         </div>
     </header>
@@ -221,120 +236,127 @@
     <section id="formula" class="py-32 bg-brand-surface relative border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center max-w-3xl mx-auto mb-20 reveal">
-                <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">The Science of Calm</h2>
+                <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">The Clinical Advantage</h2>
                 <p class="text-slate-300 font-normal leading-relaxed">
-                    Five powerhouse ingredients perfectly balanced to calm your nerves without slowing down your mind. Zero jitters. Zero crash. Pure clarity.
+                    This isn't some gas-station energy shot or a sleepy herbal tea. It's a precise, 5-compound matrix designed to completely decouple physical tension from cognitive execution. Zero jitters. Zero crash. Pure clarity.
                 </p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
                 
-                <!-- Full-Width Hero Ingredient -->
                 <div class="bg-brand-card p-10 border border-slate-700 rounded-xl hover-lift reveal delay-100 md:col-span-2 text-center flex flex-col items-center">
-                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Smooth Operator</span>
+                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Alpha Hacker</span>
                     <h3 class="font-heading text-3xl font-bold text-white mb-4">Pure L-Theanine</h3>
-                    <p class="text-slate-400 text-sm md:text-base leading-relaxed max-w-2xl">Promotes a beautifully relaxed and alert state of mind by tuning out the mental noise and overthinking, forming the core anchor of our clinical matrix.</p>
+                    <p class="text-slate-400 text-sm md:text-base leading-relaxed max-w-2xl">It supports your brain's transition into a relaxed, alpha-wave state, tuning out the mental noise and overthinking so you can actually perform. This is the core anchor of the matrix.</p>
                 </div>
 
-                <!-- 2x2 Ingredient Grid -->
                 <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
-                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Chill Factor</span>
+                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Autonomic Stabilizer</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Motherwort Extract</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Helps steady your racing heart, keeping you physically calm so your mind can confidently take the lead.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">It supports a steady, calm resting heart rate, effectively intercepting the stress feedback loop before it even has a chance to take hold.</p>
                 </div>
 
                 <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200">
-                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Focus Fuel</span>
+                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Dopamine Drip</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Acetyl L-Tyrosine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Quickly replenishes your brain's natural focus chemicals, helping you think fast and stay sharp under pressure.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">High situational stress depletes your neurotransmitters. ALT crosses the blood-brain barrier efficiently to replenish them, keeping you sharp, witty, and engaged.</p>
                 </div>
 
                 <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
-                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Memory Match</span>
+                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Word-Recall Engine</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Uridine Monophosphate</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Supports brain health and word recall, ensuring you never lose your train of thought mid-sentence again.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">It supports synaptic processing speed so you can maintain a fluid train of thought and navigate complex conversations seamlessly.</p>
                 </div>
 
                 <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200">
-                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Spark</span>
+                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Catalyst</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Micro-Dosed Caffeine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Just enough clean energy to keep you engaged, perfectly balanced by L-Theanine to prevent any of the usual jitters.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">Just enough clean kinetic energy to ignite the matrix and keep you engaged, precisely buffered by L-Theanine to ensure you stay smooth and steady.</p>
                 </div>
 
+            </div>
+
+            <!-- Link to the Science Page -->
+            <div class="text-center reveal">
+                <a href="science.html" class="inline-flex items-center gap-2 text-accent-cyan hover:text-white font-bold text-sm tracking-widest uppercase transition-colors">
+                    Read The Full Clinical Breakdown 
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Operational Protocols -->
+    <!-- Operational Protocols (Now Linked to Specific Pages) -->
     <section id="protocol" class="py-32 bg-brand-bg relative border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-6">
-            <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white text-center mb-20 tracking-tight reveal">When To Drink Social Phix</h2>
+            <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white text-center mb-20 tracking-tight reveal">When To Deploy The Phix</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto">
                 
-                <!-- 01 Interviews -->
-                <div class="group reveal delay-100">
+                <!-- 01 Interviews (Linked) -->
+                <a href="interview-prep.html" class="block group reveal delay-100 p-6 rounded-2xl hover:bg-brand-surface border border-transparent hover:border-slate-700 transition-all duration-300">
                     <div class="w-48 sm:w-56 mx-auto overflow-hidden rounded-xl mb-6 relative border border-slate-700">
                         <div class="absolute inset-0 bg-brand-bg/40 group-hover:bg-transparent transition duration-500 z-10 pointer-events-none"></div>
                         <img src="interview.png" alt="Executive Interview Preparation" 
                              class="w-full aspect-[4/5] object-cover object-center transform group-hover:scale-105 transition duration-700 filter grayscale group-hover:grayscale-0"
-                             onerror="this.onerror=null;this.src='https://placehold.co/800x1000/112240/FFFFFF?text=Interviews'"
-                        >
+                             onerror="this.onerror=null;this.src='https://placehold.co/800x1000/112240/FFFFFF?text=Interviews'">
                     </div>
                     <div class="flex items-center gap-3 mb-2">
                         <span class="bg-accent-orange text-white text-xs font-bold px-2 py-1 rounded">01</span>
-                        <h3 class="font-heading text-2xl font-bold text-white">Interviews</h3>
+                        <h3 class="font-heading text-2xl font-bold text-white group-hover:text-accent-cyan transition-colors">Interviews</h3>
                     </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Drink 30 minutes before you walk in. Steady your nerves, speak with natural authority, and answer every question with ease.</p>
-                </div>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4">Drink 30 minutes prior. Walk in, own the room, and answer every question with ease.</p>
 
-                <!-- 02 Presentations -->
-                <div class="group reveal delay-200">
+                    <span class="text-accent-cyan text-xs font-bold uppercase tracking-widest flex items-center gap-1">View Protocol <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </a>
+
+                <!-- 02 Presentations (Linked) -->
+                <a href="presentation-anxiety.html" class="block group reveal delay-200 p-6 rounded-2xl hover:bg-brand-surface border border-transparent hover:border-slate-700 transition-all duration-300">
                     <div class="w-48 sm:w-56 mx-auto overflow-hidden rounded-xl mb-6 relative border border-slate-700">
                         <div class="absolute inset-0 bg-brand-bg/40 group-hover:bg-transparent transition duration-500 z-10 pointer-events-none"></div>
                         <img src="presentation.png" alt="Boardroom Presentations" 
                              class="w-full aspect-[4/5] object-cover object-center transform group-hover:scale-105 transition duration-700 filter grayscale group-hover:grayscale-0"
-                             onerror="this.onerror=null;this.src='https://placehold.co/800x1000/112240/FFFFFF?text=Presentations'"
-                        >
+                             onerror="this.onerror=null;this.src='https://placehold.co/800x1000/112240/FFFFFF?text=Presentations'">
                     </div>
                     <div class="flex items-center gap-3 mb-2">
                         <span class="bg-accent-orange text-white text-xs font-bold px-2 py-1 rounded">02</span>
-                        <h3 class="font-heading text-2xl font-bold text-white">Presentations</h3>
+                        <h3 class="font-heading text-2xl font-bold text-white group-hover:text-accent-cyan transition-colors">Presentations</h3>
                     </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Step up to the mic with total confidence. Keep your pacing smooth, your mind clear, and your audience absolutely captivated.</p>
-                </div>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4">Step up to the mic with total confidence. Keep your pacing smooth, your mind clear, and your audience absolutely captivated.</p>
+                    <span class="text-accent-cyan text-xs font-bold uppercase tracking-widest flex items-center gap-1">View Protocol <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </a>
 
-                <!-- 03 Networking -->
-                <div class="group reveal delay-100">
+                <!-- 03 Networking (Linked) -->
+                <a href="networking-confidence.html" class="block group reveal delay-100 p-6 rounded-2xl hover:bg-brand-surface border border-transparent hover:border-slate-700 transition-all duration-300">
                     <div class="w-48 sm:w-56 mx-auto overflow-hidden rounded-xl mb-6 relative border border-slate-700">
                         <div class="absolute inset-0 bg-brand-bg/40 group-hover:bg-transparent transition duration-500 z-10 pointer-events-none"></div>
                         <img src="networking.png" alt="Industry Networking" 
                              class="w-full aspect-[4/5] object-cover object-center transform group-hover:scale-105 transition duration-700 filter grayscale group-hover:grayscale-0"
-                             onerror="this.onerror=null;this.src='https://placehold.co/800x1000/112240/FFFFFF?text=Networking'"
-                        >
+                             onerror="this.onerror=null;this.src='https://placehold.co/800x1000/112240/FFFFFF?text=Networking'">
                     </div>
                     <div class="flex items-center gap-3 mb-2">
                         <span class="bg-accent-orange text-white text-xs font-bold px-2 py-1 rounded">03</span>
-                        <h3 class="font-heading text-2xl font-bold text-white">Networking</h3>
+                        <h3 class="font-heading text-2xl font-bold text-white group-hover:text-accent-cyan transition-colors">Networking</h3>
                     </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Work the room without the awkwardness. Stay relaxed, engaged, and ready to make genuine, memorable connections.</p>
-                </div>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4">Navigate crowded rooms with total social ease. Stay relaxed, verbally fluid, and genuinely command the conversation.</p>
+                    <span class="text-accent-cyan text-xs font-bold uppercase tracking-widest flex items-center gap-1">View Protocol <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </a>
 
-                <!-- 04 Dates -->
-                <div class="group reveal delay-200">
+                <!-- 04 Dates (Linked) -->
+                <a href="first-date-nerves.html" class="block group reveal delay-200 p-6 rounded-2xl hover:bg-brand-surface border border-transparent hover:border-slate-700 transition-all duration-300">
                     <div class="w-48 sm:w-56 mx-auto overflow-hidden rounded-xl mb-6 relative border border-slate-700">
                         <div class="absolute inset-0 bg-brand-bg/40 group-hover:bg-transparent transition duration-500 z-10 pointer-events-none"></div>
                         <img src="dates.png" alt="High Stakes Dates" 
                              class="w-full aspect-[4/5] object-cover object-center transform group-hover:scale-105 transition duration-700 filter grayscale group-hover:grayscale-0"
-                             onerror="this.onerror=null;this.src='https://placehold.co/800x1000/112240/FFFFFF?text=Dates'"
-                        >
+                             onerror="this.onerror=null;this.src='https://placehold.co/800x1000/112240/FFFFFF?text=Dates'">
                     </div>
                     <div class="flex items-center gap-3 mb-2">
                         <span class="bg-accent-orange text-white text-xs font-bold px-2 py-1 rounded">04</span>
-                        <h3 class="font-heading text-2xl font-bold text-white">Dates</h3>
+                        <h3 class="font-heading text-2xl font-bold text-white group-hover:text-accent-cyan transition-colors">Dates</h3>
                     </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Ditch the first-date overthinking. Be your true, charismatic self and actually enjoy the evening from the first sip.</p>
-                </div>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4">Ease the first-date overthinking. Quiet the background noise in your head and just be your actual, charismatic self.</p>
+                    <span class="text-accent-cyan text-xs font-bold uppercase tracking-widest flex items-center gap-1">View Protocol <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </a>
 
             </div>
         </div>
@@ -345,18 +367,18 @@
         <div class="max-w-4xl mx-auto px-6 reveal">
             <div class="border-l-4 border-accent-orange pl-6 mb-10">
                 <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan uppercase mb-3 block">The Origin</span>
-                <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white tracking-tight">Formulated by Pharmacists.<br/><span class="text-accent-orange">Built for Real Life.</span></h2>
+                <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white tracking-tight">Formulated by Pharmacists.<br/><span class="text-accent-orange">Built for the Real World.</span></h2>
             </div>
             
             <div class="space-y-6 text-slate-300 text-sm sm:text-base font-normal leading-relaxed pl-7 border-l border-slate-700/50">
                 <p>
-                    The supplement aisle is full of flashy marketing and empty promises. As professional pharmacists, we saw a real need for a trusted, science-backed solution to help people navigate high-stakes moments without relying on generic energy drinks or drowsy relaxants.
+                    The supplement industry is largely a joke—full of pixie-dusted ingredients and flashy labels that do absolutely nothing when the pressure is actually on. As professional pharmacists, we couldn't find a single product that legitimately eased the physical signs of nervous tension while enhancing mental sharpness.
                 </p>
                 <p>
-                    Social Phix wasn't just thrown together. Every ingredient in our formula was hand-picked not just for what it does alone, but for how it works with the others to naturally calm your body and sharpen your mind. 
+                    So, we built it ourselves. Social Phix is the result of obsessive clinical tweaking. Every single compound in this matrix was selected for how it biochemically interacts with the others.
                 </p>
                 <p>
-                    It’s a precise, highly effective tool designed with real clinical expertise—so you can confidently step into any room feeling totally in control.
+                    It’s a precise, heavy-hitting tool designed to give you an uncompromising edge when you need it most.
                 </p>
             </div>
         </div>
@@ -369,11 +391,11 @@
             <div class="space-y-6">
                 <article class="bg-brand-card p-6 rounded-lg border border-slate-700">
                     <h3 class="font-bold text-lg text-white mb-2">What exactly is Social Phix?</h3>
-                    <p class="text-slate-300 text-sm leading-relaxed">Social Phix is a 100ml functional wellness shot crafted by pharmacists. It comes in a convenient, travel-friendly format and is formulated to ease physical nervousness while boosting your mental clarity.</p>
+                    <p class="text-slate-300 text-sm leading-relaxed">Social Phix is a 100ml functional wellness shot crafted by pharmacists. It comes in a convenient, travel-friendly format and is formulated to support a calm physical state while aggressively enhancing your mental clarity.</p>
                 </article>
                 <article class="bg-brand-card p-6 rounded-lg border border-slate-700">
                     <h3 class="font-bold text-lg text-white mb-2">Will this make me feel tired or drowsy?</h3>
-                    <p class="text-slate-300 text-sm leading-relaxed">Not at all! Instead of using traditional relaxants that make you sleepy, we pair L-Theanine with a micro-dose of caffeine. This combo promotes "alpha brain waves," leaving you feeling completely calm, yet alert and ready to perform.</p>
+                    <p class="text-slate-300 text-sm leading-relaxed">Not a chance. Instead of using traditional relaxants that make you sleepy, we pair L-Theanine with a precise micro-dose of caffeine. This combo promotes your brain's "alpha state," leaving you feeling completely composed, yet highly alert and ready to execute.</p>
                 </article>
             </div>
         </div>
@@ -384,12 +406,11 @@
         <div class="absolute w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[120px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
         
         <div class="max-w-xl mx-auto px-6 text-center relative z-10 reveal">
-            <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">Request A Sample</h2>
+            <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">Secure Your Advantage</h2>
             <p class="text-slate-300 font-normal mb-10 leading-relaxed">
-                Spots for our pre-launch sample run are extremely limited. Join our email list below for a chance to receive a sample and be among the first to experience pure calm and perfect focus.
+                Spots for our pre-launch sample run are extremely limited. Join our email list below for a chance to receive a sample and be among the first to experience true clarity under pressure.
             </p>
 
-            <!-- Loops Form Integration -->
             <form id="loops-form" action="https://app.loops.so/api/newsletter-form/cmrjkzmpw010r0iz4qp4xrssn" method="POST" class="space-y-5 bg-brand-card p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left">
                 <div>
                     <label for="email" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Email</label>
@@ -408,23 +429,60 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-brand-bg py-16 text-center">
-        <div class="font-heading text-2xl font-extrabold tracking-tight text-white mb-8 opacity-80">
-            SOCIAL<span class="text-accent-orange">PHIX</span>
+    <!-- The SEO "Fat Footer" Expansion -->
+    <footer class="bg-brand-bg py-20 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-12">
+            
+            <!-- Brand & Disclaimer -->
+            <div class="col-span-1 md:col-span-5">
+                <div class="font-heading text-2xl font-extrabold tracking-tight text-white mb-6">
+                    SOCIAL<span class="text-accent-orange">PHIX</span>
+                </div>
+                <p class="text-xs text-slate-500 font-normal leading-relaxed mb-6 max-w-sm">
+                    Disclaimer: These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease. Always consult your healthcare professional before beginning any new supplement protocol.
+                </p>
+                <p class="text-[10px] font-bold tracking-widest uppercase text-slate-600">
+                    &copy; 2026 Social Phix. All Rights Reserved.
+                </p>
+            </div>
+
+            <!-- SEO Hub: The Science -->
+            <div class="col-span-1 md:col-span-2 md:col-start-7">
+                <h4 class="text-white font-bold text-xs tracking-widest uppercase mb-6">Clinical Science</h4>
+                <ul class="space-y-4">
+                    <li><a href="science.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">The Matrix Deep Dive</a></li>
+                    <li><a href="science.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">L-Theanine Alpha States</a></li>
+                    <li><a href="science.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">ALT & Dopamine</a></li>
+                    <li><a href="science.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">Motherwort Autonomics</a></li>
+                </ul>
+            </div>
+
+            <!-- SEO Hub: Protocols -->
+            <div class="col-span-1 md:col-span-2">
+                <h4 class="text-white font-bold text-xs tracking-widest uppercase mb-6">Deployment</h4>
+                <ul class="space-y-4">
+                    <li><a href="presentation-anxiety.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">Boardroom Presentations</a></li>
+                    <li><a href="interview-prep.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">High-Stakes Interviews</a></li>
+                    <li><a href="networking-confidence.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">Industry Networking</a></li>
+                    <li><a href="first-date-nerves.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">First Date Nerves</a></li>
+                </ul>
+            </div>
+
+            <!-- SEO Hub: Resources -->
+            <div class="col-span-1 md:col-span-2">
+                <h4 class="text-white font-bold text-xs tracking-widest uppercase mb-6">Resources</h4>
+                <ul class="space-y-4">
+                    <li><a href="#faq" class="text-sm text-slate-400 hover:text-accent-cyan transition">Support & FAQ</a></li>
+                    <li><a href="#preorder" class="text-sm text-slate-400 hover:text-accent-cyan transition">Request Sample</a></li>
+                </ul>
+            </div>
+
         </div>
-        <p class="text-xs text-slate-500 max-w-3xl mx-auto px-6 font-normal leading-loose">
-            Disclaimer: These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease. Always consult your healthcare professional before beginning any new supplement protocol.
-        </p>
-        <p class="text-[10px] font-bold tracking-widest uppercase text-slate-600 mt-10">
-            &copy; 2026 Social Phix. All Rights Reserved.
-        </p>
     </footer>
 
     <!-- Intersection Observer & Form Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Scroll Reveal Animation
             const reveals = document.querySelectorAll('.reveal');
             const revealOnScroll = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
@@ -438,20 +496,17 @@
             });
             reveals.forEach(reveal => revealOnScroll.observe(reveal));
 
-            // Form Submit Intercept
             const loopsForm = document.getElementById('loops-form');
             if (loopsForm) {
                 loopsForm.addEventListener('submit', function(event) {
-                    event.preventDefault(); // Stop standard HTML redirect temporarily
+                    event.preventDefault(); 
                     
                     const form = event.target;
                     const submitBtn = form.querySelector('button[type="submit"]');
                     
-                    // Visual feedback
                     submitBtn.innerText = "Requesting...";
                     submitBtn.disabled = true;
 
-                    // Encode data so Loops API accepts it properly via fetch
                     const formData = new FormData(form);
                     const encodedData = new URLSearchParams(formData).toString();
 
@@ -466,13 +521,11 @@
                         if (response.ok) {
                             window.location.href = "https://socialphix.com/success.html";
                         } else {
-                            // If Loops rejects the fetch request, fallback to native HTML submission
                             form.submit();
                         }
                     })
                     .catch((error) => {
                         console.error("Submission Error:", error);
-                        // Fallback to native HTML submission if blocked by browser rules
                         form.submit();
                     });
                 });
