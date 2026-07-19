@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- Brand Surface Background -->
+  <rect width="48" height="48" rx="10" fill="#050B14" />
+  
+  <!-- Electric Cyan Frame -->
+  <rect x="2" y="2" width="44" height="44" rx="8" fill="none" stroke="#00E5FF" stroke-width="2" />
+  
+  <!-- The 'P' Monogram -->
+  <path d="M14 12 H26 C32 12, 32 24, 26 24 H14 V36" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- The 'Rx' Integrated Symbol -->
+  <path d="M28 28 L 36 36 M28 36 L 32 32" stroke="#FF5722" stroke-width="4" stroke-linecap="round" />
+</svg>
