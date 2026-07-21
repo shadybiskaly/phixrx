@@ -403,7 +403,7 @@
         </div>
     </section>
 
-    <!-- Loops Request Engine -->
+<!-- Loops Request Engine -->
     <section id="preorder" class="py-32 bg-brand-surface relative overflow-hidden cyan-glow-bottom">
         <div class="absolute w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[120px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
         
@@ -414,6 +414,50 @@
             </p>
 
             <form id="loops-form" action="https://app.loops.so/api/newsletter-form/cmrjkzmpw010r0iz4qp4xrssn" method="POST" class="space-y-5 bg-brand-card p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left">
+                
+                <!-- Poll Field 1: User Profile -->
+                <div>
+                    <label for="userGroup" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">I am a...</label>
+                    <div class="relative">
+                        <select id="userGroup" name="userGroup" required 
+                                class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 appearance-none cursor-pointer">
+                            <option value="" disabled selected>Select your profile</option>
+                            <option value="Founder">Founders</option>
+                            <option value="Sales Professional">Sales Professionals</option>
+                            <option value="Creator">Creators</option>
+                            <option value="Public Speaker">Public Speakers</option>
+                            <option value="Executive">Executives</option>
+                            <option value="Student">Students</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Poll Field 2: Use Case -->
+                <div>
+                    <label for="useCase" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Use Case</label>
+                    <div class="relative">
+                        <select id="useCase" name="useCase" required 
+                                class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 appearance-none cursor-pointer">
+                            <option value="" disabled selected>Why do you need the matrix?</option>
+                            <option value="Networking">Networking</option>
+                            <option value="Dates">Dates</option>
+                            <option value="Social Events">Social Events</option>
+                            <option value="Presentations">Presentations</option>
+                            <option value="Speeches">Speeches</option>
+                            <option value="Job Interviews">Job Interviews</option>
+                            <option value="Performances">Performances</option>
+                            <option value="Competitions">Competitions</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Original Email Field -->
                 <div>
                     <label for="email" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Email</label>
                     <input type="email" id="email" name="email" placeholder="name@domain.com" required 
@@ -444,7 +488,7 @@
                     Disclaimer: These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease. Always consult your healthcare professional before beginning any new supplement protocol.
                 </p>
                 <p class="text-[10px] font-bold tracking-widest uppercase text-slate-600">
-                    &copy; 2026 Social Phix. All Rights Reserved.
+                    &copy; 2026 PhixRx. All Rights Reserved.
                 </p>
             </div>
 
