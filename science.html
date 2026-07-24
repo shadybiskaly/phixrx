@@ -31,9 +31,44 @@
       "headline": "The Clinical Matrix: Science Behind Social Phix",
       "description": "A pharmacist-formulated 5-compound matrix featuring L-Theanine, Motherwort, Acetyl L-Tyrosine, Uridine Monophosphate, and micro-dosed caffeine, designed to help support calm focus under pressure.",
       "image": "https://www.socialphix.com/phix2.png",
-      "author": { "@type": "Organization", "name": "PhixRx" },
+      "author": {
+        "@type": "Person",
+        "name": "Shady Biskaly",
+        "honorificSuffix": "R.Ph., BScPharm",
+        "jobTitle": "Founder & Chief Formulator",
+        "url": "https://www.socialphix.com/about.html",
+        "hasCredential": [
+          {
+            "@type": "EducationalOccupationalCredential",
+            "credentialCategory": "professional license",
+            "name": "Registered Pharmacist (R.Ph.)",
+            "recognizedBy": { "@type": "Organization", "name": "Ontario College of Pharmacists" }
+          },
+          {
+            "@type": "EducationalOccupationalCredential",
+            "credentialCategory": "degree",
+            "name": "Bachelor of Science in Pharmacy (BScPharm)"
+          }
+        ]
+      },
+      "reviewedBy": {
+        "@type": "Person",
+        "name": "Shady Biskaly",
+        "honorificSuffix": "R.Ph., BScPharm",
+        "url": "https://www.socialphix.com/about.html"
+      },
       "publisher": { "@type": "Organization", "name": "Social Phix", "logo": { "@type": "ImageObject", "url": "https://www.socialphix.com/phix2.png" } },
-      "mainEntityOfPage": "https://www.socialphix.com/science.html"
+      "mainEntityOfPage": "https://www.socialphix.com/science.html",
+      "citation": [
+        { "@type": "ScholarlyArticle", "name": "L-theanine, a natural constituent in tea, and its effect on mental state", "author": "Nobre AC, Rao A, Owen GN", "datePublished": "2008", "url": "https://pubmed.ncbi.nlm.nih.gov/18296328/" },
+        { "@type": "ScholarlyArticle", "name": "Effects of Tea or L-Theanine plus Caffeine on Cognition, Sleep, and Mood in Healthy Participants: A Systematic Review and Meta-Analysis of Randomized Controlled Trials", "datePublished": "2025", "url": "https://academic.oup.com/nutritionreviews/article/83/10/1873/8123998" },
+        { "@type": "ScholarlyArticle", "name": "Leonurus cardiaca L. (motherwort): a review of its phytochemistry and pharmacology", "author": "Wojtyniak K, Szymanski M, Matlawska I", "datePublished": "2013", "url": "https://pubmed.ncbi.nlm.nih.gov/23042598/" },
+        { "@type": "ScholarlyArticle", "name": "Effect of Leonurus cardiaca oil extract in patients with arterial hypertension accompanied by anxiety and sleep disorders", "author": "Shikov AN et al.", "datePublished": "2011", "url": "https://pubmed.ncbi.nlm.nih.gov/20839214/" },
+        { "@type": "ScholarlyArticle", "name": "Effect of tyrosine supplementation on clinical and healthy populations under stress or cognitive demands: a review", "author": "Jongkees BJ, Hommel B, Kuhn S, Colzato LS", "datePublished": "2015", "url": "https://www.sciencedirect.com/science/article/abs/pii/S0022395615002472" },
+        { "@type": "ScholarlyArticle", "name": "Behavioral and cognitive effects of tyrosine intake in healthy human adults", "author": "Hase A, Jung SE, aan het Rot M", "datePublished": "2015", "url": "https://pubmed.ncbi.nlm.nih.gov/25797188/" },
+        { "@type": "ScholarlyArticle", "name": "Dietary uridine-5'-monophosphate supplementation increases potassium-evoked dopamine release and promotes neurite outgrowth in aged rats", "author": "Wang L, Pooler AM, Albrecht MA, Wurtman RJ", "datePublished": "2005", "url": "https://pubmed.ncbi.nlm.nih.gov/16055952/" },
+        { "@type": "ScholarlyArticle", "name": "Short-term administration of uridine increases brain membrane phospholipid precursors in healthy adults", "author": "Silveri MM et al.", "datePublished": "2011", "url": "https://pubmed.ncbi.nlm.nih.gov/21176029/" }
+      ]
     }
     </script>
 
@@ -60,6 +95,12 @@
         .bg-grid { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; top: 0; left: 0; z-index: 0; pointer-events: none; }
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
+        sup.cite a { color: #00E5FF; text-decoration: none; font-weight: 600; padding: 0 2px; }
+        sup.cite a:hover { text-decoration: underline; }
+        .references-list { counter-reset: ref; }
+        .references-list li { color: #94a3b8; font-size: 0.8rem; line-height: 1.6; margin-bottom: 0.75rem; }
+        .references-list li a { color: #00E5FF; text-decoration: none; word-break: break-all; }
+        .references-list li a:hover { text-decoration: underline; }
     </style>
 </head>
 <body class="antialiased font-sans">
@@ -108,10 +149,10 @@
         <div class="reveal">
             <h2 class="font-heading text-3xl font-bold text-white mb-4">Pure L-Theanine: The Alpha Hacker</h2>
             <p class="text-slate-300 leading-relaxed mb-6">
-                When you step into a boardroom or a high-stakes interview, your brain activity naturally becomes busier. Beta wave activity rises, which can bring mental friction and overthinking. L-Theanine is an amino acid that crosses the blood-brain barrier and has been studied for its role in supporting alpha brain wave activity — the frequency associated with relaxed, effortless alertness.
+                When you step into a boardroom or a high-stakes interview, your brain activity naturally becomes busier. Beta wave activity rises, which can bring mental friction and overthinking. L-Theanine is an amino acid that crosses the blood-brain barrier and has been studied for its role in supporting alpha brain wave activity — the frequency associated with relaxed, effortless alertness.<sup class="cite"><a href="#ref-1">[1]</a></sup>
             </p>
             <p class="text-slate-300 leading-relaxed mb-6">
-                By interacting with glutamate pathways, it's included in the formula to help quiet the background noise in your head, so you can process complex variables with more composure.
+                By interacting with glutamate pathways, it's included in the formula to help quiet the background noise in your head, so you can process complex variables with more composure. A 2025 systematic review of 50 randomized controlled trials found that L-theanine, combined with caffeine, was associated with small-to-moderate improvements in attentional task performance and mood outcomes in healthy adults.<sup class="cite"><a href="#ref-2">[2]</a></sup>
             </p>
         </div>
 
@@ -121,7 +162,7 @@
                 Confidence isn't just in your head; it's in your chest. When adrenaline rises, your heart rate accelerates. Your brain registers that physical signal and can interpret it as danger — a feedback loop that keeps the tension going.
             </p>
             <p class="text-slate-300 leading-relaxed mb-6">
-                Motherwort (<em>Leonurus cardiaca</em>) is a botanical traditionally used to help support cardiovascular calm. It's included here to help support a steady, calm resting heart rate, so the physical feedback loop is easier to interrupt. When your body feels calm, your mind can stay clear.
+                Motherwort (<em>Leonurus cardiaca</em>) is a botanical traditionally used to help support cardiovascular calm. It's included here to help support a steady, calm resting heart rate, so the physical feedback loop is easier to interrupt. A 2011 pharmacology review confirmed motherwort's traditionally reported sedative and mild hypotensive activity in clinical trials.<sup class="cite"><a href="#ref-3">[3]</a></sup> In an open clinical trial of 50 patients with stage 1–2 hypertension accompanied by anxiety and sleep issues, a motherwort oil extract taken over 28 days was associated with positive effects on psycho-emotional status and blood pressure.<sup class="cite"><a href="#ref-4">[4]</a></sup> When your body feels calm, your mind can stay clear.
             </p>
         </div>
 
@@ -131,17 +172,17 @@
                 Acute stress can rapidly draw down your brain's catecholamine reserves (dopamine, epinephrine, and norepinephrine). When these dip, your drive, wit, and verbal fluidity can drop with them. You go blank.
             </p>
             <p class="text-slate-300 leading-relaxed mb-6">
-                Acetyl L-Tyrosine (ALT) is a highly bioavailable amino acid precursor to these specific neurotransmitters. It's included in the formula to help support catecholamine availability under load, so your cognitive tank feels fuller when you're actively processing pressure.
+                Acetyl L-Tyrosine (ALT) is a highly bioavailable amino acid precursor to these specific neurotransmitters. It's included in the formula to help support catecholamine availability under load, so your cognitive tank feels fuller when you're actively processing pressure. A 2015 review of the cognitive effects of tyrosine concluded that it "does seem to effectively enhance cognitive performance, particularly in short-term stressful and/or cognitively demanding situations," though the effect depends on active depletion of dopamine and norepinephrine.<sup class="cite"><a href="#ref-5">[5]</a></sup> A separate 2015 systematic review found that tyrosine loading acutely counteracts working-memory and information-processing declines caused by demanding conditions such as cognitive load or environmental stress.<sup class="cite"><a href="#ref-6">[6]</a></sup>
             </p>
         </div>
 
         <div class="reveal">
             <h2 class="font-heading text-3xl font-bold text-white mb-4">Uridine Monophosphate: The Word-Recall Engine</h2>
             <p class="text-slate-300 leading-relaxed mb-6">
-                Have you ever rehearsed a speech perfectly, only to lose your train of thought on stage? That's a hiccup in synaptic data retrieval. Uridine Monophosphate is a nucleotide involved in RNA synthesis and synaptic plasticity.
+                Have you ever rehearsed a speech perfectly, only to lose your train of thought on stage? That's a hiccup in synaptic data retrieval. Uridine Monophosphate is a nucleotide involved in RNA synthesis and synaptic plasticity — it's a precursor to CDP-choline, which is required for phosphatidylcholine synthesis in neuronal membranes.<sup class="cite"><a href="#ref-7">[7]</a></sup>
             </p>
             <p class="text-slate-300 leading-relaxed mb-6">
-                In the Social Phix formula, it's included to help support verbal recall and neural bandwidth, so your vocabulary rolls off the tongue more fluidly.
+                In the Social Phix formula, it's included to help support verbal recall and neural bandwidth. In a 2011 phosphorus-MRS study, seven days of oral uridine in healthy adults measurably increased brain membrane phospholipid precursors, suggesting a role in supporting membrane-level neuronal function.<sup class="cite"><a href="#ref-8">[8]</a></sup>
             </p>
         </div>
 
@@ -150,6 +191,56 @@
             <p class="text-slate-300 leading-relaxed mb-6">
                 We aren't trying to over-stimulate you. We're trying to spark the engine. A highly controlled micro-dose of caffeine is included for the kinetic energy needed for active engagement. Because it's suspended alongside a substantial dose of L-Theanine, the jagged, jittery feeling caffeine can bring on its own is largely smoothed out, leaving cleaner, sharper engagement.
             </p>
+        </div>
+
+        <div class="reveal pt-12 border-t border-slate-800" id="references">
+            <h2 class="font-heading text-2xl font-bold text-white mb-2">References</h2>
+            <p class="text-xs text-slate-500 leading-relaxed mb-6 italic">The studies cited below are provided for scientific context regarding individual ingredients. They do not constitute claims about Social Phix as a finished product, and Social Phix has not been evaluated by the FDA.</p>
+
+            <!-- Author Byline (E-E-A-T signal) -->
+            <div class="bg-brand-card p-5 rounded-lg border border-slate-700 mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="flex-shrink-0 w-14 h-14 rounded-full bg-brand-bg border border-accent-cyan/40 flex items-center justify-center font-heading font-extrabold text-accent-orange text-xl">SB</div>
+                <div class="flex-1">
+                    <p class="text-xs text-slate-500 uppercase tracking-widest mb-1 font-semibold">Formulated & Reviewed By</p>
+                    <p class="text-white font-bold">Shady Biskaly, R.Ph., BScPharm</p>
+                    <p class="text-xs text-slate-400">Licensed Pharmacist, Ontario, Canada · A decade+ in clinical practice · <a href="about.html" class="text-accent-cyan hover:underline">Full bio</a></p>
+                </div>
+            </div>
+
+            <ol class="references-list list-decimal list-inside space-y-3">
+                <li id="ref-1">
+                    Nobre AC, Rao A, Owen GN. L-theanine, a natural constituent in tea, and its effect on mental state. <em>Asia Pac J Clin Nutr.</em> 2008;17 Suppl 1:167–8.
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/18296328/" target="_blank" rel="noopener noreferrer">https://pubmed.ncbi.nlm.nih.gov/18296328/</a>
+                </li>
+                <li id="ref-2">
+                    Baba Y, Inagaki S, Nakagawa S, et al. Effects of Tea (<em>Camellia sinensis</em>) or its Bioactive Compounds L-Theanine or L-Theanine plus Caffeine on Cognition, Sleep, and Mood in Healthy Participants: A Systematic Review and Meta-Analysis of Randomized Controlled Trials. <em>Nutr Rev.</em> 2025;83(10):1873–1897.
+                    <a href="https://academic.oup.com/nutritionreviews/article/83/10/1873/8123998" target="_blank" rel="noopener noreferrer">https://academic.oup.com/nutritionreviews/article/83/10/1873/8123998</a>
+                </li>
+                <li id="ref-3">
+                    Wojtyniak K, Szymański M, Matławska I. <em>Leonurus cardiaca</em> L. (motherwort): a review of its phytochemistry and pharmacology. <em>Phytother Res.</em> 2013;27(8):1115–20.
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/23042598/" target="_blank" rel="noopener noreferrer">https://pubmed.ncbi.nlm.nih.gov/23042598/</a>
+                </li>
+                <li id="ref-4">
+                    Shikov AN, Pozharitskaya ON, Makarov VG, et al. Effect of <em>Leonurus cardiaca</em> oil extract in patients with arterial hypertension accompanied by anxiety and sleep disorders. <em>Phytother Res.</em> 2011;25(4):540–3.
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/20839214/" target="_blank" rel="noopener noreferrer">https://pubmed.ncbi.nlm.nih.gov/20839214/</a>
+                </li>
+                <li id="ref-5">
+                    Jongkees BJ, Hommel B, Kühn S, Colzato LS. Effect of tyrosine supplementation on clinical and healthy populations under stress or cognitive demands — a review. <em>J Psychiatr Res.</em> 2015;70:50–7.
+                    <a href="https://www.sciencedirect.com/science/article/abs/pii/S0022395615002472" target="_blank" rel="noopener noreferrer">https://www.sciencedirect.com/science/article/abs/pii/S0022395615002472</a>
+                </li>
+                <li id="ref-6">
+                    Hase A, Jung SE, aan het Rot M. Behavioral and cognitive effects of tyrosine intake in healthy human adults. <em>Pharmacol Biochem Behav.</em> 2015;133:1–6.
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/25797188/" target="_blank" rel="noopener noreferrer">https://pubmed.ncbi.nlm.nih.gov/25797188/</a>
+                </li>
+                <li id="ref-7">
+                    Wang L, Pooler AM, Albrecht MA, Wurtman RJ. Dietary uridine-5′-monophosphate supplementation increases potassium-evoked dopamine release and promotes neurite outgrowth in aged rats. <em>J Mol Neurosci.</em> 2005;27(1):137–45.
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/16055952/" target="_blank" rel="noopener noreferrer">https://pubmed.ncbi.nlm.nih.gov/16055952/</a>
+                </li>
+                <li id="ref-8">
+                    Silveri MM, Dikan J, Ross AJ, et al. Short-term administration of uridine increases brain membrane phospholipid precursors in healthy adults: a 31-phosphorus magnetic resonance spectroscopy study at 4T. <em>Bipolar Disord.</em> 2011;13(2):189–97.
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/21176029/" target="_blank" rel="noopener noreferrer">https://pubmed.ncbi.nlm.nih.gov/21176029/</a>
+                </li>
+            </ol>
         </div>
 
         <div class="pt-10 text-center reveal border-t border-slate-800">
@@ -196,10 +287,11 @@
                 </ul>
             </div>
 
-            <!-- SEO Hub: Resources -->
+            <!-- SEO Hub: Company -->
             <div class="col-span-1 md:col-span-2">
-                <h4 class="text-white font-bold text-xs tracking-widest uppercase mb-6">Resources</h4>
+                <h4 class="text-white font-bold text-xs tracking-widest uppercase mb-6">Company</h4>
                 <ul class="space-y-4">
+                    <li><a href="about.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">About the Founder</a></li>
                     <li><a href="/#faq" class="text-sm text-slate-400 hover:text-accent-cyan transition">Support & FAQ</a></li>
                     <li><a href="/#preorder" class="text-sm text-slate-400 hover:text-accent-cyan transition">Request Sample</a></li>
                 </ul>
