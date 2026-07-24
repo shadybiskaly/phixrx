@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0QQKCJJEPB"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -13,15 +12,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Clinical Matrix | Science Behind Social Phix</title>
-    <meta name="description" content="Discover the science behind Social Phix. A pharmacist-formulated 5-compound matrix featuring L-Theanine, Motherwort, and Acetyl L-Tyrosine to neutralize anxiety.">
-    <meta name="keywords" content="Social Phix ingredients, L-Theanine for focus, Motherwort for anxiety, Acetyl L-Tyrosine dopamine, clinical confidence supplement">
-    
-    <meta property="og:site_name" content="Social Phix">
-    <meta property="og:title" content="The Clinical Matrix | Social Phix">
-    <meta property="og:url" content="https://www.socialphix.com/science">
-    <meta property="og:type" content="website">
+    <meta name="description" content="Discover the science behind Social Phix — a pharmacist-formulated 5-compound matrix featuring L-Theanine, Motherwort, Acetyl L-Tyrosine, Uridine Monophosphate, and micro-dosed caffeine, designed to help support calm focus under pressure.">
+    <meta name="keywords" content="Social Phix ingredients, L-Theanine for focus, Motherwort supplement, Acetyl L-Tyrosine, Uridine Monophosphate, clinical confidence supplement">
 
-    <!-- Tailwind CSS & Fonts -->
+    <meta property="og:site_name" content="Social Phix">
+    <meta property="og:title" content="The Clinical Matrix | Science Behind Social Phix">
+    <meta property="og:description" content="Discover the science behind Social Phix — a pharmacist-formulated 5-compound matrix designed to help support calm focus under pressure.">
+    <meta property="og:url" content="https://www.socialphix.com/science">
+    <meta property="og:image" content="https://www.socialphix.com/phix2.png">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://www.socialphix.com/science.html">
+
+    <!-- Article Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "The Clinical Matrix: Science Behind Social Phix",
+      "description": "A pharmacist-formulated 5-compound matrix featuring L-Theanine, Motherwort, Acetyl L-Tyrosine, Uridine Monophosphate, and micro-dosed caffeine, designed to help support calm focus under pressure.",
+      "image": "https://www.socialphix.com/phix2.png",
+      "author": { "@type": "Organization", "name": "PhixRx" },
+      "publisher": { "@type": "Organization", "name": "Social Phix", "logo": { "@type": "ImageObject", "url": "https://www.socialphix.com/phix2.png" } },
+      "mainEntityOfPage": "https://www.socialphix.com/science.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,18 +47,8 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        sans: ['"Inter"', 'sans-serif'],
-                    },
-                    colors: {
-                        'brand-bg': '#050B14',      
-                        'brand-surface': '#0A192F', 
-                        'brand-card': '#112240',    
-                        'accent-cyan': '#00E5FF',   
-                        'accent-orange': '#FF5722', 
-                        'accent-orange-hover': '#E64A19'
-                    }
+                    fontFamily: { heading: ['"Plus Jakarta Sans"', 'sans-serif'], sans: ['"Inter"', 'sans-serif'] },
+                    colors: { 'brand-bg': '#050B14', 'brand-surface': '#0A192F', 'brand-card': '#112240', 'accent-cyan': '#00E5FF', 'accent-orange': '#FF5722', 'accent-orange-hover': '#E64A19' }
                 }
             }
         }
@@ -51,18 +57,14 @@
     <style>
         body { background-color: #0A192F; color: #FFFFFF; overflow-x: hidden; }
         .glass-nav { background: rgba(10, 25, 47, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 229, 255, 0.1); }
-        .bg-grid {
-            position: absolute; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px; top: 0; left: 0; z-index: 0; pointer-events: none;
-        }
+        .bg-grid { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; top: 0; left: 0; z-index: 0; pointer-events: none; }
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body class="antialiased font-sans">
-    <!--  Navigation -->
+
+    <!-- Navigation -->
     <nav class="glass-nav fixed w-full top-0 z-50 px-6 py-4 transition-all">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="font-heading text-2xl font-extrabold tracking-tight text-white">
@@ -80,94 +82,85 @@
         </div>
     </nav>
 
-
-    <!-- Page Header -->
+    <!-- Hero Header -->
     <header class="relative pt-40 pb-20 overflow-hidden border-b border-accent-cyan/20 bg-brand-bg">
-        <div class="bg-grid"></div>
-        <div class="max-w-4xl mx-auto px-6 text-center relative z-10 reveal active">
-            <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan uppercase mb-4 block">Pharmacology Over Placebos</span>
-            <h1 class="font-heading text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6">
-                The Clinical Matrix.
-            </h1>
-            <p class="text-lg text-slate-300 leading-relaxed">
-                You don't need another gas-station energy drink. You need a physiological advantage. Here is exactly how our 5-compound formula systematically dismantles physical panic and weaponizes your focus.
-            </p>
-        </div>
+    <div class="bg-grid"></div>
+    <div class="max-w-4xl mx-auto px-6 text-center relative z-10 reveal active">
+        <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan uppercase mb-4 block">Pharmacology Over Placebos</span>
+        <h1 class="font-heading text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6">
+            The Clinical Matrix.
+        </h1>
+        <p class="text-lg text-slate-300 leading-relaxed">
+            You don't need another gas-station energy drink. You need a physiological advantage. Here's exactly how our 5-compound formula is designed to help you feel steadier and sharper when the pressure hits.
+        </p>
+    </div>
     </header>
 
-    <!-- Content Section -->
+    <!-- Main Article Body -->
     <section class="py-24 bg-brand-surface relative z-10">
-        <div class="max-w-4xl mx-auto px-6 space-y-16">
-            
-            <!-- Intro -->
-            <div class="reveal">
-                <p class="text-slate-300 leading-relaxed text-lg mb-6">
-                    The supplement industry is plagued by marketing hype and "pixie-dusted" proprietary blends. As clinical pharmacists, we refused to play that game. Social Phix is built on a ruthless, scientifically validated approach to high-pressure performance. We isolated the exact biological mechanisms that cause you to freeze under pressure, and we formulated a specific counter-measure for every single one.
-                </p>
-            </div>
-
-            <!-- L-Theanine -->
-            <div class="reveal border-l-4 border-accent-orange pl-6">
-                <h2 class="font-heading text-3xl font-bold text-white mb-4">Pure L-Theanine: The Alpha Hacker</h2>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    When you step into a boardroom or a high-stakes interview, your brain activity naturally becomes chaotic. Beta waves spike, creating mental friction and overthinking. L-Theanine is an amino acid that explicitly crosses the blood-brain barrier to promote alpha brain waves —the exact frequency associated with relaxed, effortless alertness.
-                </p>
-                <p class="text-slate-300 leading-relaxed">
-                    By blocking competitive glutamate pathways, it literally quiets the background noise in your head, allowing you to process complex variables without the panic.
-                </p>
-            </div>
-
-            <!-- Motherwort -->
-            <div class="reveal border-l-4 border-accent-cyan pl-6">
-                <h2 class="font-heading text-3xl font-bold text-white mb-4">Motherwort Extract: The Autonomic Stabilizer</h2>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    Confidence isn't just in your head; it's in your chest. When adrenaline hits, your heart rate accelerates. Your brain registers this physical telemetry and assumes you are in danger, triggering a vicious cycle of panic.
-                </p>
-                <p class="text-slate-300 leading-relaxed">
-                    Motherwort (*Leonurus cardiaca*) acts as a mild, natural cardiovascular supporter. It helps maintain a steady, calm resting heart rate, intercepting the physical tension loop before it takes hold. If your body stays calm, your mind stays dominant.
-                </p>
-            </div>
-
-            <!-- Acetyl L-Tyrosine -->
-            <div class="reveal border-l-4 border-accent-orange pl-6">
-                <h2 class="font-heading text-3xl font-bold text-white mb-4">Acetyl L-Tyrosine: The Dopamine Drip</h2>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    Acute stress instantly drains your brain's catecholamine reserves (dopamine, epinephrine, and norepinephrine). When these tank, your drive, wit, and verbal fluidity vanish. You go blank.
-                </p>
-                <p class="text-slate-300 leading-relaxed">
-                    Acetyl L-Tyrosine (ALT) is a highly bioavailable precursor that rapidly replenishes these specific neurotransmitters under load. It ensures your cognitive tank stays full when you are actively processing pressure.
-                </p>
-            </div>
-
-            <!-- Uridine -->
-            <div class="reveal border-l-4 border-accent-cyan pl-6">
-                <h2 class="font-heading text-3xl font-bold text-white mb-4">Uridine Monophosphate: The Word-Recall Engine</h2>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    Have you ever rehearsed a speech perfectly, only to completely lose your train of thought on stage? That is a failure in synaptic data retrieval. Uridine Monophosphate is heavily involved in RNA synthesis and neuroplasticity.
-                </p>
-                <p class="text-slate-300 leading-relaxed">
-                    In the context of Social Phix, it is deployed to maximize verbal memory function and neural bandwidth, ensuring your vocabulary rolls off the tongue fluidly.
-                </p>
-            </div>
-
-            <!-- Caffeine -->
-            <div class="reveal border-l-4 border-accent-orange pl-6">
-                <h2 class="font-heading text-3xl font-bold text-white mb-4">Micro-Dosed Caffeine: The Catalyst</h2>
-                <p class="text-slate-300 leading-relaxed">
-                    We aren't trying to over-stimulate you. We are trying to spark the engine. By utilizing a highly controlled micro-dose of caffeine, we provide the kinetic energy required for active engagement. Crucially, because it is suspended within a massive dose of L-Theanine, the jagged, jittery artifacts of caffeine are entirely stripped away, leaving only razor-sharp engagement.
-                </p>
-            </div>
-
-            <div class="pt-10 text-center reveal">
-                <a href="/#preorder" class="inline-block px-10 py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300">
-                    Experience The Matrix
-                </a>
-            </div>
-
+    <div class="max-w-3xl mx-auto px-6 space-y-12">
+        <div class="reveal">
+            <p class="text-slate-300 leading-relaxed mb-6">
+                The supplement industry is plagued by marketing hype and pixie-dusted proprietary blends. As clinical pharmacists, we refused to play that game. Social Phix is built on a disciplined, evidence-informed approach to high-pressure performance. We isolated the specific physiological mechanisms behind feeling frozen under pressure, and formulated a targeted, structure/function support for each one.
+            </p>
         </div>
+
+        <div class="reveal">
+            <h2 class="font-heading text-3xl font-bold text-white mb-4">Pure L-Theanine: The Alpha Hacker</h2>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                When you step into a boardroom or a high-stakes interview, your brain activity naturally becomes busier. Beta wave activity rises, which can bring mental friction and overthinking. L-Theanine is an amino acid that crosses the blood-brain barrier and has been studied for its role in supporting alpha brain wave activity — the frequency associated with relaxed, effortless alertness.
+            </p>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                By interacting with glutamate pathways, it's included in the formula to help quiet the background noise in your head, so you can process complex variables with more composure.
+            </p>
+        </div>
+
+        <div class="reveal">
+            <h2 class="font-heading text-3xl font-bold text-white mb-4">Motherwort Extract: The Autonomic Stabilizer</h2>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                Confidence isn't just in your head; it's in your chest. When adrenaline rises, your heart rate accelerates. Your brain registers that physical signal and can interpret it as danger — a feedback loop that keeps the tension going.
+            </p>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                Motherwort (<em>Leonurus cardiaca</em>) is a botanical traditionally used to help support cardiovascular calm. It's included here to help support a steady, calm resting heart rate, so the physical feedback loop is easier to interrupt. When your body feels calm, your mind can stay clear.
+            </p>
+        </div>
+
+        <div class="reveal">
+            <h2 class="font-heading text-3xl font-bold text-white mb-4">Acetyl L-Tyrosine: The Dopamine Drip</h2>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                Acute stress can rapidly draw down your brain's catecholamine reserves (dopamine, epinephrine, and norepinephrine). When these dip, your drive, wit, and verbal fluidity can drop with them. You go blank.
+            </p>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                Acetyl L-Tyrosine (ALT) is a highly bioavailable amino acid precursor to these specific neurotransmitters. It's included in the formula to help support catecholamine availability under load, so your cognitive tank feels fuller when you're actively processing pressure.
+            </p>
+        </div>
+
+        <div class="reveal">
+            <h2 class="font-heading text-3xl font-bold text-white mb-4">Uridine Monophosphate: The Word-Recall Engine</h2>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                Have you ever rehearsed a speech perfectly, only to lose your train of thought on stage? That's a hiccup in synaptic data retrieval. Uridine Monophosphate is a nucleotide involved in RNA synthesis and synaptic plasticity.
+            </p>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                In the Social Phix formula, it's included to help support verbal recall and neural bandwidth, so your vocabulary rolls off the tongue more fluidly.
+            </p>
+        </div>
+
+        <div class="reveal">
+            <h2 class="font-heading text-3xl font-bold text-white mb-4">Micro-Dosed Caffeine: The Catalyst</h2>
+            <p class="text-slate-300 leading-relaxed mb-6">
+                We aren't trying to over-stimulate you. We're trying to spark the engine. A highly controlled micro-dose of caffeine is included for the kinetic energy needed for active engagement. Because it's suspended alongside a substantial dose of L-Theanine, the jagged, jittery feeling caffeine can bring on its own is largely smoothed out, leaving cleaner, sharper engagement.
+            </p>
+        </div>
+
+        <div class="pt-10 text-center reveal border-t border-slate-800">
+            <a href="/#preorder" class="inline-block px-10 py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300">
+                Experience The Matrix
+            </a>
+        </div>
+    </div>
     </section>
 
-    <!-- The SEO "Fat Footer" Expansion -->
+ <!-- The SEO "Fat Footer" Expansion -->
     <footer class="bg-brand-bg py-20 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-12">
             
