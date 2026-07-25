@@ -682,22 +682,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v3 loaded', 'color:#00E5FF;font-weight:bold');
-
-            // Pull a referral code out of LaunchList's widget URL if the
-            // JSON response doesn't expose one directly.
-            function extractCode(link) {
-                if (!link) return '';
-                try {
-                    const u = new URL(link);
-                    return u.searchParams.get('code')
-                        || u.searchParams.get('ref')
-                        || u.searchParams.get('referral_code')
-                        || (u.pathname.split('/').filter(Boolean).pop() || '');
-                } catch (e) {
-                    return '';
-                }
-            }
+            console.log('%cSocial Phix signup v4 loaded', 'color:#00E5FF;font-weight:bold');
 
             const reveals = document.querySelectorAll('.reveal');
             const revealOnScroll = new IntersectionObserver((entries, observer) => {
@@ -811,17 +796,11 @@
                     try { sessionStorage.setItem('sp_signup', JSON.stringify(data)); } catch (err) {}
 
                     if (data.ok) {
-                        const code = data.referral_code
-                                  || data.referralCode
-                                  || data.code
-                                  || extractCode(data.embeddedLink)
-                                  || '';
-
+                        // Deliberately no referral code here. New signups land on
+                        // the "check your inbox" state; the tracker unlocks only
+                        // via the link in the confirmation email, once verified.
                         const qs = new URLSearchParams();
-                        if (code) qs.set('ref', code);
-                        qs.set('count', data.users_referred ?? data.usersReferred ?? 0);
                         if (data.position) qs.set('pos', data.position);
-                        if (data.embeddedLink) qs.set('w', data.embeddedLink);
 
                         window.location.href = '/success.html?' + qs.toString();
                     } else {

@@ -117,15 +117,45 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                 </div>
-                <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">You're On The List</span>
-                <h1 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight">Now Move Up It.</h1>
-                <p class="text-slate-300 leading-relaxed max-w-md mx-auto">
-                    The first run is small. Every friend who joins through your link moves you closer to the front — and unlocks free product along the way.
+                <span id="pageEyebrow" class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">Check Your Inbox</span>
+                <h1 id="pageHeadline" class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight">Almost There.</h1>
+                <p id="pageSubhead" class="text-slate-300 leading-relaxed max-w-md mx-auto">
+                    Confirm your email and your referral link unlocks.
                 </p>
                 <p id="positionNote" class="hidden mt-4 text-sm text-slate-400">
                     You're currently <span class="text-accent-cyan font-bold">#<span id="positionValue">—</span></span> in line.
                 </p>
             </div>
+
+            <!-- PENDING STATE: shown until the email is verified -->
+            <div id="pendingState" class="hidden">
+                <div class="bg-brand-card p-8 sm:p-10 rounded-2xl border border-accent-cyan/30 shadow-[0_0_40px_rgba(0,0,0,0.4)] text-center">
+                    <div class="w-14 h-14 mx-auto bg-brand-bg rounded-full flex items-center justify-center mb-6 border border-accent-cyan/40">
+                        <svg class="w-7 h-7 text-accent-cyan" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+
+                    <h2 class="font-heading text-2xl font-bold text-white mb-4">One click left.</h2>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-6 max-w-sm mx-auto">
+                        We've sent you a confirmation email. Click the link inside and your referral link and reward tracker unlock immediately.
+                    </p>
+
+                    <div class="bg-brand-bg border border-slate-700 rounded-lg p-5 text-left">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-accent-cyan mb-2">Why the extra step</p>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Referrals only count once the person confirms their email. It keeps the leaderboard honest — and it means the rewards go to people who actually brought real friends.
+                        </p>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 mt-6">
+                        Nothing arrived? Check spam, or give it a minute.
+                    </p>
+                </div>
+            </div>
+
+            <!-- VERIFIED STATE: the full tracker -->
+            <div id="verifiedState" class="hidden">
 
             <!-- Referral link + sharing -->
             <div id="referralCard" class="bg-brand-card p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.4)] mb-6">
@@ -173,10 +203,53 @@
                 </div>
             </div>
 
-            <!-- Emailed message, shown if we have neither code nor widget -->
-            <div id="emailFallback" class="hidden bg-brand-card p-8 rounded-2xl border border-slate-700 text-center mb-6">
-                <p class="text-slate-300 text-sm leading-relaxed mb-2">Your referral link is on its way to your inbox.</p>
-                <p class="text-slate-500 text-xs">Confirm your email to activate it — referrals only count once your friends confirm theirs too.</p>
+            <!-- VERIFIED STATE: the full tracker -->
+            <div id="verifiedState" class="hidden">
+
+            <!-- Referral link + sharing -->
+            <div id="referralCard" class="bg-brand-card p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.4)] mb-6">
+                <label for="referralLink" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">Your Personal Link</label>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="referralLink" readonly
+                           class="flex-1 px-4 py-3.5 bg-brand-bg border border-slate-600 rounded-md text-white text-sm font-medium focus:outline-none focus:border-accent-cyan select-all">
+                    <button type="button" id="copyBtn"
+                            class="px-6 py-3.5 text-xs font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover transition duration-300 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan">
+                        Copy Link
+                    </button>
+                </div>
+
+                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mt-6 mb-3">Or Share Directly</p>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <a href="#" data-share="sms" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        Text
+                    </a>
+                    <a href="#" data-share="whatsapp" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"></path></svg>
+                        WhatsApp
+                    </a>
+                    <a href="#" data-share="twitter" target="_blank" rel="noopener noreferrer" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                        X
+                    </a>
+                    <a href="#" data-share="facebook" target="_blank" rel="noopener noreferrer" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
+                        Facebook
+                    </a>
+                    <a href="#" data-share="email" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        Email
+                    </a>
+                </div>
+            </div>
+
+            <!-- Fallback: LaunchList's own widget, shown only if no referral code came through -->
+            <div id="widgetFallback" class="hidden bg-brand-card p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.4)] mb-6">
+                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-4">Your Link &amp; Position</p>
+                <div class="rounded-lg overflow-hidden bg-brand-bg border border-slate-700">
+                    <iframe id="launchlistFrame" title="Your referral link and waitlist position"
+                            class="w-full block" style="height: 420px; border: 0;" src="about:blank"></iframe>
+                </div>
             </div>
 
             <!-- Progress + Milestones -->
@@ -237,6 +310,8 @@
                 </p>
             </div>
 
+            </div><!-- /verifiedState -->
+
             <div class="text-center mt-8">
                 <a href="https://www.socialphix.com/" class="text-xs font-bold tracking-widest uppercase text-slate-400 hover:text-accent-cyan transition">
                     Back to Homepage
@@ -260,23 +335,32 @@
         const position   = params.get('pos')  || '';
         const widgetLink = params.get('w')    || '';
 
-        const referralCard = document.getElementById('referralCard');
-        const widgetBox    = document.getElementById('widgetFallback');
-        const emailBox     = document.getElementById('emailFallback');
+        const referralCard  = document.getElementById('referralCard');
+        const widgetBox     = document.getElementById('widgetFallback');
+        const pendingState  = document.getElementById('pendingState');
+        const verifiedState = document.getElementById('verifiedState');
 
-        /* ---------- Decide which panel to show ---------- */
-        if (refCode) {
-            // Best case: we have a real code, so show the branded card.
-            setupReferralCard(refCode);
-        } else if (widgetLink && /^https:\/\/(www\.)?getlaunchlist\.com\//.test(widgetLink)) {
-            // No code, but LaunchList gave us its widget — use that.
-            referralCard.classList.add('hidden');
-            widgetBox.classList.remove('hidden');
-            document.getElementById('launchlistFrame').src = widgetLink;
+        // A referral code means they arrived from the confirmation email,
+        // so the tracker is unlocked. No code means they've just signed up
+        // and still need to verify.
+        const isVerified = Boolean(refCode) || Boolean(widgetLink);
+
+        if (isVerified) {
+            verifiedState.classList.remove('hidden');
+            document.getElementById('pageEyebrow').textContent  = "You're On The List";
+            document.getElementById('pageHeadline').textContent = 'Now Move Up It.';
+            document.getElementById('pageSubhead').textContent  =
+                'The first run is small. Every friend who joins through your link moves you closer to the front — and unlocks free product along the way.';
+
+            if (refCode) {
+                setupReferralCard(refCode);
+            } else {
+                referralCard.classList.add('hidden');
+                widgetBox.classList.remove('hidden');
+                document.getElementById('launchlistFrame').src = widgetLink;
+            }
         } else {
-            // Neither: direct visit or an unexpected response shape.
-            referralCard.classList.add('hidden');
-            emailBox.classList.remove('hidden');
+            pendingState.classList.remove('hidden');
         }
 
         /* ---------- Position ---------- */
@@ -325,7 +409,8 @@
             });
         }
 
-        /* ---------- Progress + milestones ---------- */
+        /* ---------- Progress + milestones (verified state only) ---------- */
+        if (isVerified) {
         const milestones = Array.from(document.querySelectorAll('.milestone'));
         const maxTier = Math.max(...milestones.map(m => parseInt(m.dataset.threshold, 10)));
 
@@ -353,7 +438,8 @@
             } else {
                 status.textContent = (threshold - refCount) + ' to go';
             }
-        });
+            });
+        }
     });
     </script>
 </body>
