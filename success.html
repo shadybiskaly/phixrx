@@ -12,12 +12,12 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Received | Social Phix</title>
-    <meta name="robots" content="noindex, nofollow"> <!-- Prevents search engines from indexing the thank you page -->
-    
+    <title>You're In | Social Phix</title>
+    <meta name="robots" content="noindex, nofollow"> <!-- Prevents search engines from indexing the confirmation page -->
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Modern Tech-Forward Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,11 +32,11 @@
                         sans: ['"Inter"', 'sans-serif'],
                     },
                     colors: {
-                        'brand-bg': '#050B14',      
-                        'brand-surface': '#0A192F', 
-                        'brand-card': '#112240',    
-                        'accent-cyan': '#00E5FF',   
-                        'accent-orange': '#FF5722', 
+                        'brand-bg': '#050B14',
+                        'brand-surface': '#0A192F',
+                        'brand-card': '#112240',
+                        'accent-cyan': '#00E5FF',
+                        'accent-orange': '#FF5722',
                         'accent-orange-hover': '#E64A19'
                     }
                 }
@@ -51,56 +51,61 @@
             overflow-x: hidden;
         }
 
-        .cyan-glow-bottom {
-            position: relative;
-        }
+        .cyan-glow-bottom { position: relative; }
         .cyan-glow-bottom::after {
             content: '';
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             height: 1px;
             background: #00E5FF;
             box-shadow: 0 -2px 15px 2px rgba(0, 229, 255, 0.6);
             z-index: 10;
         }
-        
+
         .bg-grid {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
             background-size: 40px 40px;
-            top: 0;
-            left: 0;
-            z-index: 0;
+            top: 0; left: 0; z-index: 0;
             pointer-events: none;
         }
 
-        /* Simple fade-in animation for the card */
         .fade-in-up {
             animation: fadeInUp 0.8s cubic-bezier(0.5, 0, 0, 1) forwards;
             opacity: 0;
             transform: translateY(20px);
         }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @media (prefers-reduced-motion: reduce) {
+            .fade-in-up { animation: none; opacity: 1; transform: none; }
+            .progress-fill { transition: none !important; }
+        }
+
+        .progress-fill {
+            transition: width 1s cubic-bezier(0.5, 0, 0, 1);
+            background: linear-gradient(90deg, #00E5FF 0%, #FF5722 100%);
+        }
+
+        .share-btn {
+            transition: all 0.2s ease;
+        }
+        .share-btn:hover {
+            border-color: rgba(0, 229, 255, 0.6);
+            background-color: rgba(0, 229, 255, 0.05);
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body class="antialiased font-sans cyan-glow-bottom min-h-screen flex flex-col relative bg-brand-bg">
 
     <div class="bg-grid"></div>
-    <div class="absolute w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[120px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+    <div class="absolute w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[120px] top-0 left-1/2 transform -translate-x-1/2 pointer-events-none z-0"></div>
 
-    <!-- Glassmorphic Simple Nav -->
-    <nav class="fixed w-full top-0 z-50 px-6 py-4">
+    <!-- Simple Nav -->
+    <nav class="fixed w-full top-0 z-50 px-6 py-4 bg-brand-bg/80 backdrop-blur-md">
         <div class="max-w-7xl mx-auto flex justify-center items-center">
             <a href="https://www.socialphix.com/" class="font-heading text-2xl font-extrabold tracking-tight text-white hover:opacity-80 transition">
                 SOCIAL<span class="text-accent-orange">PHIX</span>
@@ -109,35 +114,217 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="flex-grow flex items-center justify-center px-6 relative z-10 pt-20 pb-20">
-        <div class="bg-brand-card p-10 sm:p-16 rounded-2xl border border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.6)] text-center max-w-lg w-full fade-in-up">
-            
-            <!-- Success Icon -->
-            <div class="w-20 h-20 mx-auto bg-brand-surface rounded-full flex items-center justify-center mb-8 border border-accent-cyan/30 shadow-[0_0_20px_rgba(0,229,255,0.2)]">
-                <svg class="w-10 h-10 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
+    <main class="flex-grow flex items-start justify-center px-6 relative z-10 pt-28 pb-20">
+        <div class="max-w-2xl w-full fade-in-up">
+
+            <!-- Confirmation -->
+            <div class="text-center mb-10">
+                <div class="w-16 h-16 mx-auto bg-brand-card rounded-full flex items-center justify-center mb-6 border border-accent-cyan/30 shadow-[0_0_20px_rgba(0,229,255,0.2)]">
+                    <svg class="w-8 h-8 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">You're On The List</span>
+                <h1 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight">Now Move Up It.</h1>
+                <p class="text-slate-300 leading-relaxed max-w-md mx-auto">
+                    The first run is small. Every friend who joins through your link moves you closer to the front — and unlocks free product along the way.
+                </p>
             </div>
 
-            <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">Status: Received</span>
-            <h1 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">Thanks!</h1>
-            
-            <p class="text-slate-300 font-normal leading-relaxed mb-10">
-                We've received your request. If you're eligible to receive a sample, we'll be in touch via email with next steps. 
-            </p>
+            <!-- Referral Link -->
+            <div class="bg-brand-card p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.4)] mb-6">
+                <label for="referralLink" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">Your Personal Link</label>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="referralLink" readonly
+                           value="https://www.socialphix.com/?ref=YOURCODE"
+                           class="flex-1 px-4 py-3.5 bg-brand-bg border border-slate-600 rounded-md text-white text-sm font-medium focus:outline-none focus:border-accent-cyan select-all">
+                    <button type="button" id="copyBtn"
+                            class="px-6 py-3.5 text-xs font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover transition duration-300 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan">
+                        Copy Link
+                    </button>
+                </div>
 
-            <a href="https://www.socialphix.com/" class="inline-block w-full py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300">
-                Return to Homepage
-            </a>
+                <!-- Share buttons -->
+                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mt-6 mb-3">Or Share Directly</p>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <a href="#" data-share="sms" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        Text
+                    </a>
+                    <a href="#" data-share="whatsapp" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"></path></svg>
+                        WhatsApp
+                    </a>
+                    <a href="#" data-share="twitter" target="_blank" rel="noopener noreferrer" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                        X
+                    </a>
+                    <a href="#" data-share="facebook" target="_blank" rel="noopener noreferrer" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
+                        Facebook
+                    </a>
+                    <a href="#" data-share="email" class="share-btn flex items-center justify-center gap-2 py-3 px-2 bg-brand-bg border border-slate-700 rounded-md text-xs font-semibold text-slate-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        Email
+                    </a>
+                </div>
+            </div>
+
+            <!-- Progress + Milestones -->
+            <div class="bg-brand-card p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
+
+                <div class="flex items-baseline justify-between mb-3">
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Your Progress</span>
+                    <span class="text-sm text-slate-300"><span id="referralCount" class="font-heading text-2xl font-extrabold text-accent-cyan">0</span> <span class="text-slate-500">referrals</span></span>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="w-full h-2.5 bg-brand-bg rounded-full overflow-hidden border border-slate-700 mb-8">
+                    <div id="progressFill" class="progress-fill h-full rounded-full" style="width: 0%"></div>
+                </div>
+
+                <!-- Milestone ladder -->
+                <div class="space-y-3" id="milestones">
+
+                    <div class="milestone flex items-center gap-4 p-4 rounded-lg border border-slate-700 bg-brand-bg" data-threshold="3">
+                        <div class="milestone-badge flex-shrink-0 w-11 h-11 rounded-full border-2 border-slate-600 flex items-center justify-center font-heading font-extrabold text-slate-400">3</div>
+                        <div class="flex-1">
+                            <p class="milestone-title font-bold text-white text-sm">Skip the line</p>
+                            <p class="text-xs text-slate-400">Priority spot in the first production run</p>
+                        </div>
+                        <span class="milestone-status text-[10px] font-bold uppercase tracking-widest text-slate-500">Locked</span>
+                    </div>
+
+                    <div class="milestone flex items-center gap-4 p-4 rounded-lg border border-slate-700 bg-brand-bg" data-threshold="5">
+                        <div class="milestone-badge flex-shrink-0 w-11 h-11 rounded-full border-2 border-slate-600 flex items-center justify-center font-heading font-extrabold text-slate-400">5</div>
+                        <div class="flex-1">
+                            <p class="milestone-title font-bold text-white text-sm">A free bottle</p>
+                            <p class="text-xs text-slate-400">Added to whatever pack you order</p>
+                        </div>
+                        <span class="milestone-status text-[10px] font-bold uppercase tracking-widest text-slate-500">Locked</span>
+                    </div>
+
+                    <div class="milestone flex items-center gap-4 p-4 rounded-lg border border-slate-700 bg-brand-bg" data-threshold="10">
+                        <div class="milestone-badge flex-shrink-0 w-11 h-11 rounded-full border-2 border-slate-600 flex items-center justify-center font-heading font-extrabold text-slate-400">10</div>
+                        <div class="flex-1">
+                            <p class="milestone-title font-bold text-white text-sm">A free 3-pack</p>
+                            <p class="text-xs text-slate-400">$24 value, on us</p>
+                        </div>
+                        <span class="milestone-status text-[10px] font-bold uppercase tracking-widest text-slate-500">Locked</span>
+                    </div>
+
+                    <div class="milestone flex items-center gap-4 p-4 rounded-lg border border-slate-700 bg-brand-bg" data-threshold="25">
+                        <div class="milestone-badge flex-shrink-0 w-11 h-11 rounded-full border-2 border-slate-600 flex items-center justify-center font-heading font-extrabold text-slate-400">25</div>
+                        <div class="flex-1">
+                            <p class="milestone-title font-bold text-white text-sm">A free 8-pack</p>
+                            <p class="text-xs text-slate-400">$56 value — a full month of big moments</p>
+                        </div>
+                        <span class="milestone-status text-[10px] font-bold uppercase tracking-widest text-slate-500">Locked</span>
+                    </div>
+
+                </div>
+
+                <p class="text-[11px] text-slate-500 leading-relaxed mt-6 pt-5 border-t border-slate-800">
+                    Referrals count once the friend confirms their email. Rewards ship with the first production run to US addresses.
+                    Duplicate or invalid signups don't count. Program runs until the first run is fully allocated.
+                </p>
+            </div>
+
+            <div class="text-center mt-8">
+                <a href="https://www.socialphix.com/" class="text-xs font-bold tracking-widest uppercase text-slate-400 hover:text-accent-cyan transition">
+                    Back to Homepage
+                </a>
+            </div>
         </div>
     </main>
 
     <!-- Footer Minimal -->
     <footer class="w-full py-8 text-center relative z-10">
         <p class="text-[10px] font-bold tracking-widest uppercase text-slate-600">
-            &copy; 2026 Social Phix. All Rights Reserved.
+            &copy; 2026 PhixRx. All Rights Reserved.
         </p>
     </footer>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // ---------------------------------------------------------------
+        // REFERRAL DATA
+        // Replace this block with values from your referral provider
+        // (Viral Loops / KickoffLabs / Prefinery / LaunchList).
+        // Until then it reads ?ref= and ?count= from the URL.
+        // ---------------------------------------------------------------
+        const params    = new URLSearchParams(window.location.search);
+        const refCode   = params.get('ref') || 'YOURCODE';
+        const refCount  = parseInt(params.get('count'), 10) || 0;
+
+        const shareUrl  = `https://www.socialphix.com/?ref=${encodeURIComponent(refCode)}`;
+        const shareMsg  = `I just grabbed a spot for Social Phix — a pharmacist-made drink for staying calm and sharp before big moments. First run is limited:`;
+
+        // Populate link field
+        const linkInput = document.getElementById('referralLink');
+        linkInput.value = shareUrl;
+
+        // Copy button
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+            } catch (err) {
+                linkInput.select();
+                document.execCommand('copy');
+            }
+            const original = copyBtn.textContent;
+            copyBtn.textContent = 'Copied';
+            setTimeout(() => { copyBtn.textContent = original; }, 2000);
+        });
+
+        // Share links
+        const encodedUrl = encodeURIComponent(shareUrl);
+        const encodedMsg = encodeURIComponent(shareMsg);
+        const shareTargets = {
+            sms:      `sms:?&body=${encodeURIComponent(shareMsg + ' ' + shareUrl)}`,
+            whatsapp: `https://wa.me/?text=${encodeURIComponent(shareMsg + ' ' + shareUrl)}`,
+            twitter:  `https://twitter.com/intent/tweet?text=${encodedMsg}&url=${encodedUrl}`,
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+            email:    `mailto:?subject=${encodeURIComponent('You should see this')}&body=${encodeURIComponent(shareMsg + '\n\n' + shareUrl)}`
+        };
+        document.querySelectorAll('[data-share]').forEach(el => {
+            const key = el.dataset.share;
+            if (shareTargets[key]) el.setAttribute('href', shareTargets[key]);
+        });
+
+        // Progress + milestone states
+        const milestones = Array.from(document.querySelectorAll('.milestone'));
+        const maxTier = Math.max(...milestones.map(m => parseInt(m.dataset.threshold, 10)));
+
+        document.getElementById('referralCount').textContent = refCount;
+
+        const pct = Math.min((refCount / maxTier) * 100, 100);
+        requestAnimationFrame(() => {
+            document.getElementById('progressFill').style.width = pct + '%';
+        });
+
+        milestones.forEach(m => {
+            const threshold = parseInt(m.dataset.threshold, 10);
+            const unlocked  = refCount >= threshold;
+            const badge     = m.querySelector('.milestone-badge');
+            const status    = m.querySelector('.milestone-status');
+
+            if (unlocked) {
+                m.classList.remove('border-slate-700');
+                m.classList.add('border-accent-cyan/50', 'bg-accent-cyan/5');
+                badge.classList.remove('border-slate-600', 'text-slate-400');
+                badge.classList.add('border-accent-cyan', 'bg-accent-cyan', 'text-brand-bg');
+                status.classList.remove('text-slate-500');
+                status.classList.add('text-accent-cyan');
+                status.textContent = 'Unlocked';
+            } else {
+                const remaining = threshold - refCount;
+                status.textContent = remaining + ' to go';
+            }
+        });
+    });
+    </script>
 </body>
 </html>
