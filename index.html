@@ -135,8 +135,6 @@
     <!-- LaunchList waitlist + referral engine -->
     <script src="https://getlaunchlist.com/js/widget-diy.js" defer></script>
 
-    <!-- Cloudflare Turnstile API -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -537,8 +535,7 @@
 
             </div>
 
-            <!-- ⚠️ REPLACE FORM_KEY WITH YOUR LAUNCHLIST FORM KEY -->
-            <form id="waitlist-form" class="launchlist-form space-y-5 bg-brand-card p-8 sm:p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left" action="https://getlaunchlist.com/s/ZlhThK" method="POST">
+            <form id="waitlist-form" class="space-y-5 bg-brand-card p-8 sm:p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left" action="https://getlaunchlist.com/s/ZlhThK" method="POST">
 
                 <!-- Selected pack (populated by pack buttons above) -->
                 <input type="hidden" id="selectedPack" name="selectedPack" value="8-Pack">
@@ -616,9 +613,8 @@
                     <input type="email" id="email" name="email" placeholder="name@domain.com" required 
                            class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 placeholder-slate-600">
                 </div>
-                
-                <!-- Cloudflare Turnstile Integration -->
-                <div class="cf-turnstile mt-2" data-sitekey="0x4AAAAAAD1HuD0kItdoQfz0" data-theme="dark"></div>
+
+                <p id="formError" class="hidden text-sm text-accent-orange bg-accent-orange/10 border border-accent-orange/30 rounded-md px-4 py-3" role="alert"></p>
 
                 <button type="submit" 
                         class="w-full py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300 mt-4">
@@ -685,6 +681,24 @@
     <!-- Intersection Observer & Form Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+            console.log('%cSocial Phix signup v3 loaded', 'color:#00E5FF;font-weight:bold');
+
+            // Pull a referral code out of LaunchList's widget URL if the
+            // JSON response doesn't expose one directly.
+            function extractCode(link) {
+                if (!link) return '';
+                try {
+                    const u = new URL(link);
+                    return u.searchParams.get('code')
+                        || u.searchParams.get('ref')
+                        || u.searchParams.get('referral_code')
+                        || (u.pathname.split('/').filter(Boolean).pop() || '');
+                } catch (e) {
+                    return '';
+                }
+            }
+
             const reveals = document.querySelectorAll('.reveal');
             const revealOnScroll = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
@@ -736,19 +750,95 @@
                 opt.addEventListener('click', () => selectPack(opt));
             });
 
-            // LaunchList's widget-diy.js intercepts submission on .launchlist-form
-            // and handles referral attribution + redirect. No custom handler needed.
-            // Button feedback only:
-            const waitlistForm = document.getElementById('waitlist-form');
-            if (waitlistForm) {
-                waitlistForm.addEventListener('submit', function () {
-                    const btn = waitlistForm.querySelector('button[type="submit"]');
-                    if (btn) {
-                        btn.textContent = 'Holding your spot...';
-                        btn.disabled = true;
+            // ---------------------------------------------------------
+            // LaunchList AJAX submit.
+            //
+            // The form deliberately carries NO launchlist-* class, so their
+            // widget script never binds to it and can't trigger a native POST.
+            // We own the submit entirely and forward referral attribution
+            // ourselves (see the ?ref= handling below).
+            //
+            // Requires the LaunchList Grow tier (AJAX submit).
+            // ---------------------------------------------------------
+            const formError = document.getElementById('formError');
+
+            // Capture-phase listener on `document` rather than on the form itself.
+            // This fires before anything else can claim the event, and survives
+            // any third-party script replacing or rebinding the form element.
+            document.addEventListener('submit', async function (e) {
+                const form = e.target;
+                if (!form || form.id !== 'waitlist-form') return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const btn = form.querySelector('button[type="submit"]');
+                const originalLabel = btn ? btn.textContent : '';
+                if (btn) {
+                    btn.textContent = 'Holding your spot...';
+                    btn.disabled = true;
+                }
+                if (formError) formError.classList.add('hidden');
+
+                try {
+                    const formData = new FormData(form);
+
+                    // Forward referral attribution ourselves, since we're no longer
+                    // relying on LaunchList's script to attach it at submit time.
+                    const incomingRef = new URLSearchParams(window.location.search).get('ref');
+                    if (incomingRef) {
+                        ['ref', 'referral', 'referral_code', 'referrer'].forEach(key => {
+                            if (!formData.has(key)) formData.append(key, incomingRef);
+                        });
                     }
-                });
-            }
+
+                    const response = await fetch(form.getAttribute('action'), {
+                        method: 'POST',
+                        body: formData,
+                        headers: { Accept: 'application/json' }
+                    });
+
+                    const raw = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(raw);
+                    } catch (parseErr) {
+                        console.error('LaunchList did not return JSON. Raw response:', raw);
+                        throw new Error('Unexpected response from the waitlist service.');
+                    }
+
+                    console.log('LaunchList response:', data);
+                    try { sessionStorage.setItem('sp_signup', JSON.stringify(data)); } catch (err) {}
+
+                    if (data.ok) {
+                        const code = data.referral_code
+                                  || data.referralCode
+                                  || data.code
+                                  || extractCode(data.embeddedLink)
+                                  || '';
+
+                        const qs = new URLSearchParams();
+                        if (code) qs.set('ref', code);
+                        qs.set('count', data.users_referred ?? data.usersReferred ?? 0);
+                        if (data.position) qs.set('pos', data.position);
+                        if (data.embeddedLink) qs.set('w', data.embeddedLink);
+
+                        window.location.href = '/success.html?' + qs.toString();
+                    } else {
+                        throw new Error(data.error || 'Something went wrong.');
+                    }
+                } catch (err) {
+                    console.error('Signup failed:', err);
+                    if (formError) {
+                        formError.textContent = "That didn't go through. Please check your email address and try again.";
+                        formError.classList.remove('hidden');
+                    }
+                    if (btn) {
+                        btn.textContent = originalLabel;
+                        btn.disabled = false;
+                    }
+                }
+            }, true);
         });
     </script>
 </body>
