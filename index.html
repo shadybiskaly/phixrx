@@ -132,9 +132,6 @@
     ]
     </script>
     
-    <!-- LaunchList waitlist + referral engine -->
-    <script src="https://getlaunchlist.com/js/widget-diy.js" defer></script>
-
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -535,7 +532,7 @@
 
             </div>
 
-            <form id="waitlist-form" class="space-y-5 bg-brand-card p-8 sm:p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left" action="https://getlaunchlist.com/s/ZlhThK" method="POST">
+            <form id="waitlist-form" class="space-y-5 bg-brand-card p-8 sm:p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left" action="https://WORKER-URL-HERE/signup" method="POST">
 
                 <!-- Selected pack (populated by pack buttons above) -->
                 <input type="hidden" id="selectedPack" name="selectedPack" value="8-Pack">
@@ -682,7 +679,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v4 loaded', 'color:#00E5FF;font-weight:bold');
+            console.log('%cSocial Phix signup v5 loaded', 'color:#00E5FF;font-weight:bold');
 
             const reveals = document.querySelectorAll('.reveal');
             const revealOnScroll = new IntersectionObserver((entries, observer) => {
@@ -736,20 +733,12 @@
             });
 
             // ---------------------------------------------------------
-            // LaunchList AJAX submit.
-            //
-            // The form deliberately carries NO launchlist-* class, so their
-            // widget script never binds to it and can't trigger a native POST.
-            // We own the submit entirely and forward referral attribution
-            // ourselves (see the ?ref= handling below).
-            //
-            // Requires the LaunchList Grow tier (AJAX submit).
+            // Signup posts to our own Cloudflare Worker.
+            // It stores them, then tells Kit to send the confirmation
+            // email. Nothing is shown until they confirm.
             // ---------------------------------------------------------
             const formError = document.getElementById('formError');
 
-            // Capture-phase listener on `document` rather than on the form itself.
-            // This fires before anything else can claim the event, and survives
-            // any third-party script replacing or rebinding the form element.
             document.addEventListener('submit', async function (e) {
                 const form = e.target;
                 if (!form || form.id !== 'waitlist-form') return;
@@ -768,48 +757,33 @@
                 try {
                     const formData = new FormData(form);
 
-                    // Forward referral attribution ourselves, since we're no longer
-                    // relying on LaunchList's script to attach it at submit time.
-                    const incomingRef = new URLSearchParams(window.location.search).get('ref');
-                    if (incomingRef) {
-                        ['ref', 'referral', 'referral_code', 'referrer'].forEach(key => {
-                            if (!formData.has(key)) formData.append(key, incomingRef);
-                        });
-                    }
+                    // Pass along who referred them, plus any campaign tags.
+                    const params = new URLSearchParams(window.location.search);
+                    ['ref', 'utm_source', 'utm_medium', 'utm_campaign'].forEach(key => {
+                        const value = params.get(key);
+                        if (value) formData.append(key, value);
+                    });
 
                     const response = await fetch(form.getAttribute('action'), {
                         method: 'POST',
-                        body: formData,
-                        headers: { Accept: 'application/json' }
+                        body: formData
                     });
 
-                    const raw = await response.text();
-                    let data;
-                    try {
-                        data = JSON.parse(raw);
-                    } catch (parseErr) {
-                        console.error('LaunchList did not return JSON. Raw response:', raw);
-                        throw new Error('Unexpected response from the waitlist service.');
-                    }
-
-                    console.log('LaunchList response:', data);
-                    try { sessionStorage.setItem('sp_signup', JSON.stringify(data)); } catch (err) {}
+                    const data = await response.json();
+                    console.log('Signup response:', data);
 
                     if (data.ok) {
-                        // Deliberately no referral code here. New signups land on
-                        // the "check your inbox" state; the tracker unlocks only
-                        // via the link in the confirmation email, once verified.
-                        const qs = new URLSearchParams();
-                        if (data.position) qs.set('pos', data.position);
-
-                        window.location.href = '/success.html?' + qs.toString();
+                        // Already confirmed previously? Straight to their tracker.
+                        window.location.href = data.alreadyVerified && data.code
+                            ? '/success.html?ref=' + encodeURIComponent(data.code)
+                            : '/success.html?pending=1';
                     } else {
                         throw new Error(data.error || 'Something went wrong.');
                     }
                 } catch (err) {
                     console.error('Signup failed:', err);
                     if (formError) {
-                        formError.textContent = "That didn't go through. Please check your email address and try again.";
+                        formError.textContent = err.message || "That didn't go through. Please try again.";
                         formError.classList.remove('hidden');
                     }
                     if (btn) {
