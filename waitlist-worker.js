@@ -44,7 +44,7 @@
 
 // Bump this whenever you paste in new code, so /  tells you at a glance
 // whether what's deployed is what you think is deployed.
-const VERSION = "2026-07-25.h";
+const VERSION = "2026-07-25.k";
 
 // Pasted secrets often pick up a trailing space or newline that you
 // can't see in the dashboard. Trim before use.
@@ -110,14 +110,17 @@ export default {
 
       // Protected routes
       if (path === "/setup" || path === "/admin" || path === "/test-email"
-          || path === "/health" || path === "/export") {
+          || path === "/health" || path === "/export" || path === "/delete"
+          || path === "/sync-kit") {
         if (url.searchParams.get("token") !== trim(env.SHARED_SECRET) || !env.SHARED_SECRET) {
           return new Response("Unauthorized. Check your token.", { status: 401 });
         }
         if (path === "/setup")  return runSetup(env);
         if (path === "/admin")  return adminView(env);
         if (path === "/health") return healthCheck(env);
-        if (path === "/export") return exportCsv(env);
+        if (path === "/export")   return exportCsv(env);
+        if (path === "/delete")   return deleteSignup(url, env);
+        if (path === "/sync-kit") return syncKit(url, env);
         return testEmail(url, env);
       }
 
@@ -211,19 +214,47 @@ async function signup(request, env) {
   const existingRaw = await env.DB.get(`sub:${email}`);
   if (existingRaw) {
     const existing = JSON.parse(existingRaw);
+
     if (existing.verified) {
-      // Already confirmed — just hand back their code.
-      return json({ ok: true, alreadyVerified: true, code: existing.code });
+      // Already confirmed. Rather than doing nothing silently, send their
+      // welcome email again — useful for anyone who lost the link, and it
+      // makes repeat testing visible instead of looking like a failure.
+      let emailSent = true, emailError = null;
+      try {
+        await sendEmail(env, { to: email, ...welcomeEmail(existing.name, existing.code) });
+      } catch (err) {
+        emailSent = false;
+        emailError = err.message;
+        console.error("WELCOME RESEND FAILED for", email, "->", err.message);
+      }
+
+      console.log("signup: already verified —", email,
+                  emailSent ? "| welcome email resent" : "| EMAIL FAILED");
+
+      return json({
+        ok: true, alreadyVerified: true, code: existing.code,
+        emailSent, emailError,
+        note: "This address was already confirmed. Their link has been emailed again.",
+      });
     }
     // Signed up but never confirmed. Send a fresh link rather than a duplicate record.
     const token = newToken();
     await env.DB.put(`pending:${token}`, email, { expirationTtl: PENDING_TTL_SECONDS });
 
     const link = verifyUrl(request, token);
-    await sendEmail(env, { to: email, ...confirmationEmail(existing.name, link) });
+
+    let emailSent = true, emailError = null;
+    try {
+      await sendEmail(env, { to: email, ...confirmationEmail(existing.name, link) });
+    } catch (err) {
+      emailSent = false;
+      emailError = err.message;
+      console.error("RESEND OF CONFIRMATION FAILED for", email, "->", err.message);
+    }
+
     await pushToKit(env, email, existing.name, { verify_url: link }, TAG_PENDING);
 
-    return json({ ok: true, resent: true });
+    return json({ ok: true, resent: true, emailSent, emailError });
   }
 
   // --- New signup --------------------------------------------------
@@ -252,8 +283,17 @@ async function signup(request, env) {
   const link = verifyUrl(request, token);
 
   // Send the confirmation before anything optional, so a Kit problem
-  // can never stop someone from being able to confirm.
-  await sendEmail(env, { to: email, ...confirmationEmail(name, link) });
+  // can never stop someone from being able to confirm. If the send fails
+  // we keep the signup anyway — better to have their details and resend
+  // than lose them — but we report it so it's never silent.
+  let emailSent = true, emailError = null;
+  try {
+    await sendEmail(env, { to: email, ...confirmationEmail(name, link) });
+  } catch (err) {
+    emailSent = false;
+    emailError = err.message;
+    console.error("CONFIRMATION EMAIL FAILED for", email, "->", err.message);
+  }
 
   await pushToKit(env, email, name, {
     verify_url:     link,
@@ -270,8 +310,10 @@ async function signup(request, env) {
     city:           record.city          || "",
   }, TAG_PENDING);
 
-  console.log("signup:", email, ref ? `(referred by ${ref})` : "");
-  return json({ ok: true });
+  console.log("signup:", email, ref ? `(referred by ${ref})` : "",
+              emailSent ? "| email sent" : "| EMAIL FAILED");
+
+  return json({ ok: true, emailSent, emailError });
 }
 
 /* ==================== 2. VERIFY ==================== */
@@ -544,7 +586,16 @@ async function adminView(env) {
     <div class="wide">
       <div class="head">
         <h1>Waitlist</h1>
-        <a class="btn" href="/export?token=${esc(env.SHARED_SECRET)}">Download CSV</a>
+        <div style="display:flex;gap:8px;">
+          <a class="btn" href="/export?token=${esc(env.SHARED_SECRET)}">Download CSV</a>
+          <a class="btn" style="background:#0369a1;" href="/sync-kit?token=${esc(env.SHARED_SECRET)}">Sync to Kit</a>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:14px;border-left-color:${env.KIT_API_KEY ? "#15803d" : "#f97316"};">
+        <strong>Kit:</strong> ${env.KIT_API_KEY
+          ? "connected. New signups are added automatically."
+          : `not connected. Add <code>KIT_API_KEY</code> as a Secret in your worker settings, then run <a href="/setup?token=${esc(env.SHARED_SECRET)}">/setup</a>.`}
       </div>
 
       <div class="cards">
@@ -587,10 +638,18 @@ async function adminView(env) {
         </div>
       </div>
 
+      <p class="muted" style="font-size:13px;margin-top:6px;">Click any column heading to sort. Click again to reverse.</p>
       <table class="data" id="all">
         <tr>
-          <th>Email</th><th>Name</th><th class="c">Status</th><th class="c">Refs</th>
-          <th>Pack</th><th>Use case</th><th>Price</th><th>Referred by</th><th>Joined</th>
+          <th data-sort="text">Email</th>
+          <th data-sort="text">Name</th>
+          <th data-sort="text" class="c">Status</th>
+          <th data-sort="num" class="c">Refs</th>
+          <th data-sort="text">Pack</th>
+          <th data-sort="text">Use case</th>
+          <th data-sort="text">Price</th>
+          <th data-sort="text">Referred by</th>
+          <th data-sort="text">Joined</th>
         </tr>
         ${rows || '<tr><td colspan="9" class="muted">No signups yet.</td></tr>'}
       </table>
@@ -619,8 +678,177 @@ async function adminView(env) {
       }
       search.addEventListener('input', apply);
       filter.addEventListener('change', apply);
+
+      // Column sorting
+      const table = document.getElementById('all');
+      const headers = Array.from(table.querySelectorAll('th'));
+      let sortCol = -1, sortAsc = true;
+
+      headers.forEach((th, i) => {
+        th.style.cursor = 'pointer';
+        th.title = 'Sort by ' + th.textContent.trim();
+        th.addEventListener('click', () => {
+          sortAsc = (sortCol === i) ? !sortAsc : true;
+          sortCol = i;
+          const numeric = th.dataset.sort === 'num';
+
+          const sorted = rows.slice().sort((a, b) => {
+            const av = a.children[i].textContent.trim();
+            const bv = b.children[i].textContent.trim();
+            let cmp;
+            if (numeric) {
+              cmp = (parseFloat(av) || 0) - (parseFloat(bv) || 0);
+            } else {
+              cmp = av.localeCompare(bv);
+            }
+            return sortAsc ? cmp : -cmp;
+          });
+
+          sorted.forEach(r => table.appendChild(r));
+          headers.forEach(h => h.textContent = h.textContent.replace(/ [\u2191\u2193]$/, ''));
+          th.textContent = th.textContent + (sortAsc ? ' \u2191' : ' \u2193');
+        });
+      });
     </script>
   `, true);
+}
+
+/* ==================== DELETE ==================== */
+
+/**
+ * Removes one signup completely, so you can run the flow again with the
+ * same address. Also what you'd use to honour a deletion request, which
+ * your privacy policy promises.
+ *   /delete?token=SECRET&email=someone@example.com
+ */
+async function deleteSignup(url, env) {
+  const email = (url.searchParams.get("email") || "").trim().toLowerCase();
+  const token = esc(url.searchParams.get("token") || "");
+
+  if (!email) {
+    return html(`
+      <h1>Delete a signup</h1>
+      <p>Removes the record entirely — useful for re-testing with the same
+         address, and for honouring deletion requests.</p>
+      <form method="GET" action="/delete" style="margin-top:18px;">
+        <input type="hidden" name="token" value="${token}">
+        <input type="email" name="email" placeholder="address to remove" required
+               style="width:280px;" autofocus>
+        <button type="submit" class="btn" style="border:0;cursor:pointer;">Delete</button>
+      </form>`);
+  }
+
+  const raw = await env.DB.get(`sub:${email}`);
+  if (!raw) {
+    return html(`<h1>Nothing to delete</h1>
+      <p>No record for <code>${esc(email)}</code>.</p>
+      <p><a href="/delete?token=${token}">Try another</a></p>`);
+  }
+
+  const sub = JSON.parse(raw);
+
+  await env.DB.delete(`sub:${email}`);
+  if (sub.code) await env.DB.delete(`code:${sub.code}`);
+
+  // Clear any outstanding verification links for this address.
+  const pendings = await env.DB.list({ prefix: "pending:" });
+  let cleared = 0;
+  for (const key of pendings.keys) {
+    if ((await env.DB.get(key.name)) === email) {
+      await env.DB.delete(key.name);
+      cleared++;
+    }
+  }
+
+  console.log("deleted:", email, "| code:", sub.code || "none", "| tokens:", cleared);
+
+  return html(`
+    <h1>Deleted</h1>
+    <p class="good">Removed <code>${esc(email)}</code>.</p>
+    <table>
+      <tr><td>Referral code freed</td><td><code>${esc(sub.code || "—")}</code></td></tr>
+      <tr><td>Pending links cleared</td><td>${cleared}</td></tr>
+      <tr><td>Was confirmed</td><td>${sub.verified ? "yes" : "no"}</td></tr>
+    </table>
+    <div class="note">You can now sign up with this address again as if it were new.</div>
+    <p style="margin-top:18px;"><a href="/admin?token=${token}">Back to dashboard</a></p>`);
+}
+
+/* ==================== KIT BACKFILL ==================== */
+
+/**
+ * Pushes everyone already in the database up to Kit.
+ *   /sync-kit?token=SECRET
+ *
+ * Needed once, after you switch Kit on — anyone who signed up while
+ * KIT_API_KEY was unset never got sent. New signups go automatically.
+ *
+ * Cloudflare caps outbound calls per request, so this works through the
+ * list in batches and hands you a link to continue.
+ */
+async function syncKit(url, env) {
+  const token = esc(url.searchParams.get("token") || "");
+
+  if (!env.KIT_API_KEY) {
+    return html(`
+      <h1>Kit isn't connected yet</h1>
+      <p>Add <code>KIT_API_KEY</code> as a Secret in your worker settings and deploy,
+         then run <a href="/setup?token=${token}">/setup</a> to create the fields
+         and tags. Come back here afterwards.</p>`);
+  }
+
+  const BATCH = 15;
+  const start = parseInt(url.searchParams.get("from"), 10) || 0;
+
+  const list = await env.DB.list({ prefix: "sub:" });
+  const keys = list.keys.slice(start, start + BATCH);
+
+  let synced = 0;
+  const problems = [];
+
+  for (const key of keys) {
+    const raw = await env.DB.get(key.name);
+    if (!raw) continue;
+    const s = JSON.parse(raw);
+
+    try {
+      await pushToKit(env, s.email, s.name, {
+        referral_code:    s.code,
+        users_referred:   s.referrals ?? 0,
+        email_verified:   s.verified ? "true" : "false",
+        referred_by_code: s.referredBy,
+        selected_pack:    s.selectedPack,
+        use_case:         s.useCase,
+        price_reaction:   s.priceReaction,
+        utm_source:       s.utmSource,
+        utm_medium:       s.utmMedium,
+        utm_campaign:     s.utmCampaign,
+        country_code:     s.country,
+        city:             s.city,
+      }, s.verified ? TAG_VERIFIED : TAG_PENDING);
+      synced++;
+    } catch (err) {
+      problems.push(`${s.email}: ${err.message}`);
+    }
+  }
+
+  const done = start + keys.length;
+  const remaining = list.keys.length - done;
+
+  return html(`
+    <h1>Kit sync</h1>
+    <table>
+      <tr><td>Sent this batch</td><td><strong>${synced}</strong></td></tr>
+      <tr><td>Done so far</td><td><strong>${done}</strong> of ${list.keys.length}</td></tr>
+      <tr><td>Remaining</td><td><strong>${remaining}</strong></td></tr>
+    </table>
+    ${problems.length ? `<h2 class="bad">Problems</h2><ul>${problems.map(p => `<li>${esc(p)}</li>`).join("")}</ul>` : ""}
+    ${remaining > 0
+      ? `<div class="note"><strong>More to go.</strong>
+           <a href="/sync-kit?token=${token}&from=${done}">Continue with the next ${BATCH}</a>.</div>`
+      : `<div class="note"><p class="good">Everyone is in Kit.</p>
+           New signups sync automatically from now on — you won't need this again.</div>`}
+    <p style="margin-top:18px;"><a href="/admin?token=${token}">Back to dashboard</a></p>`);
 }
 
 /* ==================== EXPORT ==================== */
@@ -686,6 +914,8 @@ function indexPage(url) {
     ["/health?token=" + token,     "Check everything at once", true],
     ["/test-email?token=" + token, "Send one test email", true],
     ["/admin?token=" + token,      "Your signup numbers", true],
+    ["/delete?token=" + token,     "Remove a signup so you can re-test", true],
+    ["/sync-kit?token=" + token,   "Push existing signups up to Kit", true],
     ["/setup?token=" + token,      "Create Kit fields (only if using Kit)", true],
     ["/signup",                    "POST only — your form posts here", false],
     ["/verify?t=TOKEN",            "The link in the confirmation email", false],
@@ -961,8 +1191,9 @@ async function testEmail(url, env) {
 
 async function sendEmail(env, { to, subject, html, text }) {
   if (!env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY not set — no email sent to", to);
-    return;
+    // Throw rather than return quietly — a missing key used to mean
+    // signups succeeded with no email and no visible clue why.
+    throw new Error("RESEND_API_KEY secret is not set on this worker");
   }
 
   const res = await fetch(RESEND, {
