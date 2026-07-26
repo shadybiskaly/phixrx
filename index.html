@@ -680,7 +680,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v10 loaded', 'color:#00E5FF;font-weight:bold');
+            console.log('%cSocial Phix signup v11 loaded', 'color:#00E5FF;font-weight:bold');
 
             // ---- Worker address ------------------------------------
             const WORKER = (window.SOCIALPHIX_WORKER || '').replace(/\/+$/, '');
@@ -802,6 +802,16 @@
 
                     // The signup can succeed while the email fails. Say so
                     // clearly rather than letting it look like it all worked.
+                    if (data.ok && data.alreadyVerified) {
+                        console.info(
+                            '%cThis address was already confirmed.',
+                            'color:#00E5FF;font-weight:bold',
+                            '\n\nNo new confirmation was needed — their existing link was emailed again.',
+                            '\nTo test the full flow from scratch, delete the record first:',
+                            '\n' + WORKER + '/delete?token=YOUR_SECRET'
+                        );
+                    }
+
                     if (data.ok && data.emailSent === false) {
                         console.error(
                             '%cSignup saved, but the confirmation email did NOT send.',
