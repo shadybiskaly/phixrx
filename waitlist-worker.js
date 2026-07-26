@@ -44,7 +44,7 @@
 
 // Bump this whenever you paste in new code, so /  tells you at a glance
 // whether what's deployed is what you think is deployed.
-const VERSION = "2026-07-25.f";
+const VERSION = "2026-07-25.g";
 
 // Pasted secrets often pick up a trailing space or newline that you
 // can't see in the dashboard. Trim before use.
@@ -683,7 +683,7 @@ function indexPage(url) {
 
   const routes = [
     ["/health?token=" + token,     "Check everything at once", true],
-    ["/test-email?token=" + token + "&to=you@example.com", "Send one test email", true],
+    ["/test-email?token=" + token, "Send one test email", true],
     ["/admin?token=" + token,      "Your signup numbers", true],
     ["/setup?token=" + token,      "Create Kit fields (only if using Kit)", true],
     ["/signup",                    "POST only — your form posts here", false],
@@ -855,7 +855,7 @@ async function healthCheck(env) {
     ${verdict}
     <table>${body}</table>
     <div class="note">
-      Next: <code>/test-email?token=YOUR_SECRET&amp;to=you@example.com</code> actually sends one.
+      Next: <code>/test-email?token=YOUR_SECRET</code> actually sends one.
     </div>
   `);
 }
@@ -864,16 +864,35 @@ async function healthCheck(env) {
 
 /**
  * Isolates email sending from everything else.
- *   /test-email?token=SECRET&to=you@example.com
+ *   /test-email?token=SECRET            (then type a real address on the page)
  * Tells you exactly what Resend said, in plain language.
  */
 async function testEmail(url, env) {
   const to = (url.searchParams.get("to") || "").trim();
 
-  if (!to) {
-    return html(`<h1>Email test</h1>
-      <p>Add an address to send to:</p>
-      <p><code>/test-email?token=YOUR_SECRET&amp;to=you@example.com</code></p>`);
+  // Reserved placeholder domains Resend rejects outright.
+  const PLACEHOLDERS = ["example.com", "example.org", "example.net", "test.com", "domain.com", "email.com"];
+  const domain = (to.split("@")[1] || "").toLowerCase();
+
+  if (!to || PLACEHOLDERS.includes(domain)) {
+    const warning = to
+      ? `<div class="note" style="border-left-color:#f97316;">
+           <strong>${esc(domain)} won't work.</strong> It's a reserved placeholder domain and Resend
+           blocks it on purpose. Use a real inbox you can open.
+         </div>`
+      : "";
+
+    return html(`
+      <h1>Email test</h1>
+      ${warning}
+      <p>Sends one confirmation email so you can see whether delivery works.</p>
+      <form method="GET" action="/test-email" style="margin-top:18px;">
+        <input type="hidden" name="token" value="${esc(url.searchParams.get("token") || "")}">
+        <input type="email" name="to" placeholder="your.real@address.com" required
+               style="width:280px;" autofocus>
+        <button type="submit" class="btn" style="border:0;cursor:pointer;">Send test</button>
+      </form>
+    `);
   }
 
   const checks = [];
@@ -910,6 +929,9 @@ async function testEmail(url, env) {
         hint = `<p><strong>Your domain isn't verified yet.</strong> Until it is, Resend only lets you
           email the address you signed up with. Go to resend.com &rarr; Domains &rarr; add
           <code>socialphix.com</code> and complete the DNS records.</p>`;
+      } else if (res.status === 422 && /`to` field|testing email/i.test(bodyText)) {
+        hint = `<p><strong>The recipient address was rejected.</strong> Resend blocks placeholder
+          domains like <code>example.com</code>. Send to a real inbox you can open.</p>`;
       } else if (res.status === 422) {
         hint = `<p><strong>The From address is rejected.</strong> <code>${esc(FROM)}</code> must be on a
           domain you've verified in Resend. Edit <code>FROM</code> near the top of the worker.</p>`;
