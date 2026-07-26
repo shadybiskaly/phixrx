@@ -44,7 +44,7 @@
 
 // Bump this whenever you paste in new code, so /  tells you at a glance
 // whether what's deployed is what you think is deployed.
-const VERSION = "2026-07-25.g";
+const VERSION = "2026-07-25.h";
 
 // Pasted secrets often pick up a trailing space or newline that you
 // can't see in the dashboard. Trim before use.
@@ -57,6 +57,7 @@ const SITE = "https://www.socialphix.com";
 const ALLOWED_ORIGINS = [
   "https://www.socialphix.com",
   "https://socialphix.com",
+  "https://shadybiskaly.github.io",   // GitHub Pages default, for previewing
   "http://localhost:8080",
   "http://localhost:3000",
   "http://127.0.0.1:8080",

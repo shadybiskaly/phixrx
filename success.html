@@ -10,6 +10,14 @@
 
   gtag('config', 'G-0QQKCJJEPB');
 </script>
+    <!-- ============================================================
+         ONE THING TO EDIT ON THIS PAGE
+         Must match the address you set in index.html.
+         ============================================================ -->
+    <script>
+      window.SOCIALPHIX_WORKER = "https://socialphix-waitlist.shadybiskaly.workers.dev";
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You're In | Social Phix</title>
@@ -275,8 +283,9 @@
     </footer>
 
     <script>
-    // Your Cloudflare Worker address. Same one the signup form posts to.
-    const WORKER = 'https://WORKER-URL-HERE';
+    // Set in the config block at the top of this file.
+    const WORKER = (window.SOCIALPHIX_WORKER || '').replace(/\/+$/, '');
+    const WORKER_MISSING = !WORKER || WORKER.includes('WORKER-URL-HERE');
 
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -351,6 +360,14 @@
         // rather than frozen at whatever it was when the email went out.
         async function loadLiveCount(code) {
             let count = 0;
+
+            if (WORKER_MISSING) {
+                console.error('Social Phix: worker address not set — showing 0 referrals.',
+                    'Edit SOCIALPHIX_WORKER at the top of success.html.');
+                renderProgress(0);
+                return;
+            }
+
             try {
                 const res  = await fetch(WORKER + '/stats?code=' + encodeURIComponent(code));
                 const data = await res.json();

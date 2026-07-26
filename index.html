@@ -13,6 +13,16 @@
       gtag('config', 'G-0QQKCJJEPB');
     </script>
 
+    <!-- ============================================================
+         ONE THING TO EDIT ON THIS PAGE
+         Paste your Cloudflare Worker address between the quotes.
+         It looks like: https://socialphix-waitlist.yourname.workers.dev
+         The page will warn you loudly if you forget.
+         ============================================================ -->
+    <script>
+      window.SOCIALPHIX_WORKER = "https://socialphix-waitlist.shadybiskaly.workers.dev";
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Phix | Pharmacist-Formulated Liquid Confidence</title>
@@ -536,7 +546,7 @@
 
             </div>
 
-            <form id="waitlist-form" class="space-y-5 bg-brand-card p-8 sm:p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left" action="https://WORKER-URL-HERE/signup" method="POST">
+            <form id="waitlist-form" class="space-y-5 bg-brand-card p-8 sm:p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left" method="POST">
 
                 <!-- Selected pack (populated by pack buttons above) -->
                 <input type="hidden" id="selectedPack" name="selectedPack" value="8-Pack">
@@ -670,7 +680,34 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v8 loaded', 'color:#00E5FF;font-weight:bold');
+            console.log('%cSocial Phix signup v9 loaded', 'color:#00E5FF;font-weight:bold');
+
+            // ---- Worker address ------------------------------------
+            const WORKER = (window.SOCIALPHIX_WORKER || '').replace(/\/+$/, '');
+            const workerMissing = !WORKER || WORKER.includes('WORKER-URL-HERE');
+
+            const signupForm = document.getElementById('waitlist-form');
+            if (signupForm && !workerMissing) {
+                signupForm.setAttribute('action', WORKER + '/signup');
+            }
+
+            if (workerMissing) {
+                console.error(
+                    '%cSocial Phix: worker address not set.',
+                    'color:#FF5722;font-weight:bold;font-size:14px',
+                    '\n\nEdit the SOCIALPHIX_WORKER line near the top of index.html and paste your ' +
+                    'Cloudflare Worker address. Signups cannot work until you do.'
+                );
+
+                // Visible banner, so this never fails quietly again.
+                const banner = document.createElement('div');
+                banner.style.cssText =
+                    'position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#FF5722;color:#fff;' +
+                    'padding:14px 18px;font:600 13px/1.5 system-ui,sans-serif;text-align:center;';
+                banner.textContent =
+                    'Setup needed: the worker address is still a placeholder. Edit SOCIALPHIX_WORKER at the top of index.html.';
+                document.body.appendChild(banner);
+            }
 
             const reveals = document.querySelectorAll('.reveal');
             const revealOnScroll = new IntersectionObserver((entries, observer) => {
