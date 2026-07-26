@@ -532,7 +532,7 @@
 
             </div>
 
-            <form id="waitlist-form" class="space-y-5 bg-brand-card p-8 sm:p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left" action="https://socialphix-waitlist.shadybiskaly.workers.dev/signup" method="POST">
+            <form id="waitlist-form" class="space-y-5 bg-brand-card p-8 sm:p-10 rounded-xl border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left" action="https://WORKER-URL-HERE/signup" method="POST">
 
                 <!-- Selected pack (populated by pack buttons above) -->
                 <input type="hidden" id="selectedPack" name="selectedPack" value="8-Pack">
@@ -541,30 +541,12 @@
                 <div>
                     <label for="name" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">First Name</label>
                     <input type="text" id="name" name="name" placeholder="Alex" required
+                           autocapitalize="words" autocomplete="given-name"
+                           style="text-transform: capitalize;"
                            class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 placeholder-slate-600">
                 </div>
 
-                <!-- Poll Field 1: User Profile -->
-                <div>
-                    <label for="userGroup" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">I am a...</label>
-                    <div class="relative">
-                        <select id="userGroup" name="userGroup" required 
-                                class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 appearance-none cursor-pointer">
-                            <option value="" disabled selected>Select your profile</option>
-                            <option value="Founder">Founder</option>
-                            <option value="Sales Professional">Sales Professional</option>
-                            <option value="Creator">Creator</option>
-                            <option value="Public Speaker">Public Speaker</option>
-                            <option value="Executive">Executive</option>
-                            <option value="Student">Student</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-slate-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Poll Field 2: Use Case -->
+                <!-- Poll Field 1: Use Case -->
                 <div>
                     <label for="useCase" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Use Case</label>
                     <div class="relative">
@@ -586,7 +568,7 @@
                     </div>
                 </div>
 
-                <!-- Poll Field 3: Price Reaction -->
+                <!-- Poll Field 2: Price Reaction -->
                 <div>
                     <label for="priceReaction" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">At $7 a bottle, this feels...</label>
                     <div class="relative">
@@ -679,7 +661,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v5 loaded', 'color:#00E5FF;font-weight:bold');
+            console.log('%cSocial Phix signup v6 loaded', 'color:#00E5FF;font-weight:bold');
 
             const reveals = document.querySelectorAll('.reveal');
             const revealOnScroll = new IntersectionObserver((entries, observer) => {

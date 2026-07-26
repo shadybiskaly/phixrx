@@ -42,6 +42,14 @@
  *   5. Redirects to your tracker page
  */
 
+// Bump this whenever you paste in new code, so /  tells you at a glance
+// whether what's deployed is what you think is deployed.
+const VERSION = "2026-07-25.d";
+
+// Pasted secrets often pick up a trailing space or newline that you
+// can't see in the dashboard. Trim before use.
+const trim = v => (typeof v === "string" ? v.trim() : v);
+
 const SITE = "https://www.socialphix.com";
 const KIT  = "https://api.kit.com/v4";
 const RESEND = "https://api.resend.com/emails";
@@ -60,7 +68,7 @@ const PENDING_TTL_SECONDS = 60 * 60 * 24 * 7; // unconfirmed signups expire afte
 // Kit converts each label to a lowercase underscored key.
 const FIELD_LABELS = [
   "Referral Code", "Verify Url", "Users Referred", "Email Verified",
-  "Referred By Code", "Selected Pack", "User Group", "Use Case",
+  "Referred By Code", "Selected Pack", "Use Case",
   "Price Reaction", "Utm Source", "Utm Medium", "Utm Campaign",
   "Country Code", "City",
 ];
@@ -90,17 +98,23 @@ export default {
       if (path === "/stats")  return cors(await stats(url, env));
 
       // Protected routes
-      if (path === "/setup" || path === "/admin") {
-        if (url.searchParams.get("token") !== env.SHARED_SECRET || !env.SHARED_SECRET) {
-          return new Response("Unauthorized.", { status: 401 });
+      if (path === "/setup" || path === "/admin" || path === "/test-email" || path === "/health") {
+        if (url.searchParams.get("token") !== trim(env.SHARED_SECRET) || !env.SHARED_SECRET) {
+          return new Response("Unauthorized. Check your token.", { status: 401 });
         }
-        return path === "/setup" ? runSetup(env) : adminView(env);
+        if (path === "/setup")  return runSetup(env);
+        if (path === "/admin")  return adminView(env);
+        if (path === "/health") return healthCheck(env);
+        return testEmail(url, env);
       }
 
-      return new Response("Social Phix waitlist worker is running.", { status: 200 });
+      return indexPage(url);
     } catch (err) {
       console.error("ERROR:", err.stack || err.message);
-      return cors(json({ ok: false, error: "Something went wrong on our end." }, 500));
+      const friendly = /Resend/i.test(err.message)
+        ? "We couldn't send your confirmation email. Please try again shortly."
+        : "Something went wrong on our end.";
+      return cors(json({ ok: false, error: friendly, detail: err.message }, 500));
     }
   },
 };
@@ -111,7 +125,7 @@ async function signup(request, env) {
   const form = await readBody(request);
 
   const email = String(form.email || "").trim().toLowerCase();
-  const name  = String(form.name  || "").trim();
+  const name  = titleCase(form.name || "");
   const ref   = String(form.ref   || "").trim().toUpperCase();
 
   // --- Validation -------------------------------------------------
@@ -165,7 +179,6 @@ async function signup(request, env) {
     signupIp: ip,
     createdAt: new Date().toISOString(),
     selectedPack:  form.selectedPack  || null,
-    userGroup:     form.userGroup     || null,
     useCase:       form.useCase       || null,
     priceReaction: form.priceReaction || null,
     country: request.cf?.country || null,
@@ -191,7 +204,6 @@ async function signup(request, env) {
     users_referred: "0",
     referred_by_code: ref || "",
     selected_pack:  record.selectedPack  || "",
-    user_group:     record.userGroup     || "",
     use_case:       record.useCase       || "",
     price_reaction: record.priceReaction || "",
     utm_source:     record.utmSource     || "",
@@ -309,7 +321,7 @@ async function stats(url, env) {
   return json({
     ok: true,
     referrals: sub.referrals || 0,
-    firstName: (sub.name || "").split(/\s+/)[0] || null,
+    firstName: firstNameOf(sub.name),
   });
 }
 
@@ -329,7 +341,7 @@ async function pushToKit(env, email, name, fields, tagName) {
 
     const res = await kit("POST", "/subscribers", env, {
       email_address: email,
-      first_name: (name || "").split(/\s+/)[0] || undefined,
+      first_name: firstNameOf(name) || undefined,
       state: "active",
       fields: clean,
     });
@@ -350,7 +362,7 @@ async function kit(method, path, env, body) {
   const res = await fetch(KIT + path, {
     method,
     headers: {
-      "X-Kit-Api-Key": env.KIT_API_KEY,
+      "X-Kit-Api-Key": trim(env.KIT_API_KEY),
       "Content-Type": "application/json",
     },
     body: body ? JSON.stringify(body) : undefined,
@@ -418,7 +430,7 @@ async function adminView(env) {
 
   let verified = 0, pending = 0, referred = 0;
   const top = [];
-  const packs = {}, groups = {}, prices = {};
+  const packs = {}, prices = {};
 
   for (const key of list.keys) {
     const raw = await env.DB.get(key.name);
@@ -430,7 +442,6 @@ async function adminView(env) {
     if (s.referrals > 0) top.push([s.email, s.referrals]);
 
     if (s.selectedPack)  packs[s.selectedPack]   = (packs[s.selectedPack] || 0) + 1;
-    if (s.userGroup)     groups[s.userGroup]     = (groups[s.userGroup] || 0) + 1;
     if (s.priceReaction) prices[s.priceReaction] = (prices[s.priceReaction] || 0) + 1;
   }
 
@@ -454,12 +465,265 @@ async function adminView(env) {
       <tr><td>Came via a referral</td><td><strong>${referred}</strong></td></tr>
     </table>
     ${breakdown("Pack chosen", packs)}
-    ${breakdown("Who they are", groups)}
     ${breakdown("Reaction to $7 a bottle", prices)}
     ${top.length ? `<h2>Top referrers</h2><table>${top.slice(0, 20)
       .map(([e, n]) => `<tr><td>${esc(e)}</td><td><strong>${n}</strong></td></tr>`).join("")}</table>` : ""}
     <div class="note">Watch the pack split and the price reaction — those two tell you
     whether $56 is the right ask.</div>
+  `);
+}
+
+/* ==================== INDEX ==================== */
+
+/**
+ * The catch-all. Shows which version is deployed and every route
+ * available, so an unknown path never looks like a mystery.
+ */
+function indexPage(url) {
+  const token = url.searchParams.get("token") || "YOUR_SECRET";
+  const base = url.origin;
+  const link = p => `${base}${p}`.replace("YOUR_SECRET", token);
+
+  const routes = [
+    ["/health?token=" + token,     "Check everything at once", true],
+    ["/test-email?token=" + token + "&to=you@example.com", "Send one test email", true],
+    ["/admin?token=" + token,      "Your signup numbers", true],
+    ["/setup?token=" + token,      "Create Kit fields (only if using Kit)", true],
+    ["/signup",                    "POST only — your form posts here", false],
+    ["/verify?t=TOKEN",            "The link in the confirmation email", false],
+    ["/stats?code=CODE",           "Referral count for the tracker", false],
+  ];
+
+  const rows = routes.map(([p, desc, clickable]) => {
+    const cell = clickable
+      ? `<a href="${esc(link(p))}"><code>${esc(p.split("?")[0])}</code></a>`
+      : `<code>${esc(p.split("?")[0])}</code>`;
+    return `<tr><td>${cell}</td><td style="font-size:13px;color:#475569;">${esc(desc)}</td></tr>`;
+  }).join("");
+
+  return html(`
+    <h1>Social Phix waitlist worker</h1>
+    <p>Deployed version <code>${esc(VERSION)}</code></p>
+    <div class="note">
+      <strong>Seeing this page when you expected something else?</strong>
+      The path you asked for isn't in the deployed code. Re-paste
+      <code>waitlist-worker.js</code> in the Cloudflare editor and click
+      <strong>Deploy</strong> — pasting alone doesn't publish it.
+    </div>
+    <h2>Routes</h2>
+    <table>${rows}</table>
+    ${url.searchParams.get("token")
+      ? `<p style="font-size:13px;color:#475569;">Links above include your token.</p>`
+      : `<p style="font-size:13px;color:#475569;">Add <code>?token=YOUR_SECRET</code> to this URL to get clickable links.</p>`}
+  `);
+}
+
+/* ==================== HEALTH CHECK ==================== */
+
+/**
+ * Checks everything at once and says what's wrong.
+ *   /health?token=SECRET
+ *
+ * The important one is the FROM-vs-verified-domain check: a domain
+ * can show "verified" in Resend while your FROM address still points
+ * at a different one.
+ */
+async function healthCheck(env) {
+  const rows = [];
+  const problems = [];
+
+  const ok  = (label, detail = "") => rows.push([label, "pass", detail]);
+  const bad = (label, detail) => { rows.push([label, "FAIL", detail]); problems.push(detail); };
+
+  /* --- Worker version --- */
+  ok("Worker code", "This endpoint exists, so you're running the current version");
+
+  /* --- KV --- */
+  if (!env.DB) {
+    bad("KV database", "No binding called DB. Settings &rarr; Bindings &rarr; add a KV namespace named exactly DB.");
+  } else {
+    try {
+      await env.DB.put("health:ping", "1", { expirationTtl: 60 });
+      const back = await env.DB.get("health:ping");
+      back === "1" ? ok("KV database", "Readable and writable")
+                   : bad("KV database", "Bound but not returning data.");
+    } catch (e) {
+      bad("KV database", "Bound but erroring: " + esc(e.message));
+    }
+  }
+
+  /* --- Secrets --- */
+  env.SHARED_SECRET ? ok("SHARED_SECRET", "Set")
+                    : bad("SHARED_SECRET", "Missing.");
+
+  if (!env.RESEND_API_KEY) {
+    bad("RESEND_API_KEY", "Missing. Settings &rarr; Variables and Secrets &rarr; add as a Secret.");
+  } else {
+    ok("RESEND_API_KEY", "Set");
+
+    /* --- Ask Resend which domains are actually verified --- */
+    try {
+      const res = await fetch("https://api.resend.com/domains", {
+        headers: { Authorization: `Bearer ${trim(env.RESEND_API_KEY)}` },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        // A "Sending access" key can send mail but can't read the domain
+        // list, so this is not necessarily a broken key.
+        rows.push(["Resend key reads domains", "info",
+          `Resend returned ${res.status} for the domain list. ` +
+          `That's expected if you created a <strong>Sending access</strong> key rather than Full access — ` +
+          `it can still send email fine. ` +
+          `<br><br>Confirm which by running <code>/test-email</code>: if an email arrives, your key is good and you can ignore this row. ` +
+          `If that also fails with 401, the key really is wrong — re-copy it from resend.com &rarr; API Keys ` +
+          `(the value is only shown once, so a half-copied key is easy to end up with).`]);
+        rows.push(["Verified domain", "info",
+          "Can't check this without domain-read permission. <code>/test-email</code> will tell you instead."]);
+      } else if (!res.ok) {
+        bad("Resend API key valid", `Resend returned HTTP ${res.status}.`);
+      } else {
+        ok("Resend API key valid", "Accepted");
+
+        const data = await res.json();
+        const domains = data.data || [];
+
+        if (!domains.length) {
+          bad("Verified domain", "No domains on this Resend account at all. Add socialphix.com under Domains.");
+        } else {
+          const list = domains.map(d => `${d.name} (${d.status})`).join(", ");
+          rows.push(["Domains on this account", "info", esc(list)]);
+
+          const verified = domains.filter(d => d.status === "verified").map(d => d.name);
+
+          // Pull the domain out of the FROM header.
+          const m = FROM.match(/<([^>]+)>/);
+          const fromAddr = m ? m[1] : FROM;
+          const fromDomain = (fromAddr.split("@")[1] || "").toLowerCase();
+
+          rows.push(["Sending as", "info", esc(fromAddr)]);
+
+          if (!verified.length) {
+            bad("FROM domain verified",
+              `No verified domains yet. Yours show as: ${esc(list)}. Resend will only deliver to your own address until one is verified.`);
+          } else if (verified.includes(fromDomain)) {
+            ok("FROM domain verified", `${esc(fromDomain)} is verified`);
+          } else {
+            bad("FROM domain verified",
+              `You're sending from <code>${esc(fromDomain)}</code> but the verified domain(s) are <code>${esc(verified.join(", "))}</code>. ` +
+              `Edit <code>FROM</code> near the top of the worker so the address sits on a verified domain.`);
+          }
+        }
+      }
+    } catch (e) {
+      bad("Resend reachable", "Couldn't reach Resend: " + esc(e.message));
+    }
+  }
+
+  /* --- Kit (optional) --- */
+  rows.push(["Kit sync", "info",
+    env.KIT_API_KEY ? "Enabled" : "Skipped — optional, nothing depends on it"]);
+
+  /* --- How many signups so far --- */
+  if (env.DB) {
+    try {
+      const list = await env.DB.list({ prefix: "sub:", limit: 1000 });
+      rows.push(["Signups stored", "info", String(list.keys.length)]);
+    } catch (e) { /* already reported above */ }
+  }
+
+  const body = rows.map(([label, state, detail]) => {
+    const badge = state === "pass" ? '<span class="good">PASS</span>'
+                : state === "FAIL" ? '<span class="bad">FAIL</span>'
+                : '<span style="color:#64748b;">—</span>';
+    return `<tr><td>${label}</td><td style="text-align:center;">${badge}</td><td style="font-size:13px;color:#475569;">${detail}</td></tr>`;
+  }).join("");
+
+  // Note: rows marked "info" are not failures.
+  const verdict = problems.length
+    ? `<p class="bad" style="font-size:16px;">${problems.length} problem${problems.length > 1 ? "s" : ""} found — see the FAIL rows.</p>`
+    : `<p class="good" style="font-size:16px;">No failures. Next step is <code>/test-email</code> — that's the only check that proves email actually sends.</p>`;
+
+  return html(`
+    <h1>Health check</h1>
+    ${verdict}
+    <table>${body}</table>
+    <div class="note">
+      Next: <code>/test-email?token=YOUR_SECRET&amp;to=you@example.com</code> actually sends one.
+    </div>
+  `);
+}
+
+/* ==================== EMAIL TEST ==================== */
+
+/**
+ * Isolates email sending from everything else.
+ *   /test-email?token=SECRET&to=you@example.com
+ * Tells you exactly what Resend said, in plain language.
+ */
+async function testEmail(url, env) {
+  const to = (url.searchParams.get("to") || "").trim();
+
+  if (!to) {
+    return html(`<h1>Email test</h1>
+      <p>Add an address to send to:</p>
+      <p><code>/test-email?token=YOUR_SECRET&amp;to=you@example.com</code></p>`);
+  }
+
+  const checks = [];
+  checks.push(["RESEND_API_KEY set", env.RESEND_API_KEY ? "yes" : "NO — this is your problem"]);
+  checks.push(["Sending from", esc(FROM)]);
+  checks.push(["Sending to", esc(to)]);
+
+  let result, detail = "";
+  try {
+    const mail = confirmationEmail("Test", `${url.origin}/verify?t=TESTTOKEN`);
+    const res = await fetch(RESEND, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${trim(env.RESEND_API_KEY)}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: FROM, reply_to: REPLY_TO, to: [to],
+        subject: "[TEST] " + mail.subject,
+        html: mail.html, text: mail.text,
+      }),
+    });
+
+    const bodyText = await res.text();
+
+    if (res.ok) {
+      result = "sent";
+      detail = `<p class="good">Resend accepted it. Check that inbox — and the spam folder.</p>
+        <p style="font-size:13px;color:#475569;">Resend's own dashboard shows delivery status for this message.</p>`;
+    } else {
+      result = "failed";
+      let hint = "";
+      if (res.status === 403 && /domain|verif/i.test(bodyText)) {
+        hint = `<p><strong>Your domain isn't verified yet.</strong> Until it is, Resend only lets you
+          email the address you signed up with. Go to resend.com &rarr; Domains &rarr; add
+          <code>socialphix.com</code> and complete the DNS records.</p>`;
+      } else if (res.status === 422) {
+        hint = `<p><strong>The From address is rejected.</strong> <code>${esc(FROM)}</code> must be on a
+          domain you've verified in Resend. Edit <code>FROM</code> near the top of the worker.</p>`;
+      } else if (res.status === 401) {
+        hint = `<p><strong>Bad API key.</strong> Re-copy it from resend.com &rarr; API Keys and re-add it
+          in Cloudflare as a <em>Secret</em>.</p>`;
+      }
+      detail = `<p class="bad">Resend rejected it (HTTP ${res.status}).</p>${hint}
+        <h2>What Resend said</h2><pre>${esc(bodyText)}</pre>`;
+    }
+  } catch (err) {
+    result = "error";
+    detail = `<p class="bad">Couldn't reach Resend at all.</p><pre>${esc(err.message)}</pre>`;
+  }
+
+  checks.push(["Result", result]);
+
+  return html(`
+    <h1>Email test</h1>
+    <table>${checks.map(([k, v]) => `<tr><td>${k}</td><td><code>${v}</code></td></tr>`).join("")}</table>
+    ${detail}
   `);
 }
 
@@ -474,7 +738,7 @@ async function sendEmail(env, { to, subject, html, text }) {
   const res = await fetch(RESEND, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      Authorization: `Bearer ${trim(env.RESEND_API_KEY)}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -557,10 +821,14 @@ function confirmationEmail(name, verifyLink) {
         </p>
       </td></tr>
     </table>
-    <p style="${P}margin-top:24px;">&mdash; Shady</p>
-    <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;color:#64748b;">
-      Shady Biskaly, R.Ph., BScPharm<br>Founder, Social Phix
+
+    <p style="margin:28px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#ffffff;font-weight:600;">
+      Shady Biskaly
     </p>
+    <p style="margin:2px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#64748b;">
+      R.Ph., BScPharm<br>Founder, Social Phix
+    </p>
+
     <p style="margin:22px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">
       Didn't sign up? Ignore this and nothing happens. The link expires in a week.
     </p>
@@ -576,8 +844,8 @@ Once you confirm, your personal referral link unlocks. Every friend who joins th
 
 Why the extra step: referrals only count once someone confirms. Keeps it honest, and means the small first run goes to people who actually brought friends.
 
-— Shady
-Shady Biskaly, R.Ph., BScPharm
+Shady Biskaly
+R.Ph., BScPharm
 Founder, Social Phix
 
 Didn't sign up? Ignore this. The link expires in a week.`;
@@ -605,17 +873,16 @@ function welcomeEmail(name, code) {
 
   const html = shell(`
     <p style="${P}">${hi}</p>
-    <h1 style="${H}">You're in. Here's your link.</h1>
-    <p style="${P}">I'm a pharmacist, not a beverage company. There's no warehouse behind this — the first run is genuinely small, and I'd rather it went to the people who helped get it made.</p>
+    <h1 style="${H}">You're confirmed. Here's your link.</h1>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0;">
       <tr><td style="background-color:#050B14;border:1px solid #1e3a5f;border-radius:8px;padding:18px;">
-        <p style="margin:0 0 6px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#00E5FF;">Your personal link</p>
+        <p style="margin:0 0 6px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#00E5FF;">Share this</p>
         <a href="${link}" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;word-break:break-all;">${link}</a>
       </td></tr>
     </table>
 
-    <p style="${P}">Every friend who joins through it moves you up. And it stacks:</p>
+    <p style="${P}">Every friend who joins through it moves you up the line. And it stacks:</p>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 8px;">
       ${tier(3,  "Skip the line",   "Priority spot in the first run")}
@@ -626,21 +893,22 @@ function welcomeEmail(name, code) {
 
     ${button(tracker, "Track my referrals")}
 
-    <p style="${P}font-size:13px;color:#94a3b8;">Referrals count once your friend confirms their email, same as you just did.</p>
+    <p style="${P}font-size:14px;color:#94a3b8;">Referrals count once your friend confirms their email, same as you just did.</p>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 0;">
       <tr><td style="border-top:1px solid #1e3a5f;padding-top:24px;">
-        <p style="${P}">Quickly, why this exists.</p>
-        <p style="${P}">More than a decade behind a pharmacy counter, and what I keep noticing has nothing to do with the counter. People are more anxious than I've ever seen them, sharpest in the younger crowd — always half-worried about how they're coming across, more hours on a screen than in a room with actual people, and then feeling it the moment they're in one.</p>
-        <p style="${P}">Alcohol dulls you. Energy drinks wire you the wrong way. Herbal calmers put you to sleep. Nothing was built for the moment you need to be calm <em>and</em> sharp at once. So I built it.</p>
-        <p style="${P}">If you want the actual pharmacology, <a href="${SITE}/science.html" style="color:#00E5FF;">it's all here</a>. I cited the papers. You can check my work.</p>
+        <p style="${P}">Worth saying why the first run is small: I'm a pharmacist who built this because nothing on the shelf worked for the moment you need to be calm <em>and</em> sharp at once. There's no warehouse behind it. So the first batch goes to the people who help get it made.</p>
+        <p style="${P}">If you want the pharmacology behind the formula, <a href="${SITE}/science.html" style="color:#00E5FF;">it's all here</a>. I cited the papers, so you can check my work.</p>
       </td></tr>
     </table>
 
-    <p style="${P}margin-top:22px;">Talk soon,</p>
-    <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;color:#64748b;">
-      <strong style="color:#ffffff;">Shady</strong><br>Shady Biskaly, R.Ph., BScPharm<br>Founder, Social Phix
+    <p style="margin:28px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#ffffff;font-weight:600;">
+      Shady Biskaly
     </p>
+    <p style="margin:2px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#64748b;">
+      R.Ph., BScPharm<br>Founder, Social Phix
+    </p>
+
     <p style="margin:22px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#475569;">
       P.S. Reply to this if you've got questions about the formula. I read everything, and I'm the one who wrote it.
     </p>
@@ -648,18 +916,15 @@ function welcomeEmail(name, code) {
 
   const text = `${hi}
 
-You're in. Here's your link.
+You're confirmed. Here's your link.
 
-I'm a pharmacist, not a beverage company. There's no warehouse behind this — the first run is genuinely small, and I'd rather it went to the people who helped get it made.
-
-Your personal link:
 ${link}
 
-Every friend who joins through it moves you up. And it stacks:
+Every friend who joins through it moves you up the line. And it stacks:
 
   3 friends  — Skip the line. Priority spot in the first run.
   5          — A free bottle added to your order.
-  10         — A free 3-pack. $24, on me.
+  10         — A free 3-pack. $24 value, on me.
   25         — A free 8-pack. $56.
 
 Track your referrals: ${tracker}
@@ -668,17 +933,12 @@ Referrals count once your friend confirms their email, same as you just did.
 
 ---
 
-Quickly, why this exists.
+Worth saying why the first run is small: I'm a pharmacist who built this because nothing on the shelf worked for the moment you need to be calm AND sharp at once. There's no warehouse behind it. So the first batch goes to the people who help get it made.
 
-More than a decade behind a pharmacy counter, and what I keep noticing has nothing to do with the counter. People are more anxious than I've ever seen them, sharpest in the younger crowd — always half-worried about how they're coming across, more hours on a screen than in a room with actual people, and then feeling it the moment they're in one.
+If you want the pharmacology behind the formula, it's all here — I cited the papers, so you can check my work: ${SITE}/science.html
 
-Alcohol dulls you. Energy drinks wire you the wrong way. Herbal calmers put you to sleep. Nothing was built for the moment you need to be calm AND sharp at once. So I built it.
-
-The actual pharmacology, with citations: ${SITE}/science.html
-
-Talk soon,
-Shady
-Shady Biskaly, R.Ph., BScPharm
+Shady Biskaly
+R.Ph., BScPharm
 Founder, Social Phix
 
 P.S. Reply if you've got questions about the formula. I read everything, and I'm the one who wrote it.`;
@@ -701,6 +961,22 @@ async function readBody(request) {
 
 function isEmail(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
+}
+
+// "alex" -> "Alex", "MARY-JANE" -> "Mary-Jane", "o'brien" -> "O'Brien"
+// Also collapses runs of whitespace.
+function titleCase(s) {
+  if (!s) return "";
+  return String(s)
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase()
+    .replace(/(^|[\s\-'])([a-z])/g, (_, sep, ch) => sep + ch.toUpperCase());
+}
+
+function firstNameOf(full) {
+  if (!full) return null;
+  return titleCase(String(full).trim().split(/\s+/)[0]) || null;
 }
 
 function newToken() {
@@ -758,6 +1034,7 @@ function html(inner) {
        code{background:#f4f4f5;padding:2px 6px;border-radius:4px;font-size:13px}
        .good{color:#15803d;font-weight:600}.bad{color:#b91c1c}
        .note{background:#f8fafc;border-left:3px solid #0ea5e9;padding:12px 16px;margin-top:24px;font-size:14px}
+       pre{background:#f4f4f5;padding:12px;border-radius:6px;font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
      </style>${inner}`,
     { headers: { "Content-Type": "text/html; charset=utf-8" } }
   );
