@@ -1,45 +1,55 @@
 /**
  * SOCIAL PHIX — SELF-HOSTED WAITLIST
  * ===============================================================
- * Replaces LaunchList entirely. Handles signup, email verification,
- * referral codes, referral counting, and spam prevention.
+ * Signup, email verification, referral codes, referral counting
+ * and spam prevention. No LaunchList, no automation limits.
  *
- * Kit sends the emails. This worker tells Kit when.
- * Cloudflare KV stores everyone. Free tier is plenty.
+ *   Cloudflare KV   stores everyone (free)
+ *   Resend          sends the two emails (free: 3,000/month)
+ *   Kit             optional — keeps your list for broadcasts later
+ *
+ * The emails are written and sent by this worker, so they carry
+ * no third-party branding and match your site exactly.
  *
  * ---------------------------------------------------------------
- * WHAT YOU NEED TO SET UP IN CLOUDFLARE (see SETUP-GUIDE.md)
+ * WHAT TO SET UP IN CLOUDFLARE (see SETUP-GUIDE.md)
  *
  *   KV namespace bound as:  DB
  *
  *   Secrets:
- *     KIT_API_KEY     Kit -> Settings -> Advanced -> API (the Key)
- *     SHARED_SECRET   any long random string you invent
+ *     RESEND_API_KEY   resend.com -> API Keys
+ *     SHARED_SECRET    any long random string you invent
+ *     KIT_API_KEY      optional. Leave unset to skip Kit entirely.
  *
  * ---------------------------------------------------------------
  * URLS THIS WORKER ANSWERS
  *
  *   POST /signup                  your form posts here
- *   GET  /verify?t=TOKEN          the link in your confirmation email
+ *   GET  /verify?t=TOKEN          the link in the confirmation email
  *   GET  /stats?code=CODE         live referral count for the tracker
- *   GET  /setup?token=SECRET      run once, creates Kit fields + tags
- *   GET  /admin?token=SECRET      your signup numbers at a glance
+ *   GET  /admin?token=SECRET      your signup numbers
+ *   GET  /setup?token=SECRET      optional, only if you use Kit
  *
  * ---------------------------------------------------------------
  * HOW A SIGNUP FLOWS
  *
  *   1. Form posts to /signup
- *   2. Worker checks it isn't spam, saves them as "pending",
- *      and tags them in Kit -> your Kit automation emails them
- *   3. They click the link -> /verify
- *   4. Worker marks them verified, generates their referral code,
- *      credits whoever referred them, tags them verified in Kit
- *      -> your Kit welcome automation fires
- *   5. Worker redirects them to your tracker page
+ *   2. Worker checks it isn't spam, saves them,
+ *      and emails them a confirmation link
+ *   3. They click it -> /verify
+ *   4. Worker verifies them, issues a referral code,
+ *      credits whoever referred them, emails them the welcome
+ *   5. Redirects to your tracker page
  */
 
 const SITE = "https://www.socialphix.com";
 const KIT  = "https://api.kit.com/v4";
+const RESEND = "https://api.resend.com/emails";
+
+// Change this once your domain is verified in Resend.
+// Until then Resend only allows sending to your own address.
+const FROM = "Shady at Social Phix <shady@socialphix.com>";
+const REPLY_TO = "shady@socialphix.com";
 
 const TAG_PENDING  = "waitlist-pending";
 const TAG_VERIFIED = "waitlist-verified";
@@ -137,7 +147,11 @@ async function signup(request, env) {
     // Signed up but never confirmed. Send a fresh link rather than a duplicate record.
     const token = newToken();
     await env.DB.put(`pending:${token}`, email, { expirationTtl: PENDING_TTL_SECONDS });
-    await pushToKit(env, email, name, { verify_url: verifyUrl(request, token) }, TAG_PENDING);
+
+    const link = verifyUrl(request, token);
+    await sendEmail(env, { to: email, ...confirmationEmail(existing.name, link) });
+    await pushToKit(env, email, existing.name, { verify_url: link }, TAG_PENDING);
+
     return json({ ok: true, resent: true });
   }
 
@@ -165,8 +179,14 @@ async function signup(request, env) {
   await env.DB.put(`sub:${email}`, JSON.stringify(record));
   await env.DB.put(`pending:${token}`, email, { expirationTtl: PENDING_TTL_SECONDS });
 
+  const link = verifyUrl(request, token);
+
+  // Send the confirmation before anything optional, so a Kit problem
+  // can never stop someone from being able to confirm.
+  await sendEmail(env, { to: email, ...confirmationEmail(name, link) });
+
   await pushToKit(env, email, name, {
-    verify_url:     verifyUrl(request, token),
+    verify_url:     link,
     email_verified: "false",
     users_referred: "0",
     referred_by_code: ref || "",
@@ -221,6 +241,15 @@ async function verify(url, env) {
   // --- Credit whoever referred them -------------------------------
   if (sub.referredBy) {
     await creditReferrer(env, sub.referredBy, email, sub.signupIp);
+  }
+
+  // Welcome email carries their referral link.
+  try {
+    await sendEmail(env, { to: email, ...welcomeEmail(sub.name, code) });
+  } catch (err) {
+    // Don't block the redirect — they still land on the tracker,
+    // which shows the same link.
+    console.error("welcome email failed:", err.message);
   }
 
   await pushToKit(env, email, sub.name, {
@@ -287,24 +316,32 @@ async function stats(url, env) {
 /* ==================== 4. KIT ==================== */
 
 async function pushToKit(env, email, name, fields, tagName) {
-  const clean = Object.fromEntries(
-    Object.entries(fields || {})
-      .filter(([, v]) => v !== null && v !== undefined && v !== "")
-      .map(([k, v]) => [k, String(v)])
-  );
+  // Kit is optional. If no key is set, or the call fails, we carry on —
+  // the waitlist itself doesn't depend on it.
+  if (!env.KIT_API_KEY) return;
 
-  const res = await kit("POST", "/subscribers", env, {
-    email_address: email,
-    first_name: (name || "").split(/\s+/)[0] || undefined,
-    state: "active",
-    fields: clean,
-  });
+  try {
+    const clean = Object.fromEntries(
+      Object.entries(fields || {})
+        .filter(([, v]) => v !== null && v !== undefined && v !== "")
+        .map(([k, v]) => [k, String(v)])
+    );
 
-  if (res.warnings?.length) {
-    console.warn("Kit ignored fields:", res.warnings.join(", "), "— run /setup");
+    const res = await kit("POST", "/subscribers", env, {
+      email_address: email,
+      first_name: (name || "").split(/\s+/)[0] || undefined,
+      state: "active",
+      fields: clean,
+    });
+
+    if (res.warnings?.length) {
+      console.warn("Kit ignored fields:", res.warnings.join(", "), "— run /setup");
+    }
+
+    if (tagName) await applyTag(env, tagName, email);
+  } catch (err) {
+    console.warn("Kit sync failed (continuing anyway):", err.message);
   }
-
-  if (tagName) await applyTag(env, tagName, email);
 }
 
 async function kit(method, path, env, body) {
@@ -424,6 +461,233 @@ async function adminView(env) {
     <div class="note">Watch the pack split and the price reaction — those two tell you
     whether $56 is the right ask.</div>
   `);
+}
+
+/* ==================== EMAIL (Resend) ==================== */
+
+async function sendEmail(env, { to, subject, html, text }) {
+  if (!env.RESEND_API_KEY) {
+    console.error("RESEND_API_KEY not set — no email sent to", to);
+    return;
+  }
+
+  const res = await fetch(RESEND, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: FROM,
+      reply_to: REPLY_TO,
+      to: [to],
+      subject,
+      html,
+      text,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend ${res.status}: ${body}`);
+  }
+  console.log("emailed:", to, "|", subject);
+}
+
+/* ---- Shared shell so both emails look like the site ---- */
+
+function shell(innerHtml) {
+  return `<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark"></head>
+<body style="margin:0;padding:0;background-color:#050B14;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#050B14;">
+<tr><td align="center" style="padding:32px 16px;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+
+  <tr><td style="padding-bottom:28px;">
+    <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.4px;color:#ffffff;">SOCIAL</span><span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.4px;color:#FF5722;">PHIX</span>
+  </td></tr>
+
+  <tr><td style="background-color:#112240;border:1px solid #1e3a5f;border-radius:14px;padding:36px 32px;">
+    ${innerHtml}
+  </td></tr>
+
+  <tr><td style="padding:26px 8px 0;">
+    <p style="margin:0 0 10px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;line-height:1.6;color:#64748b;">
+      These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.
+    </p>
+    <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;color:#475569;">
+      &copy; 2026 PhixRx &middot; Shipping to the United States
+    </p>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+function button(href, label) {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0;">
+    <tr><td align="center" style="background-color:#FF5722;border-radius:6px;">
+      <a href="${href}" style="display:inline-block;padding:15px 34px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#ffffff;text-decoration:none;">${label}</a>
+    </td></tr>
+  </table>`;
+}
+
+const P = "margin:0 0 16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#cbd5e1;";
+const H = "margin:0 0 18px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.3;color:#ffffff;";
+
+/* ---- Email 1: confirm your address ---- */
+
+function confirmationEmail(name, verifyLink) {
+  const hi = name ? `Hey ${escAttr(name)},` : "Hey,";
+
+  const html = shell(`
+    <p style="${P}">${hi}</p>
+    <h1 style="${H}">You're one click from the list.</h1>
+    <p style="${P}">Confirm your email and your personal referral link unlocks straight away.</p>
+    ${button(verifyLink, "Confirm my email")}
+    <p style="${P}">Every friend who joins through your link moves you up. Three of them and you skip the line entirely for the first run.</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 8px;">
+      <tr><td style="background-color:#0A192F;border-left:3px solid #00E5FF;border-radius:4px;padding:16px 18px;">
+        <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:#94a3b8;">
+          Why the extra step: referrals only count once someone confirms. It keeps the whole thing honest, and it means the small first run goes to people who actually brought friends.
+        </p>
+      </td></tr>
+    </table>
+    <p style="${P}margin-top:24px;">&mdash; Shady</p>
+    <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;color:#64748b;">
+      Shady Biskaly, R.Ph., BScPharm<br>Founder, Social Phix
+    </p>
+    <p style="margin:22px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">
+      Didn't sign up? Ignore this and nothing happens. The link expires in a week.
+    </p>
+  `);
+
+  const text = `${hi}
+
+You're one click from the Social Phix list.
+
+Confirm your email: ${verifyLink}
+
+Once you confirm, your personal referral link unlocks. Every friend who joins through it moves you up — three of them and you skip the line entirely for the first run.
+
+Why the extra step: referrals only count once someone confirms. Keeps it honest, and means the small first run goes to people who actually brought friends.
+
+— Shady
+Shady Biskaly, R.Ph., BScPharm
+Founder, Social Phix
+
+Didn't sign up? Ignore this. The link expires in a week.`;
+
+  return { subject: "Confirm your email — then your link is live", html, text };
+}
+
+/* ---- Email 2: welcome, with the referral link ---- */
+
+function welcomeEmail(name, code) {
+  const hi = name ? `Hey ${escAttr(name)},` : "Hey,";
+  const link = `${SITE}/?ref=${code}`;
+  const tracker = `${SITE}/success.html?ref=${code}`;
+
+  const tier = (n, title, detail) => `
+    <tr>
+      <td width="42" valign="top" style="padding:9px 0;">
+        <div style="width:30px;height:30px;line-height:30px;text-align:center;border-radius:15px;background-color:#0A192F;border:1px solid #00E5FF;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:800;color:#00E5FF;">${n}</div>
+      </td>
+      <td valign="top" style="padding:9px 0;">
+        <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;color:#ffffff;">${title}</p>
+        <p style="margin:2px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;color:#94a3b8;">${detail}</p>
+      </td>
+    </tr>`;
+
+  const html = shell(`
+    <p style="${P}">${hi}</p>
+    <h1 style="${H}">You're in. Here's your link.</h1>
+    <p style="${P}">I'm a pharmacist, not a beverage company. There's no warehouse behind this — the first run is genuinely small, and I'd rather it went to the people who helped get it made.</p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0;">
+      <tr><td style="background-color:#050B14;border:1px solid #1e3a5f;border-radius:8px;padding:18px;">
+        <p style="margin:0 0 6px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#00E5FF;">Your personal link</p>
+        <a href="${link}" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;word-break:break-all;">${link}</a>
+      </td></tr>
+    </table>
+
+    <p style="${P}">Every friend who joins through it moves you up. And it stacks:</p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 8px;">
+      ${tier(3,  "Skip the line",   "Priority spot in the first run")}
+      ${tier(5,  "A free bottle",   "Added to whatever pack you order")}
+      ${tier(10, "A free 3-pack",   "$24 value, on me")}
+      ${tier(25, "A free 8-pack",   "$56 — a month of things that matter")}
+    </table>
+
+    ${button(tracker, "Track my referrals")}
+
+    <p style="${P}font-size:13px;color:#94a3b8;">Referrals count once your friend confirms their email, same as you just did.</p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 0;">
+      <tr><td style="border-top:1px solid #1e3a5f;padding-top:24px;">
+        <p style="${P}">Quickly, why this exists.</p>
+        <p style="${P}">More than a decade behind a pharmacy counter, and what I keep noticing has nothing to do with the counter. People are more anxious than I've ever seen them, sharpest in the younger crowd — always half-worried about how they're coming across, more hours on a screen than in a room with actual people, and then feeling it the moment they're in one.</p>
+        <p style="${P}">Alcohol dulls you. Energy drinks wire you the wrong way. Herbal calmers put you to sleep. Nothing was built for the moment you need to be calm <em>and</em> sharp at once. So I built it.</p>
+        <p style="${P}">If you want the actual pharmacology, <a href="${SITE}/science.html" style="color:#00E5FF;">it's all here</a>. I cited the papers. You can check my work.</p>
+      </td></tr>
+    </table>
+
+    <p style="${P}margin-top:22px;">Talk soon,</p>
+    <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;color:#64748b;">
+      <strong style="color:#ffffff;">Shady</strong><br>Shady Biskaly, R.Ph., BScPharm<br>Founder, Social Phix
+    </p>
+    <p style="margin:22px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#475569;">
+      P.S. Reply to this if you've got questions about the formula. I read everything, and I'm the one who wrote it.
+    </p>
+  `);
+
+  const text = `${hi}
+
+You're in. Here's your link.
+
+I'm a pharmacist, not a beverage company. There's no warehouse behind this — the first run is genuinely small, and I'd rather it went to the people who helped get it made.
+
+Your personal link:
+${link}
+
+Every friend who joins through it moves you up. And it stacks:
+
+  3 friends  — Skip the line. Priority spot in the first run.
+  5          — A free bottle added to your order.
+  10         — A free 3-pack. $24, on me.
+  25         — A free 8-pack. $56.
+
+Track your referrals: ${tracker}
+
+Referrals count once your friend confirms their email, same as you just did.
+
+---
+
+Quickly, why this exists.
+
+More than a decade behind a pharmacy counter, and what I keep noticing has nothing to do with the counter. People are more anxious than I've ever seen them, sharpest in the younger crowd — always half-worried about how they're coming across, more hours on a screen than in a room with actual people, and then feeling it the moment they're in one.
+
+Alcohol dulls you. Energy drinks wire you the wrong way. Herbal calmers put you to sleep. Nothing was built for the moment you need to be calm AND sharp at once. So I built it.
+
+The actual pharmacology, with citations: ${SITE}/science.html
+
+Talk soon,
+Shady
+Shady Biskaly, R.Ph., BScPharm
+Founder, Social Phix
+
+P.S. Reply if you've got questions about the formula. I read everything, and I'm the one who wrote it.`;
+
+  return { subject: "You're in. Here's your link.", html, text };
+}
+
+function escAttr(s) {
+  return String(s).replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
 }
 
 /* ==================== HELPERS ==================== */
