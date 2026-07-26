@@ -133,6 +133,10 @@
     </script>
     
     
+    <!-- Cloudflare Turnstile (bot protection). The worker verifies the
+         token server-side, which is what makes it actually do something. -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -593,6 +597,10 @@
                            class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 placeholder-slate-600">
                 </div>
 
+                <!-- Turnstile widget. Swap the sitekey for your own if it differs:
+                     dash.cloudflare.com -> Turnstile -> your site -> Site Key -->
+                <div class="cf-turnstile pt-1" data-sitekey="0x4AAAAAAD1HuD0kItdoQfz0" data-theme="dark"></div>
+
                 <p id="formError" class="hidden text-sm text-accent-orange bg-accent-orange/10 border border-accent-orange/30 rounded-md px-4 py-3" role="alert"></p>
 
                 <button type="submit" 
@@ -602,7 +610,7 @@
 
                 <p class="text-[11px] text-slate-500 leading-relaxed text-center pt-2">
                     No payment today. We'll email you when the first run is ready, and you can confirm or walk away then.<br class="hidden sm:block">
-                    Shipping to the United States only.
+                    Shipping to the United States only. By joining you agree to our <a href="privacy.html" class="text-slate-400 underline hover:text-accent-cyan">Privacy Policy</a>.
                 </p>
             </form>
         </div>
@@ -649,6 +657,7 @@
                 <h4 class="text-white font-bold text-xs tracking-widest uppercase mb-6">Company</h4>
                 <ul class="space-y-4">
                     <li><a href="about.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">About the Founder</a></li>
+                    <li><a href="privacy.html" class="text-sm text-slate-400 hover:text-accent-cyan transition">Privacy Policy</a></li>
                     <li><a href="#faq" class="text-sm text-slate-400 hover:text-accent-cyan transition">Support & FAQ</a></li>
                     <li><a href="#preorder" class="text-sm text-slate-400 hover:text-accent-cyan transition">Request Sample</a></li>
                 </ul>
@@ -661,7 +670,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v6 loaded', 'color:#00E5FF;font-weight:bold');
+            console.log('%cSocial Phix signup v8 loaded', 'color:#00E5FF;font-weight:bold');
 
             const reveals = document.querySelectorAll('.reveal');
             const revealOnScroll = new IntersectionObserver((entries, observer) => {
@@ -764,8 +773,26 @@
                     }
                 } catch (err) {
                     console.error('Signup failed:', err);
+
+                    // "Failed to fetch" means the browser never got a reply —
+                    // usually a wrong worker URL or a blocked origin, not a
+                    // problem with what the person typed.
+                    const isNetwork = err instanceof TypeError
+                        || /failed to fetch|networkerror|load failed/i.test(err.message || '');
+
+                    if (isNetwork) {
+                        console.error(
+                            'Could not reach the signup service at:',
+                            form.getAttribute('action'),
+                            '\nCheck the worker URL is correct and that this page\'s origin (' +
+                            window.location.origin + ') is in ALLOWED_ORIGINS in the worker.'
+                        );
+                    }
+
                     if (formError) {
-                        formError.textContent = err.message || "That didn't go through. Please try again.";
+                        formError.textContent = isNetwork
+                            ? "We couldn't reach the server. Please check your connection and try again."
+                            : (err.message || "That didn't go through. Please try again.");
                         formError.classList.remove('hidden');
                     }
                     if (btn) {

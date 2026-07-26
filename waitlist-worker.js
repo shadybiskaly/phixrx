@@ -44,13 +44,23 @@
 
 // Bump this whenever you paste in new code, so /  tells you at a glance
 // whether what's deployed is what you think is deployed.
-const VERSION = "2026-07-25.d";
+const VERSION = "2026-07-25.f";
 
 // Pasted secrets often pick up a trailing space or newline that you
 // can't see in the dashboard. Trim before use.
 const trim = v => (typeof v === "string" ? v.trim() : v);
 
 const SITE = "https://www.socialphix.com";
+
+// Browsers block cross-origin requests unless the server names the origin
+// back. Anything you might load the form from needs to be in here.
+const ALLOWED_ORIGINS = [
+  "https://www.socialphix.com",
+  "https://socialphix.com",
+  "http://localhost:8080",
+  "http://localhost:3000",
+  "http://127.0.0.1:8080",
+];
 const KIT  = "https://api.kit.com/v4";
 const RESEND = "https://api.resend.com/emails";
 
@@ -90,21 +100,23 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    if (request.method === "OPTIONS") return cors(new Response(null, { status: 204 }));
+    if (request.method === "OPTIONS") return cors(new Response(null, { status: 204 }), request);
 
     try {
-      if (path === "/signup" && request.method === "POST") return cors(await signup(request, env));
+      if (path === "/signup" && request.method === "POST") return cors(await signup(request, env), request);
       if (path === "/verify") return await verify(url, env);
-      if (path === "/stats")  return cors(await stats(url, env));
+      if (path === "/stats")  return cors(await stats(url, env), request);
 
       // Protected routes
-      if (path === "/setup" || path === "/admin" || path === "/test-email" || path === "/health") {
+      if (path === "/setup" || path === "/admin" || path === "/test-email"
+          || path === "/health" || path === "/export") {
         if (url.searchParams.get("token") !== trim(env.SHARED_SECRET) || !env.SHARED_SECRET) {
           return new Response("Unauthorized. Check your token.", { status: 401 });
         }
         if (path === "/setup")  return runSetup(env);
         if (path === "/admin")  return adminView(env);
         if (path === "/health") return healthCheck(env);
+        if (path === "/export") return exportCsv(env);
         return testEmail(url, env);
       }
 
@@ -114,10 +126,45 @@ export default {
       const friendly = /Resend/i.test(err.message)
         ? "We couldn't send your confirmation email. Please try again shortly."
         : "Something went wrong on our end.";
-      return cors(json({ ok: false, error: friendly, detail: err.message }, 500));
+      return cors(json({ ok: false, error: friendly, detail: err.message }, 500), request);
     }
   },
 };
+
+/* ==================== TURNSTILE ==================== */
+
+/**
+ * Verifies the Turnstile token server-side. This is the part that was
+ * missing before: a Turnstile widget only protects anything if the
+ * server receiving the form checks the token. Now that's us.
+ *
+ * Optional. If TURNSTILE_SECRET isn't set, verification is skipped
+ * and the other spam rules still apply.
+ */
+async function verifyTurnstile(token, ip, env) {
+  if (!env.TURNSTILE_SECRET) return { ok: true, skipped: true };
+  if (!token) return { ok: false, reason: "no token" };
+
+  const form = new FormData();
+  form.append("secret", trim(env.TURNSTILE_SECRET));
+  form.append("response", token);
+  if (ip) form.append("remoteip", ip);
+
+  try {
+    const res = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      { method: "POST", body: form }
+    );
+    const data = await res.json();
+    return data.success
+      ? { ok: true }
+      : { ok: false, reason: (data["error-codes"] || []).join(", ") || "rejected" };
+  } catch (err) {
+    // Don't lock people out if Cloudflare's endpoint has a wobble.
+    console.warn("Turnstile check errored, allowing through:", err.message);
+    return { ok: true, degraded: true };
+  }
+}
 
 /* ==================== 1. SIGNUP ==================== */
 
@@ -139,8 +186,17 @@ async function signup(request, env) {
     return json({ ok: false, error: "Please use a permanent email address." }, 400);
   }
 
-  // --- Rate limit by IP -------------------------------------------
+  // --- Bot check ---------------------------------------------------
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+
+  const turnstile = await verifyTurnstile(
+    form["cf-turnstile-response"], ip, env
+  );
+  if (!turnstile.ok) {
+    console.log("turnstile rejected:", email, turnstile.reason);
+    return json({ ok: false, error: "Please complete the verification and try again." }, 400);
+  }
+
   const rateKey = `rate:${ip}`;
   const attempts = parseInt(await env.DB.get(rateKey), 10) || 0;
 
@@ -427,50 +483,191 @@ async function runSetup(env) {
 
 async function adminView(env) {
   const list = await env.DB.list({ prefix: "sub:" });
+  const people = [];
 
-  let verified = 0, pending = 0, referred = 0;
-  const top = [];
-  const packs = {}, prices = {};
+  for (const key of list.keys) {
+    const raw = await env.DB.get(key.name);
+    if (raw) people.push(JSON.parse(raw));
+  }
+
+  people.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+
+  const verified = people.filter(p => p.verified).length;
+  const pending  = people.length - verified;
+  const referred = people.filter(p => p.referredBy).length;
+  const totalRef = people.reduce((n, p) => n + (p.referrals || 0), 0);
+  const rate     = people.length ? Math.round((verified / people.length) * 100) : 0;
+
+  const tally = (field) => {
+    const counts = {};
+    for (const p of people) if (p[field]) counts[p[field]] = (counts[p[field]] || 0) + 1;
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  };
+
+  const bar = (rows, accent) => {
+    if (!rows.length) return `<p class="muted">Nothing yet.</p>`;
+    const max = Math.max(...rows.map(r => r[1]));
+    return rows.map(([label, n]) => `
+      <div class="barrow">
+        <div class="barlabel">${esc(label)}</div>
+        <div class="bartrack"><div class="barfill" style="width:${Math.round((n / max) * 100)}%;background:${accent}"></div></div>
+        <div class="barnum">${n}</div>
+      </div>`).join("");
+  };
+
+  const card = (label, value, note = "") => `
+    <div class="card">
+      <div class="cardnum">${value}</div>
+      <div class="cardlabel">${label}</div>
+      ${note ? `<div class="cardnote">${note}</div>` : ""}
+    </div>`;
+
+  const rows = people.map(p => `
+    <tr data-verified="${p.verified ? 1 : 0}">
+      <td>${esc(p.email)}</td>
+      <td>${esc(p.name || "—")}</td>
+      <td class="c">${p.verified ? '<span class="pill ok">confirmed</span>' : '<span class="pill wait">pending</span>'}</td>
+      <td class="c"><strong>${p.referrals || 0}</strong></td>
+      <td>${esc(p.selectedPack || "—")}</td>
+      <td>${esc(p.useCase || "—")}</td>
+      <td>${esc(p.priceReaction || "—")}</td>
+      <td>${esc(p.referredBy || "—")}</td>
+      <td class="muted">${esc((p.createdAt || "").slice(0, 10))}</td>
+    </tr>`).join("");
+
+  const top = people.filter(p => p.referrals > 0)
+                    .sort((a, b) => b.referrals - a.referrals)
+                    .slice(0, 10);
+
+  return html(`
+    <div class="wide">
+      <div class="head">
+        <h1>Waitlist</h1>
+        <a class="btn" href="/export?token=${esc(env.SHARED_SECRET)}">Download CSV</a>
+      </div>
+
+      <div class="cards">
+        ${card("Confirmed", verified)}
+        ${card("Pending", pending, `${rate}% confirm`)}
+        ${card("Via referral", referred, people.length ? Math.round(referred / people.length * 100) + "% of signups" : "")}
+        ${card("Referrals made", totalRef)}
+      </div>
+
+      <div class="cols">
+        <div class="col">
+          <h2>Pack chosen</h2>
+          ${bar(tally("selectedPack"), "#0ea5e9")}
+        </div>
+        <div class="col">
+          <h2>Reaction to $7 a bottle</h2>
+          ${bar(tally("priceReaction"), "#f97316")}
+        </div>
+      </div>
+
+      <h2>What they're using it for</h2>
+      ${bar(tally("useCase"), "#8b5cf6")}
+
+      ${top.length ? `
+        <h2>Top referrers</h2>
+        <table class="data">
+          <tr><th>Email</th><th class="c">Referrals</th></tr>
+          ${top.map(p => `<tr><td>${esc(p.email)}</td><td class="c"><strong>${p.referrals}</strong></td></tr>`).join("")}
+        </table>` : ""}
+
+      <div class="head" style="margin-top:34px;">
+        <h2 style="margin:0;">Everyone (${people.length})</h2>
+        <div>
+          <input id="search" placeholder="Filter by email or name..." />
+          <select id="filter">
+            <option value="all">All</option>
+            <option value="1">Confirmed only</option>
+            <option value="0">Pending only</option>
+          </select>
+        </div>
+      </div>
+
+      <table class="data" id="all">
+        <tr>
+          <th>Email</th><th>Name</th><th class="c">Status</th><th class="c">Refs</th>
+          <th>Pack</th><th>Use case</th><th>Price</th><th>Referred by</th><th>Joined</th>
+        </tr>
+        ${rows || '<tr><td colspan="9" class="muted">No signups yet.</td></tr>'}
+      </table>
+
+      <div class="note">
+        The two numbers that decide whether $56 is the right ask: the pack split and the
+        price reaction. Watch those before anything else.
+      </div>
+    </div>
+
+    <script>
+      const search = document.getElementById('search');
+      const filter = document.getElementById('filter');
+      const rows = Array.from(document.querySelectorAll('#all tr')).slice(1);
+
+      function apply() {
+        const q = (search.value || '').toLowerCase();
+        const f = filter.value;
+        rows.forEach(r => {
+          const text = r.textContent.toLowerCase();
+          const v = r.getAttribute('data-verified');
+          const okText = !q || text.includes(q);
+          const okFilter = f === 'all' || v === f;
+          r.style.display = (okText && okFilter) ? '' : 'none';
+        });
+      }
+      search.addEventListener('input', apply);
+      filter.addEventListener('change', apply);
+    </script>
+  `, true);
+}
+
+/* ==================== EXPORT ==================== */
+
+/**
+ * Downloads your whole list as a CSV.
+ *   /export?token=SECRET
+ * Opens in Excel or Google Sheets. Your data is yours — take a copy
+ * whenever you like.
+ */
+async function exportCsv(env) {
+  const list = await env.DB.list({ prefix: "sub:" });
+  const rows = [];
 
   for (const key of list.keys) {
     const raw = await env.DB.get(key.name);
     if (!raw) continue;
-    const s = JSON.parse(raw);
-
-    if (s.verified) verified++; else pending++;
-    if (s.referredBy) referred++;
-    if (s.referrals > 0) top.push([s.email, s.referrals]);
-
-    if (s.selectedPack)  packs[s.selectedPack]   = (packs[s.selectedPack] || 0) + 1;
-    if (s.priceReaction) prices[s.priceReaction] = (prices[s.priceReaction] || 0) + 1;
+    rows.push(JSON.parse(raw));
   }
 
-  top.sort((a, b) => b[1] - a[1]);
-  const total = verified + pending;
-  const rate = total ? Math.round((verified / total) * 100) : 0;
+  // Newest first.
+  rows.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
 
-  const breakdown = (title, obj) => {
-    const rows = Object.entries(obj).sort((a, b) => b[1] - a[1]);
-    if (!rows.length) return "";
-    return `<h2>${title}</h2><table>${rows
-      .map(([k, v]) => `<tr><td>${esc(k)}</td><td><strong>${v}</strong></td></tr>`).join("")}</table>`;
+  const cols = [
+    "email", "name", "verified", "referrals", "code", "referredBy",
+    "selectedPack", "useCase", "priceReaction",
+    "country", "city", "utmSource", "utmMedium", "utmCampaign",
+    "createdAt", "verifiedAt",
+  ];
+
+  const cell = v => {
+    if (v === null || v === undefined) return "";
+    const s = String(v);
+    // Quote anything containing a comma, quote or newline.
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
 
-  return html(`
-    <h1>Waitlist</h1>
-    <table>
-      <tr><td>Confirmed</td><td><strong>${verified}</strong></td></tr>
-      <tr><td>Awaiting confirmation</td><td><strong>${pending}</strong></td></tr>
-      <tr><td>Confirmation rate</td><td><strong>${rate}%</strong></td></tr>
-      <tr><td>Came via a referral</td><td><strong>${referred}</strong></td></tr>
-    </table>
-    ${breakdown("Pack chosen", packs)}
-    ${breakdown("Reaction to $7 a bottle", prices)}
-    ${top.length ? `<h2>Top referrers</h2><table>${top.slice(0, 20)
-      .map(([e, n]) => `<tr><td>${esc(e)}</td><td><strong>${n}</strong></td></tr>`).join("")}</table>` : ""}
-    <div class="note">Watch the pack split and the price reaction — those two tell you
-    whether $56 is the right ask.</div>
-  `);
+  const csv = [
+    cols.join(","),
+    ...rows.map(r => cols.map(col => cell(r[col])).join(",")),
+  ].join("\n");
+
+  return new Response(csv, {
+    headers: {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": `attachment; filename="socialphix-waitlist-${new Date().toISOString().slice(0, 10)}.csv"`,
+    },
+  });
 }
 
 /* ==================== INDEX ==================== */
@@ -617,6 +814,16 @@ async function healthCheck(env) {
     } catch (e) {
       bad("Resend reachable", "Couldn't reach Resend: " + esc(e.message));
     }
+  }
+
+  /* --- Turnstile --- */
+  if (env.TURNSTILE_SECRET) {
+    ok("Bot protection", "Turnstile active — tokens verified server-side");
+  } else {
+    rows.push(["Bot protection", "info",
+      "Turnstile not configured. Rate limiting, disposable-domain blocking and email " +
+      "verification still apply, but there's no bot challenge on the form. " +
+      "Add <code>TURNSTILE_SECRET</code> to enable it."]);
   }
 
   /* --- Kit (optional) --- */
@@ -1003,10 +1210,21 @@ function redirect(to) {
   return new Response(null, { status: 302, headers: { Location: to } });
 }
 
-function cors(res) {
-  res.headers.set("Access-Control-Allow-Origin", SITE);
+function cors(res, request) {
+  const origin = request?.headers?.get("Origin");
+
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.headers.set("Access-Control-Allow-Origin", origin);
+  } else {
+    // Fall back to the main site so a missing Origin header still works.
+    res.headers.set("Access-Control-Allow-Origin", SITE);
+    if (origin) console.warn("Blocked origin:", origin, "— add it to ALLOWED_ORIGINS if that's yours");
+  }
+
+  res.headers.set("Vary", "Origin");
   res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  res.headers.set("Access-Control-Max-Age", "86400");
   return res;
 }
 
@@ -1022,19 +1240,43 @@ function esc(s) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-function html(inner) {
+function html(inner, wide = false) {
   return new Response(
     `<!doctype html><meta charset="utf-8"><title>Social Phix</title>
+     <meta name="viewport" content="width=device-width,initial-scale=1">
      <style>
-       body{font:16px/1.6 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;color:#111}
-       h1{font-size:22px}h2{font-size:16px;margin-top:28px;color:#475569}
-       table{border-collapse:collapse;width:100%;margin-top:10px}
-       td{border-bottom:1px solid #eee;padding:7px 4px;font-size:14px}
-       td:last-child{text-align:right}
-       code{background:#f4f4f5;padding:2px 6px;border-radius:4px;font-size:13px}
+       body{font:15px/1.6 system-ui,-apple-system,sans-serif;margin:0;padding:36px 20px;color:#0f172a;background:#f8fafc}
+       .wide,body>*:not(.wide){max-width:${wide ? "1080px" : "640px"};margin:0 auto}
+       h1{font-size:24px;margin:0 0 4px}
+       h2{font-size:15px;margin:32px 0 12px;color:#475569;text-transform:uppercase;letter-spacing:.6px}
+       code{background:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:13px}
+       pre{background:#e2e8f0;padding:12px;border-radius:6px;font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+       table{border-collapse:collapse;width:100%;margin-top:10px;background:#fff;border-radius:8px;overflow:hidden}
+       td,th{border-bottom:1px solid #e2e8f0;padding:9px 12px;font-size:13px;text-align:left}
+       th{background:#f1f5f9;font-weight:600;color:#475569;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+       td.c,th.c{text-align:center}
+       .muted{color:#94a3b8}
        .good{color:#15803d;font-weight:600}.bad{color:#b91c1c}
-       .note{background:#f8fafc;border-left:3px solid #0ea5e9;padding:12px 16px;margin-top:24px;font-size:14px}
-       pre{background:#f4f4f5;padding:12px;border-radius:6px;font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+       .note{background:#eff6ff;border-left:3px solid #0ea5e9;padding:14px 18px;margin-top:28px;font-size:14px;border-radius:0 6px 6px 0}
+       .head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+       .btn{display:inline-block;background:#0f172a;color:#fff;text-decoration:none;padding:9px 18px;border-radius:6px;font-size:13px;font-weight:600}
+       .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+       .card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:18px}
+       .cardnum{font-size:30px;font-weight:800;letter-spacing:-1px}
+       .cardlabel{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+       .cardnote{font-size:12px;color:#94a3b8;margin-top:4px}
+       .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px}
+       .barrow{display:flex;align-items:center;gap:12px;margin-bottom:7px}
+       .barlabel{width:150px;font-size:13px;flex-shrink:0}
+       .bartrack{flex:1;height:9px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+       .barfill{height:100%;border-radius:5px}
+       .barnum{width:34px;text-align:right;font-size:13px;font-weight:700;flex-shrink:0}
+       .pill{display:inline-block;padding:2px 9px;border-radius:11px;font-size:11px;font-weight:600}
+       .pill.ok{background:#dcfce7;color:#15803d}
+       .pill.wait{background:#fef3c7;color:#a16207}
+       input,select{padding:7px 11px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;font-family:inherit}
+       input{width:210px}
+       a{color:#0369a1}
      </style>${inner}`,
     { headers: { "Content-Type": "text/html; charset=utf-8" } }
   );
