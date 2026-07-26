@@ -680,7 +680,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v9 loaded', 'color:#00E5FF;font-weight:bold');
+            console.log('%cSocial Phix signup v10 loaded', 'color:#00E5FF;font-weight:bold');
 
             // ---- Worker address ------------------------------------
             const WORKER = (window.SOCIALPHIX_WORKER || '').replace(/\/+$/, '');
@@ -799,6 +799,17 @@
 
                     const data = await response.json();
                     console.log('Signup response:', data);
+
+                    // The signup can succeed while the email fails. Say so
+                    // clearly rather than letting it look like it all worked.
+                    if (data.ok && data.emailSent === false) {
+                        console.error(
+                            '%cSignup saved, but the confirmation email did NOT send.',
+                            'color:#FF5722;font-weight:bold;font-size:14px',
+                            '\n\nReason:', data.emailError,
+                            '\n\nCheck resend.com -> Emails, and your worker logs.'
+                        );
+                    }
 
                     if (data.ok) {
                         // Already confirmed previously? Straight to their tracker.
