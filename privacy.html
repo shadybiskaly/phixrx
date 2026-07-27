@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
+    <!-- Security headers. A CSP restricts where scripts and styles may load
+         from, so an injected <script> from anywhere else simply won't run. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://raw.githubusercontent.com https://placehold.co https://www.google-analytics.com; connect-src 'self' https://*.workers.dev https://www.google-analytics.com https://region1.google-analytics.com; frame-src https://challenges.cloudflare.com; form-action 'self' https://*.workers.dev; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="canonical" href="https://www.socialphix.com/privacy.html" />
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/shadybiskaly/phixrx/refs/heads/main/logo.svg">
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0QQKCJJEPB"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-111753TXDT"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-0QQKCJJEPB');
+      gtag('config', 'G-111753TXDT');
     </script>
 
     <meta charset="UTF-8">
@@ -21,22 +26,12 @@
     <meta property="og:url" content="https://www.socialphix.com/privacy.html">
     <meta property="og:type" content="website">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/socialphix.css">
     <link rel="alternate" type="text/plain" href="/llms.txt" title="Plain-text summary for AI assistants">
+    <link rel="preload" href="/socialphix.css" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { heading: ['"Plus Jakarta Sans"', 'sans-serif'], sans: ['"Inter"', 'sans-serif'] },
-                    colors: { 'brand-bg': '#050B14', 'brand-surface': '#0A192F', 'brand-card': '#112240', 'accent-cyan': '#00E5FF', 'accent-orange': '#FF5722', 'accent-orange-hover': '#E64A19' }
-                }
-            }
-        }
-    </script>
 
     <style>
         body { background-color: #0A192F; color: #FFFFFF; overflow-x: hidden; }
