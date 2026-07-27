@@ -1,0 +1,39 @@
+# Security headers
+#
+# Works on: Cloudflare Pages, Netlify, Vercel (as vercel.json).
+# Does NOT work on GitHub Pages — GitHub serves static files and will
+# not send custom headers. See SECURITY-SPEED.md for the Cloudflare
+# route, which gets you these without moving hosts.
+
+/*
+  # Clickjacking. This one CANNOT be set by a meta tag — an HTTP header
+  # is the only way, which is the main reason to bother with this file.
+  X-Frame-Options: DENY
+
+  # Stop browsers guessing content types (an XSS vector for uploads)
+  X-Content-Type-Options: nosniff
+
+  # Don't leak full URLs — your admin token lives in a query string
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Force HTTPS for two years, including subdomains
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+  # Turn off browser APIs the site never uses
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+  # Same policy as the meta tag, but as a header it also covers
+  # frame-ancestors, which meta cannot
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://raw.githubusercontent.com https://placehold.co https://www.google-analytics.com; connect-src 'self' https://*.workers.dev https://www.google-analytics.com https://region1.google-analytics.com; frame-src https://challenges.cloudflare.com; form-action 'self' https://*.workers.dev; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+
+# Long cache for the stylesheet — it's content-addressed by rebuild,
+# so bump the filename if you ever need to bust it
+/socialphix.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML should revalidate so edits go live immediately
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

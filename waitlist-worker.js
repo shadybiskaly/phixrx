@@ -44,7 +44,7 @@
 
 // Bump this whenever you paste in new code, so /  tells you at a glance
 // whether what's deployed is what you think is deployed.
-const VERSION = "2026-07-25.k";
+const VERSION = "2026-07-25.o";
 
 // Pasted secrets often pick up a trailing space or newline that you
 // can't see in the dashboard. Trim before use.
@@ -69,6 +69,10 @@ const RESEND = "https://api.resend.com/emails";
 // Until then Resend only allows sending to your own address.
 const FROM = "Shady at Social Phix <shady@socialphix.com>";
 const REPLY_TO = "shady@socialphix.com";
+
+// CAN-SPAM requires a valid physical postal address in commercial email.
+// A PO box registered to the business is fine. REPLACE THIS.
+const POSTAL_ADDRESS = "PhixRx, [street address], [city], ON [postal code], Canada";
 
 const TAG_PENDING  = "waitlist-pending";
 const TAG_VERIFIED = "waitlist-verified";
@@ -96,15 +100,22 @@ const DISPOSABLE = new Set([
 
 let tagCache = null;
 
+// The worker's own address, captured per request so emails can build
+// links back to it without you having to configure it anywhere.
+let WORKER_ORIGIN = "";
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    WORKER_ORIGIN = url.origin;
+
     if (request.method === "OPTIONS") return cors(new Response(null, { status: 204 }), request);
 
     try {
       if (path === "/signup" && request.method === "POST") return cors(await signup(request, env), request);
+      if (path === "/unsubscribe") return unsubscribe(request, url, env);
       if (path === "/verify") return await verify(url, env);
       if (path === "/stats")  return cors(await stats(url, env), request);
 
@@ -112,7 +123,7 @@ export default {
       if (path === "/setup" || path === "/admin" || path === "/test-email"
           || path === "/health" || path === "/export" || path === "/delete"
           || path === "/sync-kit") {
-        if (url.searchParams.get("token") !== trim(env.SHARED_SECRET) || !env.SHARED_SECRET) {
+        if (!env.SHARED_SECRET || !safeEqual(url.searchParams.get("token"), trim(env.SHARED_SECRET))) {
           return new Response("Unauthorized. Check your token.", { status: 401 });
         }
         if (path === "/setup")  return runSetup(env);
@@ -210,6 +221,18 @@ async function signup(request, env) {
   }
   await env.DB.put(rateKey, String(attempts + 1), { expirationTtl: 3600 });
 
+  // --- Previously unsubscribed? -------------------------------------
+  // Someone who opted out stays opted out. Silently re-adding them is
+  // exactly the pattern that earns spam complaints and blocklistings.
+  const suppressed = await env.DB.get(`unsub:${email}`);
+  if (suppressed) {
+    console.log("signup blocked — on the suppression list:", email);
+    return json({
+      ok: false,
+      error: "This address was removed from our list. Email us if you'd like to rejoin.",
+    }, 400);
+  }
+
   // --- Already known? ---------------------------------------------
   const existingRaw = await env.DB.get(`sub:${email}`);
   if (existingRaw) {
@@ -221,7 +244,7 @@ async function signup(request, env) {
       // makes repeat testing visible instead of looking like a failure.
       let emailSent = true, emailError = null;
       try {
-        await sendEmail(env, { to: email, ...welcomeEmail(existing.name, existing.code) });
+        await sendEmail(env, { to: email, ...welcomeEmail(existing.name, existing.code, await unsubUrl(email, env)) });
       } catch (err) {
         emailSent = false;
         emailError = err.message;
@@ -245,7 +268,7 @@ async function signup(request, env) {
 
     let emailSent = true, emailError = null;
     try {
-      await sendEmail(env, { to: email, ...confirmationEmail(existing.name, link) });
+      await sendEmail(env, { to: email, ...confirmationEmail(existing.name, link, await unsubUrl(email, env)) });
     } catch (err) {
       emailSent = false;
       emailError = err.message;
@@ -288,7 +311,7 @@ async function signup(request, env) {
   // than lose them — but we report it so it's never silent.
   let emailSent = true, emailError = null;
   try {
-    await sendEmail(env, { to: email, ...confirmationEmail(name, link) });
+    await sendEmail(env, { to: email, ...confirmationEmail(name, link, await unsubUrl(email, env)) });
   } catch (err) {
     emailSent = false;
     emailError = err.message;
@@ -356,7 +379,7 @@ async function verify(url, env) {
 
   // Welcome email carries their referral link.
   try {
-    await sendEmail(env, { to: email, ...welcomeEmail(sub.name, code) });
+    await sendEmail(env, { to: email, ...welcomeEmail(sub.name, code, await unsubUrl(email, env)) });
   } catch (err) {
     // Don't block the redirect — they still land on the tracker,
     // which shows the same link.
@@ -426,7 +449,7 @@ async function stats(url, env) {
 
 /* ==================== 4. KIT ==================== */
 
-async function pushToKit(env, email, name, fields, tagName) {
+async function pushToKit(env, email, name, fields, tagName, opts = {}) {
   // Kit is optional. If no key is set, or the call fails, we carry on —
   // the waitlist itself doesn't depend on it.
   if (!env.KIT_API_KEY) return;
@@ -441,7 +464,10 @@ async function pushToKit(env, email, name, fields, tagName) {
     const res = await kit("POST", "/subscribers", env, {
       email_address: email,
       first_name: firstNameOf(name) || undefined,
-      state: "active",
+      // Only assert "active" for genuinely new or confirming signups.
+      // Sending it on every call — including a backfill — would quietly
+      // re-subscribe anyone who had opted out in Kit.
+      ...(opts.activate === false ? {} : { state: "active" }),
       fields: clean,
     });
 
@@ -484,6 +510,26 @@ async function applyTag(env, tagName, email) {
     return;
   }
   return kit("POST", `/tags/${id}/subscribers`, env, { email_address: email });
+}
+
+/**
+ * Actually unsubscribes someone in Kit.
+ *
+ * Kit needs the subscriber id, not the address, so we look it up first.
+ * Note this is one-way: Kit offers no API to reactivate a cancelled
+ * subscriber — they'd have to re-subscribe through a form themselves.
+ */
+async function unsubscribeFromKit(env, email) {
+  if (!env.KIT_API_KEY) return { ok: false, reason: "Kit not connected" };
+
+  const found = await kit("GET",
+    `/subscribers?email_address=${encodeURIComponent(email)}`, env);
+
+  const subscriber = (found.subscribers || [])[0];
+  if (!subscriber) return { ok: false, reason: "not found in Kit" };
+
+  await kit("POST", `/subscribers/${subscriber.id}/unsubscribe`, env);
+  return { ok: true, id: subscriber.id };
 }
 
 /* ==================== 5. SETUP ==================== */
@@ -534,6 +580,11 @@ async function adminView(env) {
   }
 
   people.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+
+  // Opt-outs are removed from the list entirely and live under their own
+  // prefix, so they never appear in these numbers or the table below.
+  const unsubList = await env.DB.list({ prefix: "unsub:" });
+  const unsubbed  = unsubList.keys.length;
 
   const verified = people.filter(p => p.verified).length;
   const pending  = people.length - verified;
@@ -603,6 +654,7 @@ async function adminView(env) {
         ${card("Pending", pending, `${rate}% confirm`)}
         ${card("Via referral", referred, people.length ? Math.round(referred / people.length * 100) + "% of signups" : "")}
         ${card("Referrals made", totalRef)}
+        ${card("Unsubscribed", unsubbed, unsubbed ? "removed from the list" : "")}
       </div>
 
       <div class="cols">
@@ -711,6 +763,109 @@ async function adminView(env) {
       });
     </script>
   `, true);
+}
+
+/* ==================== UNSUBSCRIBE ==================== */
+
+/**
+ * One-click unsubscribe. Deliberately requires no login and no
+ * confirmation step — CAN-SPAM allows at most a single page, and
+ * Gmail's bulk sender rules expect a one-click POST to work.
+ *
+ *   GET  /unsubscribe?e=EMAIL&t=TOKEN   shows a confirmation page
+ *   POST /unsubscribe?e=EMAIL&t=TOKEN   silent, for List-Unsubscribe-Post
+ *
+ * The token is an HMAC of the address, so nobody can unsubscribe
+ * anyone else by guessing URLs.
+ */
+async function unsubscribe(request, url, env) {
+  const email = (url.searchParams.get("e") || "").trim().toLowerCase();
+  const token = (url.searchParams.get("t") || "").trim();
+
+  const expected = email ? await unsubToken(email, env) : null;
+  const valid = Boolean(email && token && safeEqual(token, expected));
+
+  // Mail clients fire this in the background. Answer plainly, no HTML.
+  const oneClick = request.method === "POST";
+
+  if (!valid) {
+    if (oneClick) return new Response("Invalid link", { status: 400 });
+    return html(`
+      <h1>That link didn't work</h1>
+      <p>It may have been broken by your email client, or already used.</p>
+      <p>Email <a href="mailto:${esc(REPLY_TO)}">${esc(REPLY_TO)}</a> and we'll
+         take you off the list by hand — no questions, no delay.</p>`);
+  }
+
+  const raw = await env.DB.get(`sub:${email}`);
+
+  if (raw) {
+    const sub = JSON.parse(raw);
+
+    // Remove them from the waitlist properly: record gone, referral code
+    // freed, any outstanding verification links killed.
+    await env.DB.delete(`sub:${email}`);
+    if (sub.code) await env.DB.delete(`code:${sub.code}`);
+
+    const pendings = await env.DB.list({ prefix: "pending:" });
+    for (const key of pendings.keys) {
+      if ((await env.DB.get(key.name)) === email) await env.DB.delete(key.name);
+    }
+  }
+
+  // Keep a suppression entry — the address and the date, nothing else.
+  // It's the only way to guarantee they never get re-added and emailed.
+  await env.DB.put(`unsub:${email}`, JSON.stringify({
+    email,
+    unsubscribedAt: new Date().toISOString(),
+  }));
+
+  // Unsubscribe them in Kit too, so a broadcast can't reach them either.
+  try {
+    const result = await unsubscribeFromKit(env, email);
+    console.log("Kit unsubscribe:", email, result.ok ? "done" : result.reason);
+  } catch (err) {
+    console.warn("Kit unsubscribe failed:", err.message);
+  }
+
+  console.log("unsubscribed and removed:", email);
+
+  if (oneClick) return new Response("OK", { status: 200 });
+
+  return html(`
+    <h1>You're unsubscribed</h1>
+    <p class="good">${esc(email)} won't receive anything further from us.</p>
+    <p>That took effect immediately — nothing else to do.</p>
+    <div class="note">
+      Your details have been removed from our list. We keep only your email
+      address on a suppression list, so you can't be added back by mistake.
+      Want that gone too? Email <a href="mailto:${esc(REPLY_TO)}">${esc(REPLY_TO)}</a>.
+    </div>
+    <p style="margin-top:20px;"><a href="${SITE}">Back to socialphix.com</a></p>`);
+}
+
+/**
+ * HMAC of the address, truncated. Deterministic, so the same address
+ * always produces the same link, and unguessable without the secret.
+ */
+async function unsubToken(email, env) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(trim(env.SHARED_SECRET) || "no-secret"),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(email));
+  return [...new Uint8Array(sig)]
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("")
+    .slice(0, 24);
+}
+
+async function unsubUrl(email, env) {
+  const t = await unsubToken(email, env);
+  return `${WORKER_ORIGIN}/unsubscribe?e=${encodeURIComponent(email)}&t=${t}`;
 }
 
 /* ==================== DELETE ==================== */
@@ -825,7 +980,7 @@ async function syncKit(url, env) {
         utm_campaign:     s.utmCampaign,
         country_code:     s.country,
         city:             s.city,
-      }, s.verified ? TAG_VERIFIED : TAG_PENDING);
+      }, s.verified ? TAG_VERIFIED : TAG_PENDING, { activate: false });
       synced++;
     } catch (err) {
       problems.push(`${s.email}: ${err.message}`);
@@ -1047,6 +1202,16 @@ async function healthCheck(env) {
     }
   }
 
+  /* --- Postal address (CAN-SPAM) --- */
+  if (/\[|\]/.test(POSTAL_ADDRESS)) {
+    rows.push(["Postal address", "info",
+      "Still a placeholder. Commercial email legally needs a real address where mail reaches you — " +
+      "a rented office, a mailbox service, or your own address. Fine while you're only emailing yourself; " +
+      "sort it before you drive real traffic. Edit <code>POSTAL_ADDRESS</code> near the top of the worker."]);
+  } else {
+    ok("Postal address", esc(POSTAL_ADDRESS));
+  }
+
   /* --- Turnstile --- */
   if (env.TURNSTILE_SECRET) {
     ok("Bot protection", "Turnstile active — tokens verified server-side");
@@ -1133,7 +1298,7 @@ async function testEmail(url, env) {
 
   let result, detail = "";
   try {
-    const mail = confirmationEmail("Test", `${url.origin}/verify?t=TESTTOKEN`);
+    const mail = confirmationEmail("Test", `${url.origin}/verify?t=TESTTOKEN`, await unsubUrl(to, env));
     const res = await fetch(RESEND, {
       method: "POST",
       headers: {
@@ -1189,7 +1354,7 @@ async function testEmail(url, env) {
 
 /* ==================== EMAIL (Resend) ==================== */
 
-async function sendEmail(env, { to, subject, html, text }) {
+async function sendEmail(env, { to, subject, html, text, unsubscribeUrl }) {
   if (!env.RESEND_API_KEY) {
     // Throw rather than return quietly — a missing key used to mean
     // signups succeeded with no email and no visible clue why.
@@ -1209,6 +1374,14 @@ async function sendEmail(env, { to, subject, html, text }) {
       subject,
       html,
       text,
+      // Gmail and Yahoo require these of bulk senders. Without them your
+      // mail gets filtered regardless of how good the content is.
+      ...(unsubscribeUrl ? {
+        headers: {
+          "List-Unsubscribe": `<${unsubscribeUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      } : {}),
     }),
   });
 
@@ -1221,7 +1394,7 @@ async function sendEmail(env, { to, subject, html, text }) {
 
 /* ---- Shared shell so both emails look like the site ---- */
 
-function shell(innerHtml) {
+function shell(innerHtml, unsubUrl) {
   return `<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark"></head>
@@ -1243,8 +1416,13 @@ function shell(innerHtml) {
     <p style="margin:0 0 10px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;line-height:1.6;color:#64748b;">
       These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.
     </p>
+    <p style="margin:0 0 10px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;line-height:1.6;color:#475569;">
+      ${POSTAL_ADDRESS}
+    </p>
     <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;color:#475569;">
-      &copy; 2026 PhixRx &middot; Shipping to the United States
+      &copy; 2026 PhixRx &middot; Shipping to the United States${unsubUrl
+        ? ` &middot; <a href="${unsubUrl}" style="color:#64748b;text-decoration:underline;">Unsubscribe</a>`
+        : ""}
     </p>
   </td></tr>
 
@@ -1266,7 +1444,7 @@ const H = "margin:0 0 18px;font-family:'Helvetica Neue',Helvetica,Arial,sans-ser
 
 /* ---- Email 1: confirm your address ---- */
 
-function confirmationEmail(name, verifyLink) {
+function confirmationEmail(name, verifyLink, unsubUrl) {
   const hi = name ? `Hey ${escAttr(name)},` : "Hey,";
 
   const html = shell(`
@@ -1293,7 +1471,7 @@ function confirmationEmail(name, verifyLink) {
     <p style="margin:22px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">
       Didn't sign up? Ignore this and nothing happens. The link expires in a week.
     </p>
-  `);
+  `, unsubUrl);
 
   const text = `${hi}
 
@@ -1309,14 +1487,18 @@ Shady Biskaly
 R.Ph., BScPharm
 Founder, Social Phix
 
-Didn't sign up? Ignore this. The link expires in a week.`;
+Didn't sign up? Ignore this. The link expires in a week.
 
-  return { subject: "Confirm your email — then your link is live", html, text };
+---
+${POSTAL_ADDRESS}
+${unsubUrl ? "Unsubscribe: " + unsubUrl : ""}`;
+
+  return { subject: "Confirm your email — then your link is live", html, text, unsubscribeUrl: unsubUrl };
 }
 
 /* ---- Email 2: welcome, with the referral link ---- */
 
-function welcomeEmail(name, code) {
+function welcomeEmail(name, code, unsubUrl) {
   const hi = name ? `Hey ${escAttr(name)},` : "Hey,";
   const link = `${SITE}/?ref=${code}`;
   const tracker = `${SITE}/success.html?ref=${code}`;
@@ -1373,7 +1555,7 @@ function welcomeEmail(name, code) {
     <p style="margin:22px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#475569;">
       P.S. Reply to this if you've got questions about the formula. I read everything, and I'm the one who wrote it.
     </p>
-  `);
+  `, unsubUrl);
 
   const text = `${hi}
 
@@ -1402,9 +1584,13 @@ Shady Biskaly
 R.Ph., BScPharm
 Founder, Social Phix
 
-P.S. Reply if you've got questions about the formula. I read everything, and I'm the one who wrote it.`;
+P.S. Reply if you've got questions about the formula. I read everything, and I'm the one who wrote it.
 
-  return { subject: "You're in. Here's your link.", html, text };
+---
+${POSTAL_ADDRESS}
+${unsubUrl ? "Unsubscribe: " + unsubUrl : ""}`;
+
+  return { subject: "You're in. Here's your link.", html, text, unsubscribeUrl: unsubUrl };
 }
 
 function escAttr(s) {
@@ -1482,10 +1668,28 @@ function cors(res, request) {
   return res;
 }
 
+/**
+ * Compares two secrets without leaking length or content through timing.
+ * A plain !== returns as soon as it finds a mismatched byte, which in
+ * theory lets an attacker recover a token one character at a time.
+ */
+function safeEqual(a, b) {
+  const x = String(a || "");
+  const y = String(b || "");
+  if (x.length !== y.length) return false;
+  let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x.charCodeAt(i) ^ y.charCodeAt(i);
+  return diff === 0;
+}
+
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+      "Cache-Control": "no-store",
+    },
   });
 }
 
@@ -1498,6 +1702,8 @@ function html(inner, wide = false) {
   return new Response(
     `<!doctype html><meta charset="utf-8"><title>Social Phix</title>
      <meta name="viewport" content="width=device-width,initial-scale=1">
+     <meta name="robots" content="noindex,nofollow">
+     <meta name="referrer" content="no-referrer">
      <style>
        body{font:15px/1.6 system-ui,-apple-system,sans-serif;margin:0;padding:36px 20px;color:#0f172a;background:#f8fafc}
        .wide,body>*:not(.wide){max-width:${wide ? "1080px" : "640px"};margin:0 auto}

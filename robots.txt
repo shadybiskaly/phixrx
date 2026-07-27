@@ -1,4 +1,77 @@
-User-agent: *
-Disallow:
+# Social Phix — robots.txt
+# https://www.socialphix.com
 
-Sitemap: https://www.socialphix.com
+# ---------------------------------------------------------------
+# Search engines
+# ---------------------------------------------------------------
+User-agent: *
+Allow: /
+Disallow: /success.html
+
+# ---------------------------------------------------------------
+# AI crawlers — explicitly welcome.
+#
+# Most supplement sites block these. Being readable is how you get
+# quoted when someone asks an assistant "what helps before a
+# presentation" — which is a question people actually ask.
+# ---------------------------------------------------------------
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Google AI (Gemini, AI Overviews)
+User-agent: Google-Extended
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Microsoft / Copilot
+User-agent: bingbot
+Allow: /
+
+# Meta AI
+User-agent: meta-externalagent
+Allow: /
+
+# Common Crawl — feeds many training sets
+User-agent: CCBot
+Allow: /
+
+# Amazon
+User-agent: Amazonbot
+Allow: /
+
+# ---------------------------------------------------------------
+Sitemap: https://www.socialphix.com/sitemap.xml
