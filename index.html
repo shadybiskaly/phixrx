@@ -31,13 +31,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Phix | The Shot for When Your Body Panics and You Can't</title>
-    <meta name="description" content="Your nervous system can't tell an interview from a leopard. Social Phix is a 100ml pharmacist-formulated shot — five compounds, no proprietary blends — designed to help support calm and focus when it counts.">
+    <meta name="description" content="The interview. The pitch. The first date. One 100ml shot, thirty minutes before — five compounds chosen to help you show up calm, quick and entirely yourself.">
     <meta name="keywords" content="Social Phix, liquid confidence, performance focus supplement, pharmacist formulated focus, motherwort, l-theanine, biohack focus">
     
     <!-- Open Graph tags to force Google to recognize the Brand Name -->
     <meta property="og:site_name" content="Social Phix">
     <meta property="og:title" content="Social Phix | The Shot for When Your Body Panics and You Can't">
-    <meta property="og:description" content="Your nervous system can't tell an interview from a leopard. Five compounds, no proprietary blends, built by a pharmacist who got tired of recommending nothing.">
+    <meta property="og:description" content="One 100ml shot, thirty minutes before the moments you can't redo. Five compounds, no proprietary blends, no filler.">
     <meta property="og:url" content="https://www.socialphix.com/">
     <meta property="og:image" content="https://www.socialphix.com/phix2.png">
     <meta property="og:type" content="website">
@@ -45,7 +45,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Social Phix | The Shot for When Your Body Panics and You Can't">
-    <meta name="twitter:description" content="Your nervous system can't tell an interview from a leopard. Five compounds, no proprietary blends, built by a pharmacist who got tired of recommending nothing.">
+    <meta name="twitter:description" content="One 100ml shot, thirty minutes before the moments you can't redo. Five compounds, no proprietary blends, no filler.">
     <meta name="twitter:image" content="https://www.socialphix.com/phix2.png">
 
     <!-- Comprehensive SEO, GEO, AEO & Site Name Schema -->
@@ -232,12 +232,23 @@
 </head>
 <body class="antialiased font-sans">
 
+    <!-- Mobile CTA. Appears once you've scrolled past the hero and hides
+         again at the form, so the action is always one tap away without
+         sitting on top of the thing it's pointing at. -->
+    <a href="#preorder" id="stickyCta"
+       class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-accent-orange text-white text-center py-4 text-sm font-bold tracking-widest uppercase shadow-[0_-4px_20px_rgba(0,0,0,0.4)] translate-y-full transition"
+       style="transition:transform .3s cubic-bezier(.4,0,.2,1)">
+        Join the Waitlist — Free
+    </a>
+
+
     <!-- Glassmorphic Navigation -->
     <nav class="glass-nav fixed w-full top-0 z-50 px-6 py-4 transition-all">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="font-heading text-2xl font-extrabold tracking-tight text-white">
                 SOCIAL<span class="text-accent-orange">PHIX</span>
             </div>
+            <!-- Full menu on desktop -->
             <div class="hidden md:flex items-center space-x-8">
                 <a href="#formula" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">How It Works</a>
                 <a href="#protocol" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">When To Use</a>
@@ -247,11 +258,18 @@
                     Join the Waitlist
                 </a>
             </div>
+
+            <!-- Mobile: skip the menu, keep the button. It's the only thing
+                 that matters on a small screen, and the whole nav used to
+                 vanish below md, leaving no call to action at all. -->
+            <a href="#preorder" class="md:hidden text-xs font-bold tracking-widest uppercase bg-accent-orange text-white px-5 py-3 rounded-md">
+                Join
+            </a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <header class="cyan-glow-bottom relative pt-32 pb-24 lg:pt-48 lg:pb-32 overflow-hidden flex flex-col items-center justify-center min-h-screen bg-brand-bg">
+    <header class="cyan-glow-bottom relative pt-28 pb-16 md:pt-32 md:pb-24 lg:pt-48 lg:pb-32 overflow-hidden flex flex-col items-center justify-center bg-brand-bg">
         <div class="bg-grid"></div>
         <div class="max-w-5xl mx-auto px-6 text-center relative z-10 reveal active">
             <div class="inline-block mb-6 border border-accent-cyan/30 rounded-full px-4 py-1.5 bg-brand-surface">
@@ -261,14 +279,14 @@
                 </span>
             </div>
             
-            <h1 class="font-heading text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white mb-6 leading-[1.05]">
+            <h1 class="font-heading text-4xl sm:text-6xl lg:text-8xl font-extrabold tracking-tighter text-white mb-6 leading-[1.05]">
                 Made For The Moments<br/>
                 <span class="text-accent-orange">You Can't Redo.</span>
             </h1>
             
-            <p class="font-sans text-lg sm:text-xl font-normal text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed">
-                The interview. The pitch. The first date. The room where the next two years get decided in forty minutes.
-                <span class="block mt-4 text-white font-medium">One 100ml shot, thirty minutes before. Five compounds chosen to help you show up calm, quick, and entirely yourself.</span>
+            <p class="font-sans text-base sm:text-xl font-normal text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+                The interview. The pitch. The first date.
+                <span class="block mt-4 text-white font-medium">One 100ml shot, thirty minutes before. Five compounds, chosen to help you show up calm, quick and entirely yourself.</span>
             </p>
             
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -290,45 +308,45 @@
     </header>
 
     <!-- The Formula Section -->
-    <section id="formula" class="py-32 bg-brand-surface relative border-b border-slate-800">
+    <section id="formula" class="py-20 md:py-32 bg-brand-surface relative border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center max-w-3xl mx-auto mb-20 reveal">
-                <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">Five Compounds. No Fairy Dust.</h2>
+                <h2 class="font-heading text-3xl sm:text-5xl font-extrabold text-white mb-5 tracking-tight">Five Compounds. No Fairy Dust.</h2>
                 <p class="text-slate-300 font-normal leading-relaxed">
-                    Most of what's sold to you in this category is a proprietary blend — which is industry code for "we put in enough of the expensive stuff to write it on the label, and enough of the cheap stuff to fill the bottle." We're not doing that. Five compounds, each one there because of what it does, each one at a dose that means something.
+                    Most of this category hides behind proprietary blends — enough of the expensive stuff to name it on the label, enough of the cheap stuff to fill the bottle. Not here. Five compounds, each at a dose that means something.
                 </p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
                 
-                <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100 md:col-span-2">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Alpha Hacker</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Pure L-Theanine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">There's a particular kind of mental static that shows up right before it matters — the running commentary, the rehearsing, the sudden awareness of your own hands. L-Theanine is studied for its role in supporting alpha-wave activity, the brain state you're in when you're relaxed but wide awake. This is the anchor of the whole formula, and it's dosed like it.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">The running commentary. The rehearsing. Sudden awareness of your own hands. Studied for supporting <strong class="text-slate-200">alpha-wave activity</strong> — relaxed and wide awake at the same time. <strong class="text-slate-200">Fifty trials deep.</strong></p>
                 </div>
 
-                <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Autonomic Stabilizer</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Motherwort Extract</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Your brain reads your heart rate to decide how worried it should be. Racing pulse in, "we're in danger" out. Motherwort extract binds the GABA-A receptor — the same neural brake prescription anxiolytics pull, through a far gentler mechanism — which is why herbalists reached for it four centuries before anyone could explain it.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">Your brain reads your pulse to decide how worried to be. Motherwort binds the <strong class="text-slate-200">GABA-A receptor</strong> — the brain's main inhibitory brake. Herbalists knew four centuries before anyone could explain why.</p>
                 </div>
 
-                <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Dopamine Drip</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Acetyl L-Tyrosine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Acute stress burns through your catecholamines fast. Drive, wit and verbal fluency run on those, which is why you can prepare for two weeks and still go blank in the room. ALT is the bioavailable precursor — it tops up the tank while you're actively emptying it.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">Stress burns through the neurotransmitters that <strong class="text-slate-200">wit and recall</strong> run on. Which is why you prepare for two weeks and still go blank. ALT tops up the tank while you're emptying it.</p>
                 </div>
 
-                <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Word-Recall Engine</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Uridine Monophosphate</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">You knew the word. You've used it a thousand times. It just wasn't there when you reached for it. That's a synaptic retrieval problem, not an intelligence problem — and uridine is a direct precursor to the phospholipids your neurons build membranes out of.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed"><strong class="text-slate-200">You knew the word.</strong> It just wasn't there when you reached for it. That's retrieval, not intelligence — and uridine feeds the pathway your neurons build membranes from.</p>
                 </div>
 
-                <div class="bg-brand-card p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Catalyst</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-3">Micro-Dosed Caffeine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Enough to light the engine. Nowhere near enough to make things worse. Caffeine on its own is a terrible idea before something that already has your heart going — paired with a proper dose of L-Theanine, the jagged edge comes off and what's left is clean, usable focus.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed"><strong class="text-slate-200">Enough to light the engine.</strong> Nowhere near enough to make things worse. Paired with L-Theanine, the jagged edge comes off and what's left is clean focus.</p>
                 </div>
 
             </div>
@@ -344,18 +362,18 @@
     </section>
 
     <!-- Operational Protocols (Now Linked to Specific Pages) -->
-    <section id="protocol" class="py-32 bg-brand-bg relative border-b border-slate-800">
+    <section id="protocol" class="py-20 md:py-32 bg-brand-bg relative border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center max-w-3xl mx-auto mb-20 reveal">
-                <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-6">Four Rooms You Don't Want to Blow.</h2>
-                <p class="text-slate-300 leading-relaxed">Different rooms, identical biology. Your body runs the same panic subroutine whether the threat is a hiring panel or someone you actually like.</p>
+                <h2 class="font-heading text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-5">Four Rooms You Don't Want to Blow.</h2>
+                <p class="text-slate-300 leading-relaxed">Different rooms, identical biology.</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto">
                 
                 <!-- 01 Presentations (Linked) -->
                 <a href="presentation-anxiety.html" class="block group reveal delay-200 p-6 rounded-2xl hover:bg-brand-surface border border-transparent hover:border-slate-700 transition-all duration-300">
-                    <div class="w-48 sm:w-56 mx-auto overflow-hidden rounded-xl mb-6 relative border border-slate-700">
+                    <div class="w-32 sm:w-56 mx-auto overflow-hidden rounded-xl mb-5 relative border border-slate-700">
                         <div class="absolute inset-0 bg-brand-bg/40 group-hover:bg-transparent transition duration-500 z-10 pointer-events-none"></div>
                         <img src="presentation.png" alt="Boardroom Presentations protocol" 
                              class="w-full aspect-[4/5] object-cover object-center transform group-hover:scale-105 transition duration-700 filter grayscale group-hover:grayscale-0"
@@ -371,7 +389,7 @@
 
                 <!-- 02 Interviews (Linked) -->
                 <a href="interview-prep.html" class="block group reveal delay-100 p-6 rounded-2xl hover:bg-brand-surface border border-transparent hover:border-slate-700 transition-all duration-300">
-                    <div class="w-48 sm:w-56 mx-auto overflow-hidden rounded-xl mb-6 relative border border-slate-700">
+                    <div class="w-32 sm:w-56 mx-auto overflow-hidden rounded-xl mb-5 relative border border-slate-700">
                         <div class="absolute inset-0 bg-brand-bg/40 group-hover:bg-transparent transition duration-500 z-10 pointer-events-none"></div>
                         <img src="interview.png" alt="Executive Interview Preparation protocol" 
                              class="w-full aspect-[4/5] object-cover object-center transform group-hover:scale-105 transition duration-700 filter grayscale group-hover:grayscale-0"
@@ -388,7 +406,7 @@
 
                 <!-- 03 Networking (Linked) -->
                 <a href="networking-confidence.html" class="block group reveal delay-100 p-6 rounded-2xl hover:bg-brand-surface border border-transparent hover:border-slate-700 transition-all duration-300">
-                    <div class="w-48 sm:w-56 mx-auto overflow-hidden rounded-xl mb-6 relative border border-slate-700">
+                    <div class="w-32 sm:w-56 mx-auto overflow-hidden rounded-xl mb-5 relative border border-slate-700">
                         <div class="absolute inset-0 bg-brand-bg/40 group-hover:bg-transparent transition duration-500 z-10 pointer-events-none"></div>
                         <img src="networking.png" alt="Industry Networking protocol" 
                              class="w-full aspect-[4/5] object-cover object-center transform group-hover:scale-105 transition duration-700 filter grayscale group-hover:grayscale-0"
@@ -404,7 +422,7 @@
 
                 <!-- 04 Dates (Linked) -->
                 <a href="first-date-nerves.html" class="block group reveal delay-200 p-6 rounded-2xl hover:bg-brand-surface border border-transparent hover:border-slate-700 transition-all duration-300">
-                    <div class="w-48 sm:w-56 mx-auto overflow-hidden rounded-xl mb-6 relative border border-slate-700">
+                    <div class="w-32 sm:w-56 mx-auto overflow-hidden rounded-xl mb-5 relative border border-slate-700">
                         <div class="absolute inset-0 bg-brand-bg/40 group-hover:bg-transparent transition duration-500 z-10 pointer-events-none"></div>
                         <img src="dates.png" alt="High Stakes Dates protocol" 
                              class="w-full aspect-[4/5] object-cover object-center transform group-hover:scale-105 transition duration-700 filter grayscale group-hover:grayscale-0"
@@ -423,11 +441,11 @@
     </section>
 
     <!-- Our Story Section -->
-    <section id="story" class="py-32 bg-brand-surface relative border-b border-slate-800">
+    <section id="story" class="py-20 md:py-32 bg-brand-surface relative border-b border-slate-800">
         <div class="max-w-4xl mx-auto px-6 reveal">
             <div class="border-l-4 border-accent-orange pl-6 mb-10">
                 <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan uppercase mb-3 block">The Origin</span>
-                <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white tracking-tight">The Drink I Wanted<br/><span class="text-accent-orange">And Couldn't Find.</span></h2>
+                <h2 class="font-heading text-3xl sm:text-5xl font-extrabold text-white tracking-tight">The Drink I Wanted<br/><span class="text-accent-orange">And Couldn't Find.</span></h2>
             </div>
             
             <!-- Founder Card -->
@@ -445,10 +463,8 @@
                     <!-- Bio Column -->
                     <div class="flex-1 space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed">
                         <p class="font-heading text-lg font-bold text-white">I've been obsessed with supplements since I was a kid.</p>
-                        <p>I read labels for fun and chased down studies the way other kids collected trading cards. Testing things on myself came with the territory, and it taught me early that most of what's on the shelf doesn't do much.</p>
-                        <p>That curiosity turned into a career. More than a decade later, I still read every paper before I believe anything.</p>
-                        <p>Somewhere along the way I started noticing how wound up everyone is. Friends, family, people my age and younger — permanently half-braced for judgement, more hours on a screen than in a room with actual people. And then the room happens, and it lands hard.</p>
-                        <p>The options were alcohol, which costs you the sharpness you came for, or an energy drink, which makes the physical part worse. Nobody had built the thing in between. So I did.</p>
+                        <p>Read labels for fun, chased down studies, tested things on myself. It taught me early that most of what's on the shelf doesn't do much. More than a decade of practising pharmacy later, I still read every paper before I believe anything.</p>
+                        <p>What I kept noticing was how wound up everyone had become — and that the only options were alcohol, which costs you the sharpness you came for, or an energy drink, which makes it worse. Nobody had built the thing in between.</p>
                         <div class="pt-4">
                             <a href="about.html" class="inline-flex items-center gap-2 text-accent-cyan hover:text-white font-bold text-xs tracking-widest uppercase transition-colors">
                                 Read the Full Story
@@ -459,14 +475,12 @@
                 </div>
             </div>
 
-            <p class="text-xs text-slate-500 italic leading-relaxed max-w-2xl">
-                Every compound in here earned its slot. If I couldn't explain why it was in the bottle, it didn't go in the bottle.
-            </p>
+
         </div>
     </section>
 
     <!-- Semantic FAQ Section -->
-    <section id="faq" class="py-24 bg-brand-bg relative border-b border-slate-800">
+    <section id="faq" class="py-16 md:py-24 bg-brand-bg relative border-b border-slate-800">
         <div class="max-w-4xl mx-auto px-6 reveal">
             <h2 class="font-heading text-3xl font-extrabold text-white mb-10 tracking-tight text-center">The Obvious Questions</h2>
             <div class="space-y-6">
@@ -483,12 +497,12 @@
     </section>
 
 <!-- Loops Request Engine -->
-    <section id="preorder" class="py-32 bg-brand-surface relative overflow-hidden cyan-glow-bottom">
+    <section id="preorder" class="py-20 md:py-32 bg-brand-surface relative overflow-hidden cyan-glow-bottom">
         <div class="absolute w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[120px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
         
         <div class="max-w-3xl mx-auto px-6 relative z-10 reveal">
             <div class="text-center mb-12">
-                <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">The First Run Is Small.</h2>
+                <h2 class="font-heading text-3xl sm:text-5xl font-extrabold text-white mb-5 tracking-tight">The First Run Is Small.</h2>
                 <p class="text-slate-300 font-normal leading-relaxed max-w-xl mx-auto">
                     Deliberately. I'd rather make a small batch properly than a big one badly. Pick your pack and I'll hold your spot — no payment today, no card, nothing to cancel.
                 </p>
@@ -670,7 +684,32 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v9 loaded', 'color:#00E5FF;font-weight:bold');
+            console.log('%cSocial Phix signup v13 loaded', 'color:#00E5FF;font-weight:bold');
+
+            // ---- Sticky mobile CTA ----
+            // Slides up once you've scrolled past the hero, and gets out of
+            // the way again at the form so it never covers the thing it points at.
+            const stickyCta = document.getElementById('stickyCta');
+            const preorderSection = document.getElementById('preorder');
+
+            if (stickyCta && preorderSection && 'IntersectionObserver' in window) {
+                let pastHero = false, atForm = false;
+                const paint = () => {
+                    stickyCta.style.transform =
+                        (pastHero && !atForm) ? 'translateY(0)' : 'translateY(100%)';
+                };
+
+                const heroEl = document.querySelector('header');
+                if (heroEl) {
+                    new IntersectionObserver(([e]) => {
+                        pastHero = !e.isIntersecting; paint();
+                    }, { threshold: 0 }).observe(heroEl);
+                }
+
+                new IntersectionObserver(([e]) => {
+                    atForm = e.isIntersecting; paint();
+                }, { threshold: 0 }).observe(preorderSection);
+            }
 
             // ---- Worker address ------------------------------------
             const WORKER = (window.SOCIALPHIX_WORKER || '').replace(/\/+$/, '');
