@@ -72,20 +72,20 @@
             <div class="font-heading text-2xl font-extrabold tracking-tight text-white">
                 SOCIAL<span class="text-accent-orange">PHIX</span>
             </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="/#formula" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">How It Works</a>
-                <a href="/#protocol" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">When To Use</a>
-                <a href="/#story" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">Our Story</a>
-                <a href="/#faq" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">FAQ</a>
-                <a href="/#preorder" class="text-xs font-bold tracking-widest uppercase bg-accent-orange text-white px-6 py-2.5 rounded-md hover:bg-accent-orange-hover transition duration-300">
+            <div class="flex items-center space-x-8">
+                <!-- Menu: desktop only. Won't fit on a phone. -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/#formula" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">How It Works</a>
+                    <a href="/#protocol" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">When To Use</a>
+                    <a href="/#story" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">Our Story</a>
+                    <a href="/#faq" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">FAQ</a>
+                </div>
+
+                <!-- The one CTA, at every screen size -->
+                <a href="/#preorder" class="text-xs font-bold tracking-widest uppercase bg-accent-orange text-white px-5 py-3 md:px-6 md:py-2.5 rounded-md hover:bg-accent-orange-hover transition duration-300 whitespace-nowrap">
                     Join the Waitlist
                 </a>
             </div>
-            <!-- Mobile: the desktop menu is hidden below md, so without this
-                 a phone visitor gets a logo and no call to action. -->
-            <a href="/#preorder" class="md:hidden text-xs font-bold tracking-widest uppercase bg-accent-orange text-white px-5 py-3 rounded-md">
-                Join the Waitlist
-            </a>
 
         </div>
     </nav>
