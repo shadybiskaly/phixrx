@@ -232,14 +232,6 @@
 </head>
 <body class="antialiased font-sans">
 
-    <!-- Mobile CTA. Appears once you've scrolled past the hero and hides
-         again at the form, so the action is always one tap away without
-         sitting on top of the thing it's pointing at. -->
-    <a href="#preorder" id="stickyCta"
-       class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-accent-orange text-white text-center py-4 text-sm font-bold tracking-widest uppercase shadow-[0_-4px_20px_rgba(0,0,0,0.4)] translate-y-full transition"
-       style="transition:transform .3s cubic-bezier(.4,0,.2,1)">
-        Join the Waitlist — Free
-    </a>
 
 
     <!-- Glassmorphic Navigation -->
@@ -248,23 +240,16 @@
             <div class="font-heading text-2xl font-extrabold tracking-tight text-white">
                 SOCIAL<span class="text-accent-orange">PHIX</span>
             </div>
-            <!-- Full menu on desktop -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#formula" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">How It Works</a>
-                <a href="#protocol" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">When To Use</a>
-                <a href="#story" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">Our Story</a>
-                <a href="#faq" class="text-sm font-medium text-slate-300 hover:text-accent-cyan transition">FAQ</a>
-                <a href="#preorder" class="text-xs font-bold tracking-widest uppercase bg-accent-orange text-white px-6 py-2.5 rounded-md hover:bg-accent-orange-hover transition duration-300">
+            <div class="flex items-center space-x-8">
+                <!-- Menu links drop away on mobile; the button never does -->
+                <a href="#formula" class="hidden md:inline-block text-sm font-medium text-slate-300 hover:text-accent-cyan transition">How It Works</a>
+                <a href="#protocol" class="hidden md:inline-block text-sm font-medium text-slate-300 hover:text-accent-cyan transition">When To Use</a>
+                <a href="#story" class="hidden md:inline-block text-sm font-medium text-slate-300 hover:text-accent-cyan transition">Our Story</a>
+                <a href="#faq" class="hidden md:inline-block text-sm font-medium text-slate-300 hover:text-accent-cyan transition">FAQ</a>
+                <a href="#preorder" class="text-xs font-bold tracking-widest uppercase bg-accent-orange text-white px-5 py-3 md:px-6 md:py-2.5 rounded-md hover:bg-accent-orange-hover transition duration-300">
                     Join the Waitlist
                 </a>
             </div>
-
-            <!-- Mobile: skip the menu, keep the button. It's the only thing
-                 that matters on a small screen, and the whole nav used to
-                 vanish below md, leaving no call to action at all. -->
-            <a href="#preorder" class="md:hidden text-xs font-bold tracking-widest uppercase bg-accent-orange text-white px-5 py-3 rounded-md">
-                Join
-            </a>
         </div>
     </nav>
 
@@ -285,8 +270,7 @@
             </h1>
             
             <p class="font-sans text-base sm:text-xl font-normal text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-                The interview. The pitch. The first date.
-                <span class="block mt-4 text-white font-medium">One 100ml shot, thirty minutes before. Five compounds, chosen to help you show up calm, quick and entirely yourself.</span>
+                One shot, thirty minutes before. Five natural compounds, chosen to help you show up calm, quick and entirely yourself.
             </p>
             
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -317,36 +301,100 @@
                 </p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
-                
-                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12 items-stretch">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Alpha Hacker</span>
-                    <h3 class="font-heading text-2xl font-bold text-white mb-3">Pure L-Theanine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">The running commentary. The rehearsing. Sudden awareness of your own hands. Studied for supporting <strong class="text-slate-200">alpha-wave activity</strong> — relaxed and wide awake at the same time. <strong class="text-slate-200">Fifty trials deep.</strong></p>
+                    <h3 class="font-heading text-2xl font-bold text-white mb-4">Pure L-Theanine</h3>
+                    <ul class="text-slate-400 text-sm leading-relaxed space-y-2.5">
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Quiets the mental chatter before it matters</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Keeps you alert — it isn't a sedative</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>50 randomised trials behind it</span>
+                        </li>
+                    </ul>
                 </div>
 
-                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Autonomic Stabilizer</span>
-                    <h3 class="font-heading text-2xl font-bold text-white mb-3">Motherwort Extract</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Your brain reads your pulse to decide how worried to be. Motherwort binds the <strong class="text-slate-200">GABA-A receptor</strong> — the brain's main inhibitory brake. Herbalists knew four centuries before anyone could explain why.</p>
+                    <h3 class="font-heading text-2xl font-bold text-white mb-4">Motherwort Extract</h3>
+                    <ul class="text-slate-400 text-sm leading-relaxed space-y-2.5">
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Helps support a calm, steady pulse</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Acts on GABA — the brain's own calm switch</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Used for 400 years, explained in 2015</span>
+                        </li>
+                    </ul>
                 </div>
 
-                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Dopamine Drip</span>
-                    <h3 class="font-heading text-2xl font-bold text-white mb-3">Acetyl L-Tyrosine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Stress burns through the neurotransmitters that <strong class="text-slate-200">wit and recall</strong> run on. Which is why you prepare for two weeks and still go blank. ALT tops up the tank while you're emptying it.</p>
+                    <h3 class="font-heading text-2xl font-bold text-white mb-4">Acetyl L-Tyrosine</h3>
+                    <ul class="text-slate-400 text-sm leading-relaxed space-y-2.5">
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Refuels what stress burns through fastest</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Helps keep you quick and articulate</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Studied specifically under real pressure</span>
+                        </li>
+                    </ul>
                 </div>
 
-                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Word-Recall Engine</span>
-                    <h3 class="font-heading text-2xl font-bold text-white mb-3">Uridine Monophosphate</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed"><strong class="text-slate-200">You knew the word.</strong> It just wasn't there when you reached for it. That's retrieval, not intelligence — and uridine feeds the pathway your neurons build membranes from.</p>
+                    <h3 class="font-heading text-2xl font-bold text-white mb-4">Uridine Monophosphate</h3>
+                    <ul class="text-slate-400 text-sm leading-relaxed space-y-2.5">
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Helps support word recall under pressure</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Feeds the brain's building blocks</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Backed by human brain imaging</span>
+                        </li>
+                    </ul>
                 </div>
 
-                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Catalyst</span>
-                    <h3 class="font-heading text-2xl font-bold text-white mb-3">Micro-Dosed Caffeine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed"><strong class="text-slate-200">Enough to light the engine.</strong> Nowhere near enough to make things worse. Paired with L-Theanine, the jagged edge comes off and what's left is clean focus.</p>
+                    <h3 class="font-heading text-2xl font-bold text-white mb-4">Micro-Dosed Caffeine</h3>
+                    <ul class="text-slate-400 text-sm leading-relaxed space-y-2.5">
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Just enough lift, deliberately not more</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Balanced by the L-Theanine beside it</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Nothing like an energy drink</span>
+                        </li>
+                    </ul>
                 </div>
 
             </div>
@@ -464,7 +512,8 @@
                     <div class="flex-1 space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed">
                         <p class="font-heading text-lg font-bold text-white">I've been obsessed with supplements since I was a kid.</p>
                         <p>Read labels for fun, chased down studies, tested things on myself. It taught me early that most of what's on the shelf doesn't do much. More than a decade of practising pharmacy later, I still read every paper before I believe anything.</p>
-                        <p>What I kept noticing was how wound up everyone had become — and that the only options were alcohol, which costs you the sharpness you came for, or an energy drink, which makes it worse. Nobody had built the thing in between.</p>
+                        <p>In recent years I've watched more and more people get self-conscious about how they come across — measured against everything social media puts in front of them — and more nervous about simply being around other people.</p>
+                        <p>Their options were alcohol, which costs you the sharpness you came for, or an energy drink, which makes it worse. Nobody had built the thing in between.</p>
                         <div class="pt-4">
                             <a href="about.html" class="inline-flex items-center gap-2 text-accent-cyan hover:text-white font-bold text-xs tracking-widest uppercase transition-colors">
                                 Read the Full Story
@@ -686,30 +735,6 @@
 
             console.log('%cSocial Phix signup v13 loaded', 'color:#00E5FF;font-weight:bold');
 
-            // ---- Sticky mobile CTA ----
-            // Slides up once you've scrolled past the hero, and gets out of
-            // the way again at the form so it never covers the thing it points at.
-            const stickyCta = document.getElementById('stickyCta');
-            const preorderSection = document.getElementById('preorder');
-
-            if (stickyCta && preorderSection && 'IntersectionObserver' in window) {
-                let pastHero = false, atForm = false;
-                const paint = () => {
-                    stickyCta.style.transform =
-                        (pastHero && !atForm) ? 'translateY(0)' : 'translateY(100%)';
-                };
-
-                const heroEl = document.querySelector('header');
-                if (heroEl) {
-                    new IntersectionObserver(([e]) => {
-                        pastHero = !e.isIntersecting; paint();
-                    }, { threshold: 0 }).observe(heroEl);
-                }
-
-                new IntersectionObserver(([e]) => {
-                    atForm = e.isIntersecting; paint();
-                }, { threshold: 0 }).observe(preorderSection);
-            }
 
             // ---- Worker address ------------------------------------
             const WORKER = (window.SOCIALPHIX_WORKER || '').replace(/\/+$/, '');
