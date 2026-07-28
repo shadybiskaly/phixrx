@@ -307,8 +307,11 @@
             
             <!-- The anchor compound, alone and centred. Same card width as the
                  rest — it just gets its own row. -->
-            <div class="max-w-5xl mx-auto mb-6">
-                <div class="md:w-1/2 md:mx-auto">
+            <!-- Width is inline on purpose. 31.25rem is exactly one grid
+                 column: (max-w-5xl 64rem - gap-6 1.5rem) / 2. Inline means
+                 it can't be broken by a stale cached stylesheet. -->
+            <div class="max-w-5xl mx-auto mb-6" style="display:flex;justify-content:center;">
+                <div style="width:100%;max-width:31.25rem;">
                 <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Alpha Hacker</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-4">Pure L-Theanine</h3>
