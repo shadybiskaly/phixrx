@@ -565,7 +565,10 @@
             <div class="text-center mb-12">
                 <h2 class="font-heading text-3xl sm:text-5xl font-extrabold text-white mb-5 tracking-tight">The First Run Is Small.</h2>
                 <p class="text-slate-300 font-normal leading-relaxed max-w-xl mx-auto">
-                    Deliberately. I'd rather make a small batch properly than a big one badly. Pick your pack and I'll hold your spot — no payment today, no card, nothing to cancel.
+                    Deliberately. I'd rather make a small batch properly than a big one badly.
+                    Joining the list costs nothing — pick your pack, leave your email.
+                    Then, if you want a <strong class="text-white">guaranteed spot in the first batch</strong>,
+                    you can reserve one: card verified, charged nothing.
                 </p>
 
                 <!-- Social proof. Stays hidden until there are enough signups
@@ -688,13 +691,13 @@
 
                 <p id="formError" class="hidden text-sm text-accent-orange bg-accent-orange/10 border border-accent-orange/30 rounded-md px-4 py-3" role="alert"></p>
 
-                <button type="submit" 
+                <button type="submit"
                         class="w-full py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300 mt-4">
-                    Hold My Spot
+                    Join The List
                 </button>
 
                 <p class="text-[11px] text-slate-500 leading-relaxed text-center pt-2">
-                    No payment today. We'll email you when the first run is ready, and you can confirm or walk away then.<br class="hidden sm:block">
+                    Joining is free — no payment. Reserving a first-batch spot afterwards is optional: card verified, never charged.<br class="hidden sm:block">
                     Shipping to the United States only. By joining you agree to our <a href="privacy.html" class="text-slate-400 underline hover:text-accent-cyan">Privacy Policy</a>.
                 </p>
             </form>
@@ -1027,7 +1030,7 @@
                 const btn = form.querySelector('button[type="submit"]');
                 const originalLabel = btn ? btn.textContent : '';
                 if (btn) {
-                    btn.textContent = 'Holding your spot...';
+                    btn.textContent = 'Joining...';
                     btn.disabled = true;
                 }
                 if (formError) formError.classList.add('hidden');
