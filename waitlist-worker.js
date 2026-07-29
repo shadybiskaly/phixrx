@@ -44,7 +44,7 @@
 
 // Bump this whenever you paste in new code, so /  tells you at a glance
 // whether what's deployed is what you think is deployed.
-const VERSION = "2026-07-25.o";
+const VERSION = "2026-07-27.b";
 
 // Pasted secrets often pick up a trailing space or newline that you
 // can't see in the dashboard. Trim before use.
@@ -118,6 +118,7 @@ export default {
       if (path === "/unsubscribe") return unsubscribe(request, url, env);
       if (path === "/verify") return await verify(url, env);
       if (path === "/stats")  return cors(await stats(url, env), request);
+      if (path === "/count")  return cors(await publicCount(env), request);
 
       // Protected routes
       if (path === "/setup" || path === "/admin" || path === "/test-email"
@@ -281,9 +282,15 @@ async function signup(request, env) {
   }
 
   // --- New signup --------------------------------------------------
+  // Code is issued now rather than at verification, so they can see their
+  // tracker straight away. Rewards still require confirmation — that's
+  // what makes confirming worth doing.
+  const code = await uniqueCode(env);
+
   const record = {
     email,
     name,
+    code,
     verified: false,
     referrals: 0,
     referredBy: ref || null,
@@ -301,6 +308,7 @@ async function signup(request, env) {
 
   const token = newToken();
   await env.DB.put(`sub:${email}`, JSON.stringify(record));
+  await env.DB.put(`code:${code}`, email);
   await env.DB.put(`pending:${token}`, email, { expirationTtl: PENDING_TTL_SECONDS });
 
   const link = verifyUrl(request, token);
@@ -320,6 +328,7 @@ async function signup(request, env) {
 
   await pushToKit(env, email, name, {
     verify_url:     link,
+    referral_code:  code,
     email_verified: "false",
     users_referred: "0",
     referred_by_code: ref || "",
@@ -336,7 +345,7 @@ async function signup(request, env) {
   console.log("signup:", email, ref ? `(referred by ${ref})` : "",
               emailSent ? "| email sent" : "| EMAIL FAILED");
 
-  return json({ ok: true, emailSent, emailError });
+  return json({ ok: true, code, emailSent, emailError });
 }
 
 /* ==================== 2. VERIFY ==================== */
@@ -362,8 +371,10 @@ async function verify(url, env) {
     return redirect(`${SITE}/success.html?ref=${sub.code}`);
   }
 
-  // --- Issue their referral code ----------------------------------
-  const code = await uniqueCode(env);
+  // --- Activate them ----------------------------------------------
+  // The code was issued at signup. Older records won't have one, so mint
+  // it here as a fallback.
+  const code = sub.code || await uniqueCode(env);
   sub.verified   = true;
   sub.code       = code;
   sub.verifiedAt = new Date().toISOString();
@@ -419,6 +430,10 @@ async function creditReferrer(env, refCode, newEmail, newIp) {
   referrer.referrals = (referrer.referrals || 0) + 1;
   await env.DB.put(`sub:${referrerEmail}`, JSON.stringify(referrer));
 
+  if (!referrer.verified) {
+    console.log("referral counted but referrer unconfirmed:", referrerEmail);
+  }
+
   // Push the new count to Kit so milestone automations can fire.
   await pushToKit(env, referrerEmail, referrer.name, {
     users_referred: String(referrer.referrals),
@@ -444,6 +459,27 @@ async function stats(url, env) {
     ok: true,
     referrals: sub.referrals || 0,
     firstName: firstNameOf(sub.name),
+    // Drives the "confirm to activate" banner. Read live rather than
+    // passed in the URL, so it's right even on a bookmarked link.
+    verified: Boolean(sub.verified),
+  });
+}
+
+/**
+ * Public signup count, for social proof on the landing page.
+ *
+ * Returns nothing until there are enough signups to be persuasive —
+ * "join 3 others" is worse than saying nothing at all.
+ */
+async function publicCount(env) {
+  const list = await env.DB.list({ prefix: "sub:" });
+  const total = list.keys.length;
+
+  return json({
+    ok: true,
+    show: total >= 25,
+    // Rounded down past 100 so it doesn't visibly tick like a fake counter.
+    count: total >= 100 ? Math.floor(total / 10) * 10 : total,
   });
 }
 

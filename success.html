@@ -148,9 +148,69 @@
                         </p>
                     </div>
 
-                    <p class="text-[11px] text-slate-500 mt-6">
-                        Nothing arrived? Check spam, or give it a minute.
-                    </p>
+                    <div class="mt-7 pt-6 border-t border-slate-700">
+                        <p class="text-[11px] text-slate-500 mb-3">
+                            Nothing arrived? Check spam first — then send it again.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="email" id="resendEmail" placeholder="your@email.com"
+                                   autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"
+                                   class="flex-1 px-4 py-3 bg-brand-bg border border-slate-600 rounded-md text-white text-sm focus:outline-none focus:border-accent-cyan placeholder-slate-600">
+                            <button type="button" id="resendBtn"
+                                    class="px-5 py-3 text-xs font-bold tracking-widest uppercase rounded-md text-slate-300 border border-slate-600 hover:border-accent-cyan hover:text-accent-cyan transition whitespace-nowrap">
+                                Resend
+                            </button>
+                        </div>
+                        <p id="resendMsg" class="hidden text-xs mt-3"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shown on the tracker until they click the confirmation link. -->
+            <div id="confirmBanner" class="hidden bg-accent-orange/10 border border-accent-orange/40 rounded-xl p-6 mb-6">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-accent-orange/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-accent-orange" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-heading font-bold text-white mb-1">One step left — confirm your email</p>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-3">
+                            Your link below works right now and referrals are being counted. But
+                            <strong class="text-white">no rewards are issued until you confirm</strong>,
+                            so click the link in the email we just sent you.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="email" id="resendEmail2" placeholder="your@email.com"
+                                   autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"
+                                   class="flex-1 px-4 py-2.5 bg-brand-bg border border-slate-600 rounded-md text-white text-sm focus:outline-none focus:border-accent-cyan placeholder-slate-600">
+                            <button type="button" id="resendBtn2"
+                                    class="px-5 py-2.5 text-xs font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover transition whitespace-nowrap">
+                                Resend Email
+                            </button>
+                        </div>
+                        <p id="resendMsg2" class="hidden text-xs mt-2"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shown when Stripe confirms the card-verification hold. -->
+            <div id="reservedBanner" class="hidden bg-accent-cyan/5 border border-accent-cyan/50 rounded-xl p-6 mb-6">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-accent-cyan/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-accent-cyan" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-heading font-bold text-white mb-1">Reservation held — you're in the first batch.</p>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Your card was verified and charged <strong class="text-white">$0</strong>.
+                            The temporary authorization on your statement disappears on its own within
+                            7 days — there's nothing to cancel. When the batch ships, you decide whether to buy.
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -289,6 +349,32 @@
         // A bad or expired verification link.
         if (error) linkError.classList.remove('hidden');
 
+        /* ---------- Reservation confirmation ---------- */
+        // Stripe redirects back here after the $0 card verification. We
+        // confirm with the worker (which checks with Stripe directly —
+        // the URL alone proves nothing) before showing the banner.
+        const reservedParam = params.get('reserved');
+        const sessionId     = params.get('session_id');
+
+        if (reservedParam === '1' && sessionId && refCode && !WORKER_MISSING) {
+            (async () => {
+                try {
+                    const res = await fetch(WORKER + '/reserve-confirm'
+                        + '?code=' + encodeURIComponent(refCode)
+                        + '&session_id=' + encodeURIComponent(sessionId));
+                    const data = await res.json();
+                    if (data.ok && data.reserved) {
+                        document.getElementById('reservedBanner').classList.remove('hidden');
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'reserve_confirmed', { method: 'stripe_hold' });
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Could not confirm reservation:', err);
+                }
+            })();
+        }
+
         if (refCode) {
             /* ---------- Verified: show the tracker ---------- */
             // The conversion that actually matters. A signup that never
@@ -308,6 +394,53 @@
         } else {
             /* ---------- Not verified yet ---------- */
             pendingState.classList.remove('hidden');
+            setupResend();
+        }
+
+        /* ---------- Resend the confirmation email ---------- */
+        // Reuses /signup — the worker already sends a fresh link when it
+        // sees a known but unconfirmed address.
+        function setupResend(inputId = 'resendEmail', btnId = 'resendBtn', msgId = 'resendMsg') {
+            const btn   = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            const msg   = document.getElementById(msgId);
+            if (!btn || !input || !msg || WORKER_MISSING) return;
+
+            btn.addEventListener('click', async () => {
+                const email = (input.value || '').trim();
+                if (!email || !email.includes('@')) {
+                    msg.textContent = 'Enter the address you signed up with.';
+                    msg.className = 'text-xs mt-2 text-accent-orange';
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.textContent = 'Sending...';
+                msg.classList.add('hidden');
+
+                try {
+                    const body = new FormData();
+                    body.append('email', email);
+                    body.append('name', '');
+
+                    const res  = await fetch(WORKER + '/signup', { method: 'POST', body });
+                    const data = await res.json();
+
+                    if (data.ok) {
+                        msg.textContent = 'Sent. Check your inbox, and your spam folder.';
+                        msg.className = 'text-xs mt-2 text-accent-cyan';
+                    } else {
+                        throw new Error(data.error || 'Could not resend.');
+                    }
+                } catch (err) {
+                    msg.textContent = err.message || 'Something went wrong. Try again shortly.';
+                    msg.className = 'text-xs mt-2 text-accent-orange';
+                } finally {
+                    msg.classList.remove('hidden');
+                    btn.disabled = false;
+                    btn.textContent = 'Resend';
+                }
+            });
         }
 
         /* ---------- Referral link + share buttons ---------- */
@@ -376,7 +509,21 @@
             try {
                 const res  = await fetch(WORKER + '/stats?code=' + encodeURIComponent(code));
                 const data = await res.json();
-                if (data.ok) count = data.referrals || 0;
+                if (data.ok) {
+                    count = data.referrals || 0;
+
+                    // Read live rather than from the URL, so a bookmarked link
+                    // shows the right state once they've confirmed.
+                    if (data.verified === false) {
+                        document.getElementById('confirmBanner').classList.remove('hidden');
+                        setupResend('resendEmail2', 'resendBtn2', 'resendMsg2');
+
+                        document.getElementById('pageEyebrow').textContent  = 'Almost There';
+                        document.getElementById('pageHeadline').textContent = 'Your Link Is Ready.';
+                        document.getElementById('pageSubhead').textContent  =
+                            'Confirm your email to activate it, then start sharing.';
+                    }
+                }
             } catch (err) {
                 console.warn('Could not load referral count:', err);
             }

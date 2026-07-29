@@ -110,11 +110,12 @@
           "name": "PhixRx"
         },
         "offers": {
-          "@type": "Offer",
+          "@type": "AggregateOffer",
           "url": "https://www.socialphix.com/#preorder",
           "priceCurrency": "USD",
-          "price": "39.99",
-          "priceValidUntil": "2027-12-31",
+          "lowPrice": "24.00",
+          "highPrice": "96.00",
+          "offerCount": "3",
           "availability": "https://schema.org/PreOrder"
         }
       },
@@ -546,7 +547,7 @@
             <div class="space-y-6">
                 <article class="bg-brand-card p-6 rounded-lg border border-slate-700">
                     <h3 class="font-bold text-lg text-white mb-2">What exactly is Social Phix?</h3>
-                    <p class="text-slate-300 text-sm leading-relaxed">A 100ml shot that fits in a jacket pocket. Five active compounds chosen to help support a calm physical state without trading away mental sharpness — which is the trade every other option on the shelf makes.</p>
+                    <p class="text-slate-300 text-sm leading-relaxed">A 100ml shot, formulated by a licensed pharmacist, that fits in a jacket pocket. Five active compounds chosen to help support a calm physical state without trading away mental sharpness — which is the trade every other option on the shelf makes.</p>
                 </article>
                 <article class="bg-brand-card p-6 rounded-lg border border-slate-700">
                     <h3 class="font-bold text-lg text-white mb-2">Will this make me feel tired or drowsy?</h3>
@@ -565,6 +566,15 @@
                 <h2 class="font-heading text-3xl sm:text-5xl font-extrabold text-white mb-5 tracking-tight">The First Run Is Small.</h2>
                 <p class="text-slate-300 font-normal leading-relaxed max-w-xl mx-auto">
                     Deliberately. I'd rather make a small batch properly than a big one badly. Pick your pack and I'll hold your spot — no payment today, no card, nothing to cancel.
+                </p>
+
+                <!-- Social proof. Stays hidden until there are enough signups
+                     to be persuasive; a low number is worse than none. -->
+                <p id="socialProof" class="hidden mt-6 text-sm text-slate-400">
+                    <span class="inline-flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-accent-cyan"></span>
+                        <span id="socialProofText"></span>
+                    </span>
                 </p>
             </div>
 
@@ -626,9 +636,9 @@
 
                 <!-- Poll Field 1: Use Case -->
                 <div>
-                    <label for="useCase" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Use Case</label>
+                    <label for="useCase" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Use Case <span class="text-slate-600 normal-case tracking-normal font-normal">— optional</span></label>
                     <div class="relative">
-                        <select id="useCase" name="useCase" required 
+                        <select id="useCase" name="useCase" 
                                 class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 appearance-none cursor-pointer">
                             <option value="" disabled selected>Why do you need the matrix?</option>
                             <option value="Networking">Networking</option>
@@ -648,9 +658,9 @@
 
                 <!-- Poll Field 2: Price Reaction -->
                 <div>
-                    <label for="priceReaction" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">At $7 a bottle, this feels...</label>
+                    <label for="priceReaction" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">At $7 a bottle, this feels... <span class="text-slate-600 normal-case tracking-normal font-normal">— optional</span></label>
                     <div class="relative">
-                        <select id="priceReaction" name="priceReaction" required
+                        <select id="priceReaction" name="priceReaction"
                                 class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 appearance-none cursor-pointer">
                             <option value="" disabled selected>Be honest — it helps us</option>
                             <option value="Good value">Like good value</option>
@@ -667,7 +677,8 @@
                 <!-- Original Email Field -->
                 <div>
                     <label for="email" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Primary Email</label>
-                    <input type="email" id="email" name="email" placeholder="name@domain.com" required 
+                    <input type="email" id="email" name="email" placeholder="name@domain.com" required
+                           autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" 
                            class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 placeholder-slate-600">
                 </div>
 
@@ -687,6 +698,68 @@
                     Shipping to the United States only. By joining you agree to our <a href="privacy.html" class="text-slate-400 underline hover:text-accent-cyan">Privacy Policy</a>.
                 </p>
             </form>
+
+            <!-- ========================================================
+                 STEP 2: RESERVE. Hidden until signup succeeds, then
+                 replaces the form. If the worker has Stripe connected it
+                 opens a real card-verification checkout ($0 charged);
+                 if not, it records the click as reservation intent.
+                 ======================================================== -->
+            <div id="reserveStep" class="hidden bg-brand-card p-8 sm:p-10 rounded-xl border border-accent-cyan/30 shadow-[0_0_40px_rgba(0,0,0,0.5)] text-left">
+
+                <div id="reserveOffer">
+                    <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan uppercase block mb-3">You're on the list — one more thing</span>
+                    <h3 class="font-heading text-2xl sm:text-3xl font-extrabold text-white mb-4">Want a spot in the first batch? Reserve it.</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-5">
+                        The first run is small, and reserved spots ship first. Verifying a card holds your
+                        <strong class="text-white"><span data-reserve-pack>8-Pack</span></strong> —
+                        <strong class="text-white">you are charged $0</strong>. The card just proves you're real.
+                    </p>
+
+                    <ul class="space-y-2.5 mb-7 text-sm text-slate-400">
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>A temporary authorization for $<span data-reserve-price>56</span> appears on your statement, then disappears on its own within 7 days</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>No charge, no subscription, nothing to cancel — ever</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 text-accent-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            <span>When the batch is ready, you decide whether to actually buy</span>
+                        </li>
+                    </ul>
+
+                    <p id="reserveError" class="hidden text-sm text-accent-orange bg-accent-orange/10 border border-accent-orange/30 rounded-md px-4 py-3 mb-4" role="alert"></p>
+
+                    <button type="button" id="reserveBtn"
+                            class="w-full py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300">
+                        Reserve My Spot — $0 Today
+                    </button>
+
+                    <button type="button" id="reserveSkip"
+                            class="w-full mt-3 py-3 text-xs font-bold tracking-widest uppercase text-slate-500 hover:text-slate-300 transition">
+                        Skip — just keep me posted by email
+                    </button>
+                </div>
+
+                <!-- Shown when Stripe isn't connected yet: the click still counts. -->
+                <div id="reserveDone" class="hidden text-center py-4">
+                    <div class="w-14 h-14 mx-auto bg-brand-bg rounded-full flex items-center justify-center mb-5 border border-accent-cyan/40">
+                        <svg class="w-7 h-7 text-accent-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <h3 class="font-heading text-2xl font-extrabold text-white mb-3">You're marked as first in line.</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-6 max-w-sm mx-auto">
+                        Card verification opens in the next day or two — we'll email you the moment
+                        reservations go live. Meanwhile, confirm your email and grab your referral link.
+                    </p>
+                    <button type="button" id="reserveContinue"
+                            class="px-8 py-4 text-xs font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover transition">
+                        Continue to My Tracker
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -744,12 +817,32 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            console.log('%cSocial Phix signup v13 loaded', 'color:#00E5FF;font-weight:bold');
-
+            console.log('%cSocial Phix signup v16 loaded (reserve step)', 'color:#00E5FF;font-weight:bold');
 
             // ---- Worker address ------------------------------------
+            // Declared before anything that uses it. (It used to sit below
+            // the social-proof fetch, which read these before they existed
+            // and silently broke the counter.)
             const WORKER = (window.SOCIALPHIX_WORKER || '').replace(/\/+$/, '');
             const workerMissing = !WORKER || WORKER.includes('WORKER-URL-HERE');
+
+            // ---- Social proof ----
+            // Fetched rather than hardcoded so it's always true. The worker
+            // decides whether the number is high enough to show at all.
+            (async () => {
+                if (workerMissing) return;
+                try {
+                    const res = await fetch(WORKER + '/count');
+                    const data = await res.json();
+                    if (data.ok && data.show) {
+                        document.getElementById('socialProofText').textContent =
+                            data.count.toLocaleString() + ' people already on the list';
+                        document.getElementById('socialProof').classList.remove('hidden');
+                    }
+                } catch (err) {
+                    // Never let this break the page — it's a nice-to-have.
+                }
+            })();
 
             const signupForm = document.getElementById('waitlist-form');
             if (signupForm && !workerMissing) {
@@ -826,6 +919,98 @@
             });
 
             // ---------------------------------------------------------
+            // Step 2: the reserve step. Shown after a successful signup.
+            // POST /reserve tells us which mode the worker is in:
+            //   stripe   -> redirect to the $0 card-verification checkout
+            //   waitlist -> Stripe not connected yet; the click was
+            //               recorded as reservation intent
+            // ---------------------------------------------------------
+            const PACK_DOLLARS = { '3-Pack': 24, '8-Pack': 56, '16-Pack': 96 };
+            let reserveCode = '';
+
+            function trackerUrl() {
+                return '/success.html?ref=' + encodeURIComponent(reserveCode);
+            }
+
+            function showReserveStep(code) {
+                reserveCode = code;
+                const pack  = (selectedPackInput && selectedPackInput.value) || '8-Pack';
+                const price = PACK_DOLLARS[pack] || 56;
+
+                document.querySelectorAll('[data-reserve-pack]').forEach(el => el.textContent = pack);
+                document.querySelectorAll('[data-reserve-price]').forEach(el => el.textContent = price);
+
+                signupForm.classList.add('hidden');
+                const step = document.getElementById('reserveStep');
+                step.classList.remove('hidden');
+                step.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                if (typeof gtag === 'function') {
+                    gtag('event', 'reserve_view', { selected_pack: pack, value: price, currency: 'USD' });
+                }
+            }
+
+            const reserveBtn      = document.getElementById('reserveBtn');
+            const reserveSkip     = document.getElementById('reserveSkip');
+            const reserveContinue = document.getElementById('reserveContinue');
+            const reserveError    = document.getElementById('reserveError');
+
+            if (reserveBtn) reserveBtn.addEventListener('click', async () => {
+                const pack  = (selectedPackInput && selectedPackInput.value) || '8-Pack';
+                const price = PACK_DOLLARS[pack] || 56;
+
+                // The click itself is the signal — fire it before anything
+                // can fail or redirect.
+                if (typeof gtag === 'function') {
+                    gtag('event', 'begin_checkout', { selected_pack: pack, value: price, currency: 'USD' });
+                }
+
+                reserveBtn.disabled = true;
+                const original = reserveBtn.textContent;
+                reserveBtn.textContent = 'Holding your spot...';
+                if (reserveError) reserveError.classList.add('hidden');
+
+                try {
+                    const res = await fetch(WORKER + '/reserve', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code: reserveCode })
+                    });
+                    const data = await res.json();
+                    if (!data.ok) throw new Error(data.error || 'Something went wrong.');
+
+                    if (data.mode === 'stripe' && data.url) {
+                        window.location.href = data.url;   // Stripe's $0-charge checkout
+                        return;
+                    }
+
+                    // Waitlist mode: intent recorded, no card step yet.
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'reserve_intent', { selected_pack: pack, value: price, currency: 'USD' });
+                    }
+                    document.getElementById('reserveOffer').classList.add('hidden');
+                    document.getElementById('reserveDone').classList.remove('hidden');
+                } catch (err) {
+                    console.error('Reserve failed:', err);
+                    if (reserveError) {
+                        reserveError.textContent = "That didn't go through — your waitlist spot is safe. Try again, or skip below.";
+                        reserveError.classList.remove('hidden');
+                    }
+                    reserveBtn.disabled = false;
+                    reserveBtn.textContent = original;
+                }
+            });
+
+            if (reserveSkip) reserveSkip.addEventListener('click', () => {
+                if (typeof gtag === 'function') gtag('event', 'reserve_skipped', {});
+                window.location.href = trackerUrl();
+            });
+
+            if (reserveContinue) reserveContinue.addEventListener('click', () => {
+                window.location.href = trackerUrl();
+            });
+
+            // ---------------------------------------------------------
             // Signup posts to our own Cloudflare Worker.
             // It stores them, then tells Kit to send the confirmation
             // email. Nothing is shown until they confirm.
@@ -878,10 +1063,14 @@
                             });
                         }
 
-                        // Already confirmed previously? Straight to their tracker.
-                        window.location.href = data.alreadyVerified && data.code
-                            ? '/success.html?ref=' + encodeURIComponent(data.code)
-                            : '/success.html?pending=1';
+                        // With a referral code in hand, offer the reserve step
+                        // (the payment-line signal) before the tracker. Without
+                        // one — e.g. a resent confirmation — go straight there.
+                        if (data.code) {
+                            showReserveStep(data.code);
+                        } else {
+                            window.location.href = '/success.html?pending=1';
+                        }
                     } else {
                         throw new Error(data.error || 'Something went wrong.');
                     }
