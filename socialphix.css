@@ -32,6 +32,7 @@ em{font-style:italic}
 .backdrop-blur-md{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .bg-accent-cyan{background-color:#00E5FF}
 .bg-accent-cyan\/5{background-color:rgba(0,229,255,0.05)}
+.bg-accent-cyan\/20{background-color:rgba(0,229,255,0.2)}
 .bg-accent-orange{background-color:#FF5722}
 .bg-accent-orange\/10{background-color:rgba(255,87,34,0.1)}
 .bg-accent-orange\/20{background-color:rgba(255,87,34,0.2)}
@@ -48,6 +49,7 @@ em{font-style:italic}
 .border-accent-cyan\/20{border-color:rgba(0,229,255,0.2)}
 .border-accent-cyan\/30{border-color:rgba(0,229,255,0.3)}
 .border-accent-cyan\/40{border-color:rgba(0,229,255,0.4)}
+.border-accent-cyan\/50{border-color:rgba(0,229,255,0.5)}
 .border-accent-orange{border-color:#FF5722}
 .border-accent-orange\/30{border-color:rgba(255,87,34,0.3)}
 .border-accent-orange\/40{border-color:rgba(255,87,34,0.4)}
@@ -145,6 +147,7 @@ em{font-style:italic}
 .mb-4{margin-bottom:1rem}
 .mb-5{margin-bottom:1.25rem}
 .mb-6{margin-bottom:1.5rem}
+.mb-7{margin-bottom:1.75rem}
 .mb-8{margin-bottom:2rem}
 .min-h-screen{min-height:100vh}
 .ml-4{margin-left:1rem}
@@ -187,6 +190,7 @@ em{font-style:italic}
 .px-4{padding-left:1rem;padding-right:1rem}
 .px-5{padding-left:1.25rem;padding-right:1.25rem}
 .px-6{padding-left:1.5rem;padding-right:1.5rem}
+.px-8{padding-left:2rem;padding-right:2rem}
 .py-1{padding-top:0.25rem;padding-bottom:0.25rem}
 .py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}
 .py-10{padding-top:2.5rem;padding-bottom:2.5rem}
@@ -292,6 +296,7 @@ em{font-style:italic}
 .hover\:border-slate-700:hover{border-color:#334155}
 .hover\:opacity-80:hover{opacity:0.8}
 .hover\:text-accent-cyan:hover{color:#00E5FF}
+.hover\:text-slate-300:hover{color:#cbd5e1}
 .hover\:text-white:hover{color:#ffffff}
 .hover\:underline:hover{text-decoration-line:underline}
 .focus\:border-accent-cyan:focus{border-color:#00E5FF}
@@ -303,6 +308,6 @@ em{font-style:italic}
 .group:hover .group-hover\:grayscale-0{filter:grayscale(0)}
 .group:hover .group-hover\:scale-105{--tw-scale:1.05;transform:translate(var(--tw-tx,0),var(--tw-ty,0)) scale(var(--tw-scale,1))}
 .group:hover .group-hover\:text-accent-cyan{color:#00E5FF}
-@media (min-width:640px){.sm\:block{display:block}.sm\:flex-row{flex-direction:row}.sm\:flex-shrink-0{flex-shrink:0}.sm\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.sm\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.sm\:items-center{align-items:center}.sm\:items-start{align-items:flex-start}.sm\:p-10{padding:2.5rem}.sm\:p-12{padding:3rem}.sm\:p-8{padding:2rem}.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-6xl{font-size:3.75rem;line-height:1}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}.sm\:w-56{width:14rem}.sm\:w-auto{width:auto}}
+@media (min-width:640px){.sm\:block{display:block}.sm\:flex-row{flex-direction:row}.sm\:flex-shrink-0{flex-shrink:0}.sm\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.sm\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.sm\:items-center{align-items:center}.sm\:items-start{align-items:flex-start}.sm\:p-10{padding:2.5rem}.sm\:p-12{padding:3rem}.sm\:p-8{padding:2rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-6xl{font-size:3.75rem;line-height:1}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}.sm\:w-56{width:14rem}.sm\:w-auto{width:auto}}
 @media (min-width:768px){.md\:col-span-2{grid-column:span 2/span 2}.md\:col-span-5{grid-column:span 5/span 5}.md\:col-start-7{grid-column-start:7}.md\:flex{display:flex}.md\:flex-row{flex-direction:row}.md\:grid-cols-12{grid-template-columns:repeat(12,minmax(0,1fr))}.md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.md\:items-start{align-items:flex-start}.md\:justify-start{justify-content:flex-start}.md\:pb-24{padding-bottom:6rem}.md\:pt-32{padding-top:8rem}.md\:px-6{padding-left:1.5rem;padding-right:1.5rem}.md\:py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.md\:py-24{padding-top:6rem;padding-bottom:6rem}.md\:py-32{padding-top:8rem;padding-bottom:8rem}.md\:text-7xl{font-size:4.5rem;line-height:1}.md\:text-left{text-align:left}}
 @media (min-width:1024px){.lg\:pb-32{padding-bottom:8rem}.lg\:pt-48{padding-top:12rem}.lg\:text-7xl{font-size:4.5rem;line-height:1}.lg\:text-8xl{font-size:6rem;line-height:1}}
