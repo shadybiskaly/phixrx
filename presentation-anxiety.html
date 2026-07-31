@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Security headers. A CSP restricts where scripts and styles may load
          from, so an injected <script> from anywhere else simply won't run. -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://raw.githubusercontent.com https://placehold.co https://www.google-analytics.com; connect-src 'self' https://*.workers.dev https://www.google-analytics.com https://region1.google-analytics.com; frame-src https://challenges.cloudflare.com; form-action 'self' https://*.workers.dev; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests">
@@ -14,8 +16,6 @@
       gtag('config', 'G-111753TXDT');
     </script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Command The Room | Social Phix Protocol</title>
     <meta name="description" content="Preparation was never the hard part — physiology is. Here's what happens to your body before you present, and the five-compound shot formulated for it.">
     <meta name="keywords" content="presentation confidence supplement, public speaking nerves, calm before a speech, boardroom confidence">
@@ -54,7 +54,8 @@
     <link rel="preload" href="/socialphix.css" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap"></noscript>
 
     <style>
         body { background-color: #0A192F; color: #FFFFFF; overflow-x: hidden; }
@@ -69,9 +70,9 @@
     <!-- Navigation -->
     <nav class="glass-nav fixed w-full top-0 z-50 px-6 py-4 transition-all">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="font-heading text-2xl font-extrabold tracking-tight text-white">
+            <a href="/" class="font-heading text-2xl font-extrabold tracking-tight text-white">
                 SOCIAL<span class="text-accent-orange">PHIX</span>
-            </div>
+            </a>
             <div class="flex items-center space-x-8">
                 <!-- Menu: desktop only. Won't fit on a phone. -->
                 <div class="hidden md:flex items-center space-x-8">
@@ -135,8 +136,10 @@
         <div class="pt-10 text-center reveal border-t border-slate-800">
             <h3 class="font-heading text-3xl font-bold text-white mb-6">Deliver It Like You Rehearsed It.</h3>
             <a href="/#preorder" class="inline-block px-10 py-5 text-sm font-bold tracking-widest uppercase rounded-md text-white bg-accent-orange hover:bg-accent-orange-hover shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] transition duration-300">
-                Join the Waitlist
+                Get On The List
             </a>
+            <p class="text-xs text-slate-500 mt-4">The first run is small. Reserved spots ship first.</p>
+            <p class="mt-6"><a href="science.html" class="text-accent-cyan hover:text-white font-bold text-xs tracking-widest uppercase transition-colors">Check My Work &mdash; Every Citation, Linked &rarr;</a></p>
         </div>
     </div>
     </section>
