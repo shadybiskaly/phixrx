@@ -159,10 +159,16 @@
     <!-- Modern Tech-Forward Google Fonts -->
     <link rel="alternate" type="text/plain" href="/llms.txt" title="Plain-text summary for AI assistants">
     <link rel="preload" href="/socialphix.css" as="style">
-    <link rel="preload" href="/phix2.webp" as="image" fetchpriority="high">
+    <link rel="preload" as="image" fetchpriority="high"
+          imagesrcset="/phix2-mobile.webp 860w, /phix2.webp 1700w"
+          imagesizes="(max-width: 920px) 100vw, 848px">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <!-- Fonts load asynchronously so text renders immediately in a system
+         font and swaps — instead of blanking the page while fonts download. -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap"></noscript>
 
     <style>
         body {
@@ -290,7 +296,10 @@
         </div>
 
         <div class="mt-20 max-w-4xl mx-auto px-6 relative z-10 reveal delay-200 active">
-            <img src="phix2.webp" alt="Social Phix 100ml pharmacist-formulated functional shot bottle"
+            <img src="phix2.webp"
+                 srcset="/phix2-mobile.webp 860w, /phix2.webp 1700w"
+                 sizes="(max-width: 920px) 100vw, 848px"
+                 alt="Social Phix 100ml pharmacist-formulated functional shot bottle"
                  width="1700" height="949" fetchpriority="high" decoding="async"
                  class="w-full h-auto rounded-2xl shadow-[0_20px_50px_rgba(0,229,255,0.1)] border border-slate-800"
                  onerror="this.onerror=null;this.src='https://placehold.co/1024x600/050B14/FFFFFF?text=Social+Phix+100ml+Shot'"
