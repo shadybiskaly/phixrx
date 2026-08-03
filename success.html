@@ -384,7 +384,7 @@
                         document.getElementById('reservedBanner').classList.remove('hidden');
                         if (typeof gtag === 'function') {
                             gtag('event', 'reserve_confirmed', { method: 'stripe_hold' });
-                            if (typeof fbq === 'function') fbq('track', 'Purchase', { value: 0, currency: 'USD', content_name: 'card_verified_reserve' });
+                            if (typeof fbq === 'function') fbq('track', 'Purchase', { value: 0, currency: 'USD', content_name: 'card_verified_reserve' }, { eventID: 'purchase-' + refCode });
                         }
                     }
                 } catch (err) {
@@ -399,7 +399,7 @@
             // confirms is a number, not a lead.
             if (typeof gtag === 'function') {
                 gtag('event', 'email_verified', { method: 'waitlist' });
-                if (typeof fbq === 'function') fbq('track', 'CompleteRegistration', { status: 'email_verified' });
+                if (typeof fbq === 'function') fbq('track', 'CompleteRegistration', { status: 'email_verified' }, { eventID: 'reg-' + refCode });
             }
 
             verifiedState.classList.remove('hidden');

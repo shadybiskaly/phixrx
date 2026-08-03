@@ -1417,6 +1417,14 @@ em{font-style:italic}
                         if (value) formData.append(key, value);
                     });
 
+                    // Meta browser cookies improve server-side match quality.
+                    // Absent if the pixel is blocked — CAPI still works without them.
+                    const fbCookie = n => (document.cookie.match('(^|;)\\s*' + n + '=([^;]*)') || [])[2] || '';
+                    ['_fbp', '_fbc'].forEach(n => {
+                        const v = fbCookie(n);
+                        if (v) formData.append(n.slice(1), v);
+                    });
+
                     const response = await fetch(form.getAttribute('action'), {
                         method: 'POST',
                         body: formData
@@ -1429,8 +1437,10 @@ em{font-style:italic}
                         // GA4 conversion. Carries the survey answers as
                         // parameters, so you can segment signups by pack,
                         // use case and price reaction inside GA.
-                        if (typeof fbq === 'function') {
-                            fbq('track', 'Lead');
+                        if (typeof fbq === 'function' && data.code) {
+                            // Same event_id the worker sends via Conversions API,
+                            // so Meta dedupes instead of double-counting.
+                            fbq('track', 'Lead', {}, { eventID: 'lead-' + data.code });
                         }
 
                         if (typeof gtag === 'function') {
