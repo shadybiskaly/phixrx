@@ -17,9 +17,12 @@
  *   KV namespace bound as:  DB
  *
  *   Secrets:
- *     RESEND_API_KEY   resend.com -> API Keys
- *     SHARED_SECRET    any long random string you invent
- *     KIT_API_KEY      optional. Leave unset to skip Kit entirely.
+ *     RESEND_API_KEY     resend.com -> API Keys
+ *     SHARED_SECRET      any long random string you invent
+ *     KIT_API_KEY        optional. Leave unset to skip Kit entirely.
+ *     STRIPE_SECRET_KEY  optional. When set, the reserve step creates
+ *                        real card authorization holds (never captured,
+ *                        zero fees). Unset = intent clicks only.
  *
  * ---------------------------------------------------------------
  * URLS THIS WORKER ANSWERS
@@ -44,13 +47,17 @@
 
 // Bump this whenever you paste in new code, so /  tells you at a glance
 // whether what's deployed is what you think is deployed.
-const VERSION = "2026-07-27.b";
+const VERSION = "2026-07-29.d";
 
 // Pasted secrets often pick up a trailing space or newline that you
 // can't see in the dashboard. Trim before use.
 const trim = v => (typeof v === "string" ? v.trim() : v);
 
 const SITE = "https://www.socialphix.com";
+
+// Server-side pack prices in cents. The reserve endpoint uses these —
+// never a price sent from the browser, which anyone can edit.
+const PACK_PRICES = { "3-Pack": 2400, "8-Pack": 5600, "16-Pack": 9600 };
 
 // Browsers block cross-origin requests unless the server names the origin
 // back. Anything you might load the form from needs to be in here.
@@ -115,6 +122,8 @@ export default {
 
     try {
       if (path === "/signup" && request.method === "POST") return cors(await signup(request, env), request);
+      if (path === "/reserve" && request.method === "POST") return cors(await reserve(request, env), request);
+      if (path === "/reserve-confirm") return cors(await reserveConfirm(url, env), request);
       if (path === "/unsubscribe") return unsubscribe(request, url, env);
       if (path === "/verify") return await verify(url, env);
       if (path === "/stats")  return cors(await stats(url, env), request);
@@ -123,12 +132,13 @@ export default {
       // Protected routes
       if (path === "/setup" || path === "/admin" || path === "/test-email"
           || path === "/health" || path === "/export" || path === "/delete"
-          || path === "/sync-kit") {
+          || path === "/sync-kit" || path === "/reset-rate") {
         if (!env.SHARED_SECRET || !safeEqual(url.searchParams.get("token"), trim(env.SHARED_SECRET))) {
           return new Response("Unauthorized. Check your token.", { status: 401 });
         }
         if (path === "/setup")  return runSetup(env);
         if (path === "/admin")  return adminView(env);
+        if (path === "/reset-rate") return resetRate(request, url, env);
         if (path === "/health") return healthCheck(env);
         if (path === "/export")   return exportCsv(env);
         if (path === "/delete")   return deleteSignup(url, env);
@@ -345,6 +355,21 @@ async function signup(request, env) {
   console.log("signup:", email, ref ? `(referred by ${ref})` : "",
               emailSent ? "| email sent" : "| EMAIL FAILED");
 
+  await sendMetaEvent(env, {
+    eventName: "Lead",
+    eventId:   `lead-${code}`,
+    email,
+    ip:  request.headers.get("CF-Connecting-IP"),
+    ua:  request.headers.get("User-Agent"),
+    fbp: String(form.fbp || "") || null,
+    fbc: String(form.fbc || "") || null,
+    customData: {
+      content_name: record.selectedPack || "",
+      utm_campaign: record.utmCampaign  || "",
+      utm_source:   record.utmSource    || "",
+    },
+  });
+
   return json({ ok: true, code, emailSent, emailError });
 }
 
@@ -403,6 +428,15 @@ async function verify(url, env) {
   }, TAG_VERIFIED);
 
   console.log("verified:", email, "code:", code);
+
+  await sendMetaEvent(env, {
+    eventName: "CompleteRegistration",
+    eventId:   `reg-${code}`,
+    email,
+    sourceUrl: `${SITE}/success.html`,
+    customData: { status: "email_verified" },
+  });
+
   return redirect(`${SITE}/success.html?ref=${code}`);
 }
 
@@ -481,6 +515,238 @@ async function publicCount(env) {
     // Rounded down past 100 so it doesn't visibly tick like a fake counter.
     count: total >= 100 ? Math.floor(total / 10) * 10 : total,
   });
+}
+
+/* ==================== 3b. RESERVE (card verification) ==================== */
+
+/**
+ * The payment-line validation signal. After signup, people are offered a
+ * "reserve your spot" step. Two modes, decided by whether the
+ * STRIPE_SECRET_KEY secret is set:
+ *
+ *   Stripe mode    — creates a Stripe Checkout session with
+ *                    capture_method=manual. The card is authorized for the
+ *                    pack price but NEVER captured, so Stripe charges no
+ *                    fee and the hold vanishes from the customer's
+ *                    statement within ~7 days. We simply never call
+ *                    capture. That's the whole trick.
+ *
+ *   Waitlist mode  — no Stripe yet. The click is still recorded
+ *                    (reserveClickedAt), because "clicked reserve" is
+ *                    already a stronger signal than "signed up".
+ *
+ * Add the secret and the same button silently upgrades from intent
+ * tracking to real card verification. No code change needed.
+ *
+ *   POST /reserve            { code: "ABC123" }
+ *   GET  /reserve-confirm    ?code=ABC123&session_id=cs_...
+ */
+
+async function reserve(request, env) {
+  const body = await readBody(request);
+  const code = String(body.code || "").trim().toUpperCase();
+  if (!code) return json({ ok: false, error: "Missing code." }, 400);
+
+  const email = await env.DB.get(`code:${code}`);
+  if (!email) return json({ ok: false, error: "Unknown code." }, 404);
+
+  const raw = await env.DB.get(`sub:${email}`);
+  if (!raw) return json({ ok: false, error: "Unknown code." }, 404);
+  const sub = JSON.parse(raw);
+
+  const pack   = PACK_PRICES[sub.selectedPack] ? sub.selectedPack : "8-Pack";
+  const amount = PACK_PRICES[pack];
+
+  // Record the click no matter what — first click wins, so repeat
+  // clicks don't overwrite the original timestamp.
+  if (!sub.reserveClickedAt) sub.reserveClickedAt = new Date().toISOString();
+
+  if (!env.STRIPE_SECRET_KEY) {
+    sub.reserveMode = "waitlist";
+    await env.DB.put(`sub:${email}`, JSON.stringify(sub));
+    console.log("reserve intent (Stripe not connected):", email, pack);
+    return json({ ok: true, mode: "waitlist" });
+  }
+
+  // Build the Checkout session. Form-encoded, per Stripe's API.
+  const params = new URLSearchParams({
+    mode: "payment",
+    "payment_method_types[0]": "card",
+    // The line that makes this cost nothing: authorize only, never capture.
+    "payment_intent_data[capture_method]": "manual",
+    "payment_intent_data[description]":
+      `Social Phix ${pack} first-batch reservation — authorization only, not captured`,
+    customer_email: email,
+    "line_items[0][quantity]": "1",
+    "line_items[0][price_data][currency]": "usd",
+    "line_items[0][price_data][unit_amount]": String(amount),
+    "line_items[0][price_data][product_data][name]":
+      `Social Phix ${pack} — First-Batch Reservation (card verified, $0 charged)`,
+    success_url: `${SITE}/success.html?ref=${code}&reserved=1&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${SITE}/success.html?ref=${code}&reserved=cancel`,
+    "metadata[code]": code,
+  });
+
+  const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${trim(env.STRIPE_SECRET_KEY)}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params.toString(),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    // Stripe having a bad moment shouldn't cost us the signal — fall back
+    // to intent-only rather than showing the visitor an error.
+    console.error("Stripe session failed:", JSON.stringify(data.error || data));
+    sub.reserveMode = "waitlist";
+    await env.DB.put(`sub:${email}`, JSON.stringify(sub));
+    return json({ ok: true, mode: "waitlist", degraded: true });
+  }
+
+  sub.reserveMode = "stripe";
+  sub.stripeSessionId = data.id;
+  await env.DB.put(`sub:${email}`, JSON.stringify(sub));
+
+  console.log("reserve checkout created:", email, pack, data.id);
+  return json({ ok: true, mode: "stripe", url: data.url });
+}
+
+/**
+ * Called by success.html when Stripe redirects back after checkout.
+ * Confirms with Stripe directly — never trusts the URL alone — then
+ * marks the signup as card-verified.
+ */
+async function reserveConfirm(url, env) {
+  const code      = String(url.searchParams.get("code") || "").trim().toUpperCase();
+  const sessionId = String(url.searchParams.get("session_id") || "").trim();
+
+  if (!code || !sessionId) return json({ ok: false, error: "Missing parameters." }, 400);
+  if (!env.STRIPE_SECRET_KEY) return json({ ok: false, error: "Stripe not connected." }, 400);
+  if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return json({ ok: false, error: "Bad session id." }, 400);
+
+  const email = await env.DB.get(`code:${code}`);
+  if (!email) return json({ ok: false, error: "Unknown code." }, 404);
+
+  const raw = await env.DB.get(`sub:${email}`);
+  if (!raw) return json({ ok: false, error: "Unknown code." }, 404);
+  const sub = JSON.parse(raw);
+
+  // Already confirmed on a previous visit — idempotent.
+  if (sub.reserved) return json({ ok: true, reserved: true });
+
+  const res = await fetch(
+    `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
+    { headers: { Authorization: `Bearer ${trim(env.STRIPE_SECRET_KEY)}` } }
+  );
+  const session = await res.json();
+
+  if (!res.ok) {
+    console.error("Stripe session lookup failed:", JSON.stringify(session.error || session));
+    return json({ ok: false, error: "Could not confirm with Stripe." }, 502);
+  }
+
+  // The session must belong to this referral code — no borrowing someone
+  // else's session id from a URL.
+  if (session.metadata?.code !== code) {
+    return json({ ok: false, error: "Session mismatch." }, 400);
+  }
+
+  if (session.status === "complete") {
+    sub.reserved        = true;
+    sub.reservedAt      = new Date().toISOString();
+    sub.reservedPack    = PACK_PRICES[sub.selectedPack] ? sub.selectedPack : "8-Pack";
+    sub.paymentIntentId = typeof session.payment_intent === "string" ? session.payment_intent : null;
+    await env.DB.put(`sub:${email}`, JSON.stringify(sub));
+    console.log("RESERVED (card verified):", email, sub.reservedPack);
+
+    await sendMetaEvent(env, {
+      eventName: "Purchase",
+      eventId:   `purchase-${code}`,
+      email,
+      sourceUrl: `${SITE}/success.html`,
+      customData: {
+        value:        PACK_PRICES[sub.reservedPack] || 0,
+        currency:     "USD",
+        content_name: sub.reservedPack,
+      },
+    });
+
+    return json({ ok: true, reserved: true });
+  }
+
+  return json({ ok: true, reserved: false });
+}
+
+
+/* ==================== META CONVERSIONS API ====================
+   Server-to-server events. Immune to ad blockers, DNS filters and
+   iOS tracking prevention — the browser pixel is best-effort, this
+   is the source of truth.
+
+   Needs two secrets (no-ops safely if either is missing):
+     META_PIXEL_ID    e.g. 1020097220917425
+     META_CAPI_TOKEN  Events Manager > Settings > Generate access token
+
+   event_id is deterministic (<type>-<referral code>) so that when the
+   browser pixel DOES fire, Meta dedupes the pair instead of counting
+   the same person twice.
+--------------------------------------------------------------- */
+
+async function sha256Hex(value) {
+  const data = new TextEncoder().encode(String(value).trim().toLowerCase());
+  const buf  = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function sendMetaEvent(env, opts) {
+  const pixelId = env.META_PIXEL_ID;
+  const token   = env.META_CAPI_TOKEN;
+  if (!pixelId || !token) return;               // not configured — stay quiet
+
+  const {
+    eventName, eventId, email,
+    ip = null, ua = null, fbp = null, fbc = null,
+    sourceUrl = SITE, customData = {},
+  } = opts;
+
+  const user_data = { em: [await sha256Hex(email)] };
+  if (email) user_data.external_id = [await sha256Hex(email)];
+  if (ip)  user_data.client_ip_address = ip;
+  if (ua)  user_data.client_user_agent = ua;
+  if (fbp) user_data.fbp = fbp;
+  if (fbc) user_data.fbc = fbc;
+
+  const payload = {
+    data: [{
+      event_name:       eventName,
+      event_time:       Math.floor(Date.now() / 1000),
+      event_id:         eventId,
+      event_source_url: sourceUrl,
+      action_source:    "website",
+      user_data,
+      custom_data:      customData,
+    }],
+  };
+
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/v21.0/${pixelId}/events?access_token=${encodeURIComponent(token)}`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
+    );
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("CAPI failed:", eventName, res.status, JSON.stringify(body).slice(0, 300));
+    } else {
+      console.log("CAPI ok:", eventName, "received:", body.events_received ?? "?");
+    }
+  } catch (err) {
+    // Never let analytics break a signup.
+    console.error("CAPI error:", eventName, err.message);
+  }
 }
 
 /* ==================== 4. KIT ==================== */
@@ -622,8 +888,10 @@ async function adminView(env) {
   const unsubList = await env.DB.list({ prefix: "unsub:" });
   const unsubbed  = unsubList.keys.length;
 
-  const verified = people.filter(p => p.verified).length;
-  const pending  = people.length - verified;
+  const verified  = people.filter(p => p.verified).length;
+  const pending   = people.length - verified;
+  const intents   = people.filter(p => p.reserveClickedAt).length;
+  const reservedN = people.filter(p => p.reserved).length;
   const referred = people.filter(p => p.referredBy).length;
   const totalRef = people.reduce((n, p) => n + (p.referrals || 0), 0);
   const rate     = people.length ? Math.round((verified / people.length) * 100) : 0;
@@ -658,11 +926,17 @@ async function adminView(env) {
       <td>${esc(p.name || "—")}</td>
       <td class="c">${p.verified ? '<span class="pill ok">confirmed</span>' : '<span class="pill wait">pending</span>'}</td>
       <td class="c"><strong>${p.referrals || 0}</strong></td>
+      <td class="c">${p.reserved
+        ? '<span class="pill ok">card ✓</span>'
+        : (p.reserveClickedAt ? '<span class="pill wait">clicked</span>' : '<span class="muted">—</span>')}</td>
       <td>${esc(p.selectedPack || "—")}</td>
       <td>${esc(p.useCase || "—")}</td>
       <td>${esc(p.priceReaction || "—")}</td>
       <td>${esc(p.referredBy || "—")}</td>
       <td class="muted">${esc((p.createdAt || "").slice(0, 10))}</td>
+      <td class="c"><a href="/delete?token=${esc(env.SHARED_SECRET)}&email=${encodeURIComponent(p.email)}"
+             onclick="return confirm('Delete ${esc(p.email)}? This also clears any unsubscribe block so the address can sign up fresh.')"
+             style="color:#b91c1c;font-weight:600;font-size:12px;">delete</a></td>
     </tr>`).join("");
 
   const top = people.filter(p => p.referrals > 0)
@@ -673,9 +947,11 @@ async function adminView(env) {
     <div class="wide">
       <div class="head">
         <h1>Waitlist</h1>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <a class="btn" href="/export?token=${esc(env.SHARED_SECRET)}">Download CSV</a>
           <a class="btn" style="background:#0369a1;" href="/sync-kit?token=${esc(env.SHARED_SECRET)}">Sync to Kit</a>
+          <a class="btn" style="background:#475569;" href="/reset-rate?token=${esc(env.SHARED_SECRET)}"
+             title="Testing signups yourself? This clears the 3-per-hour limit for your own connection.">Reset my rate limit</a>
         </div>
       </div>
 
@@ -690,6 +966,8 @@ async function adminView(env) {
         ${card("Pending", pending, `${rate}% confirm`)}
         ${card("Via referral", referred, people.length ? Math.round(referred / people.length * 100) + "% of signups" : "")}
         ${card("Referrals made", totalRef)}
+        ${card("Reserve clicks", intents, people.length ? Math.round(intents / people.length * 100) + "% of signups" : "")}
+        ${card("Card-verified", reservedN, "crossed the payment line")}
         ${card("Unsubscribed", unsubbed, unsubbed ? "removed from the list" : "")}
       </div>
 
@@ -733,18 +1011,21 @@ async function adminView(env) {
           <th data-sort="text">Name</th>
           <th data-sort="text" class="c">Status</th>
           <th data-sort="num" class="c">Refs</th>
+          <th data-sort="text" class="c">Reserve</th>
           <th data-sort="text">Pack</th>
           <th data-sort="text">Use case</th>
           <th data-sort="text">Price</th>
           <th data-sort="text">Referred by</th>
           <th data-sort="text">Joined</th>
+          <th></th>
         </tr>
-        ${rows || '<tr><td colspan="9" class="muted">No signups yet.</td></tr>'}
+        ${rows || '<tr><td colspan="11" class="muted">No signups yet.</td></tr>'}
       </table>
 
       <div class="note">
-        The two numbers that decide whether $56 is the right ask: the pack split and the
-        price reaction. Watch those before anything else.
+        The numbers that matter, in order: <strong>card-verified count</strong> (the payment-line
+        signal), then the pack split and price reaction. A signup is interest; a verified card
+        is intent.
       </div>
     </div>
 
@@ -929,8 +1210,22 @@ async function deleteSignup(url, env) {
       </form>`);
   }
 
+  // Clear the suppression entry too — without this, an address that
+  // unsubscribed could never sign up again, even after being deleted.
+  // Deliberate admin action, so it's fine: the suppression list exists to
+  // stop *accidental* re-adds, not to block your own re-testing.
+  const wasSuppressed = Boolean(await env.DB.get(`unsub:${email}`));
+  if (wasSuppressed) await env.DB.delete(`unsub:${email}`);
+
   const raw = await env.DB.get(`sub:${email}`);
   if (!raw) {
+    if (wasSuppressed) {
+      return html(`<h1>Suppression cleared</h1>
+        <p class="good"><code>${esc(email)}</code> had unsubscribed, so it was on the
+        suppression list. That entry is now removed.</p>
+        <div class="note">This address can sign up again as if it were new.</div>
+        <p style="margin-top:18px;"><a href="/admin?token=${token}">Back to dashboard</a></p>`);
+    }
     return html(`<h1>Nothing to delete</h1>
       <p>No record for <code>${esc(email)}</code>.</p>
       <p><a href="/delete?token=${token}">Try another</a></p>`);
@@ -960,8 +1255,30 @@ async function deleteSignup(url, env) {
       <tr><td>Referral code freed</td><td><code>${esc(sub.code || "—")}</code></td></tr>
       <tr><td>Pending links cleared</td><td>${cleared}</td></tr>
       <tr><td>Was confirmed</td><td>${sub.verified ? "yes" : "no"}</td></tr>
+      <tr><td>Suppression cleared</td><td>${wasSuppressed ? "yes — they had unsubscribed" : "wasn't suppressed"}</td></tr>
     </table>
     <div class="note">You can now sign up with this address again as if it were new.</div>
+    <p style="margin-top:18px;"><a href="/admin?token=${token}">Back to dashboard</a></p>`);
+}
+
+/* ==================== RATE-LIMIT RESET ==================== */
+
+/**
+ * Clears the signup rate limit for the connection making the request.
+ * The limit (3 signups/hour/IP) exists to stop abuse, but it also stops
+ * YOU when you're testing the flow repeatedly. One click from the admin
+ * dashboard resets it for your own IP only.
+ *   /reset-rate?token=SECRET
+ */
+async function resetRate(request, url, env) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  await env.DB.delete(`rate:${ip}`);
+  const token = esc(url.searchParams.get("token") || "");
+  console.log("rate limit reset for", ip);
+  return html(`
+    <h1>Rate limit reset</h1>
+    <p class="good">Signups from your current connection (<code>${esc(ip)}</code>) are no longer rate-limited.</p>
+    <div class="note">This only affects your own IP. The 3-per-hour limit stays in place for everyone else.</div>
     <p style="margin-top:18px;"><a href="/admin?token=${token}">Back to dashboard</a></p>`);
 }
 
@@ -1066,6 +1383,7 @@ async function exportCsv(env) {
   const cols = [
     "email", "name", "verified", "referrals", "code", "referredBy",
     "selectedPack", "useCase", "priceReaction",
+    "reserveClickedAt", "reserved", "reservedPack", "reservedAt",
     "country", "city", "utmSource", "utmMedium", "utmCampaign",
     "createdAt", "verifiedAt",
   ];
@@ -1106,9 +1424,12 @@ function indexPage(url) {
     ["/test-email?token=" + token, "Send one test email", true],
     ["/admin?token=" + token,      "Your signup numbers", true],
     ["/delete?token=" + token,     "Remove a signup so you can re-test", true],
+    ["/reset-rate?token=" + token, "Clear the signup rate limit for your own IP", true],
     ["/sync-kit?token=" + token,   "Push existing signups up to Kit", true],
     ["/setup?token=" + token,      "Create Kit fields (only if using Kit)", true],
     ["/signup",                    "POST only — your form posts here", false],
+    ["/reserve",                   "POST only — the card-verification reserve step", false],
+    ["/reserve-confirm",           "Called by success.html after Stripe redirects back", false],
     ["/verify?t=TOKEN",            "The link in the confirmation email", false],
     ["/stats?code=CODE",           "Referral count for the tracker", false],
   ];
@@ -1257,6 +1578,13 @@ async function healthCheck(env) {
       "verification still apply, but there's no bot challenge on the form. " +
       "Add <code>TURNSTILE_SECRET</code> to enable it."]);
   }
+
+  /* --- Stripe reserve (optional) --- */
+  rows.push(["Stripe reserve", "info",
+    env.STRIPE_SECRET_KEY
+      ? "Connected — the reserve button creates real card authorizations (never captured, zero fees)"
+      : "Not connected — the reserve button records intent clicks only. Add <code>STRIPE_SECRET_KEY</code> " +
+        "as a Secret and the same button switches to real card verification, no code change needed."]);
 
   /* --- Kit (optional) --- */
   rows.push(["Kit sync", "info",
@@ -1564,10 +1892,10 @@ function welcomeEmail(name, code, unsubUrl) {
     <p style="${P}">Every friend who joins through it moves you up the line. And it stacks:</p>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 8px;">
-      ${tier(3,  "Skip the line",   "Priority spot in the first run")}
-      ${tier(5,  "A free bottle",   "Added to whatever pack you order")}
-      ${tier(10, "A free 3-pack",   "$24 value, on me")}
-      ${tier(25, "A free 8-pack",   "$56 — a month of things that matter")}
+      ${tier(3,  "Skip the line",   "First-run priority, right behind reserved spots")}
+      ${tier(5,  "A free bottle",   "Added to your first order")}
+      ${tier(10, "A free 3-pack",   "Added to your first order — $24 value, on me")}
+      ${tier(25, "The Founders' 8-pack", "Free with your first order, plus a founding-member vote on what we make next")}
     </table>
 
     ${button(tracker, "Track my referrals")}
@@ -1601,10 +1929,10 @@ ${link}
 
 Every friend who joins through it moves you up the line. And it stacks:
 
-  3 friends  — Skip the line. Priority spot in the first run.
-  5          — A free bottle added to your order.
-  10         — A free 3-pack. $24 value, on me.
-  25         — A free 8-pack. $56.
+  3 friends  — Skip the line. First-run priority, right behind reserved spots.
+  5          — A free bottle, added to your first order.
+  10         — A free 3-pack added to your first order. $24 value, on me.
+  25         — The Founders' 8-pack: free with your first order, plus a vote on what we make next.
 
 Track your referrals: ${tracker}
 
