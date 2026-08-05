@@ -592,6 +592,23 @@ em{font-style:italic}
     <!-- End Meta Pixel -->
 </head>
 <body class="antialiased font-sans">
+    <!-- Product Hunt welcome banner: shows only for utm_source=producthunt -->
+    <div id="phBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;
+         background:linear-gradient(90deg,#DA552F,#FF5C1A);color:#fff;text-align:center;
+         padding:11px 16px;font-weight:700;font-size:14px;letter-spacing:.02em">
+      Welcome, Product Hunters — early supporters get first-batch priority. 
+    </div>
+    <script>
+    (function(){try{
+      var p=new URLSearchParams(location.search);
+      var src=((p.get('utm_source')||'')+' '+(p.get('ref')||'')).toLowerCase();
+      if(src.indexOf('producthunt')>-1||src.trim()==='ph'){
+        document.getElementById('phBanner').style.display='block';
+        document.body.style.paddingTop='42px';
+      }
+    }catch(e){}})();
+    </script>
+
 
 
 
@@ -644,7 +661,7 @@ em{font-style:italic}
                     Get On The List
                 </a>
                 <a href="#formula" class="w-full sm:w-auto px-10 py-4 border-2 border-slate-600 text-sm font-bold tracking-widest uppercase rounded-md text-white hover:border-accent-cyan hover:text-accent-cyan transition-all duration-300">
-                    Check My Work
+                    Check the Science
                 </a>
             </div>
         </div>
