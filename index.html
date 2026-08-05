@@ -996,10 +996,13 @@ em{font-style:italic}
                 <!-- Selected pack (populated by pack buttons above) -->
                 <input type="hidden" id="selectedPack" name="selectedPack" value="8-Pack">
 
+                <!-- Survey moved post-signup: email-only capture converts better.
+                     Kept in the DOM, hidden, so nothing downstream breaks. -->
+                <div class="hidden" aria-hidden="true">
                 <!-- Name: enables personalized welcome + referral emails -->
                 <div>
                     <label for="name" class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">First Name</label>
-                    <input type="text" id="name" name="name" placeholder="Alex" required
+                    <input type="text" id="name" name="name" placeholder="Alex" 
                            autocapitalize="words" autocomplete="given-name"
                            style="text-transform: capitalize;"
                            class="w-full px-5 py-4 bg-brand-bg border border-slate-600 rounded-md text-white font-medium focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition duration-300 placeholder-slate-600">
@@ -1043,6 +1046,8 @@ em{font-style:italic}
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
+                </div>
+
                 </div>
 
                 <!-- Original Email Field -->
