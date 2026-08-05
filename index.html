@@ -592,28 +592,31 @@ em{font-style:italic}
     <!-- End Meta Pixel -->
 </head>
 <body class="antialiased font-sans">
-    <!-- Product Hunt welcome banner: shows only for utm_source=producthunt -->
+    <!-- Product Hunt welcome toast: shows only for utm_source=producthunt -->
     <style>
-      #phBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:60;
-        background:linear-gradient(90deg,#DA552F,#FF5C1A);color:#fff;text-align:center;
-        padding:10px 14px;font-weight:700;font-size:14px;letter-spacing:.02em;line-height:1.35}
-      @media (max-width:640px){#phBanner{font-size:12.5px;padding:9px 12px}}
+      #phToast{display:none;position:fixed;left:20px;bottom:20px;z-index:100;max-width:340px;
+        background:#101B2E;border:1px solid rgba(255,92,26,.55);border-radius:14px;
+        box-shadow:0 12px 40px rgba(0,0,0,.55);padding:16px 40px 16px 16px;color:#fff;
+        font-size:14px;line-height:1.5;opacity:0;transform:translateY(12px);
+        transition:opacity .4s ease,transform .4s ease}
+      #phToast.on{opacity:1;transform:none}
+      #phToast b{color:#FF5C1A}
+      #phToast .x{position:absolute;top:8px;right:12px;cursor:pointer;color:#8fa0bb;
+        font-size:18px;line-height:1;background:none;border:0;padding:4px}
+      @media (max-width:640px){#phToast{left:12px;right:12px;bottom:12px;max-width:none}}
     </style>
-    <div id="phBanner">Welcome, Product Hunters &mdash; early supporters get first-batch priority.</div>
+    <div id="phToast" role="status">
+      <button class="x" aria-label="Dismiss" onclick="this.parentNode.style.display='none'">&times;</button>
+      <b>Welcome, Product Hunters!</b> Early supporters get first-batch priority &mdash; join the list below.
+    </div>
     <script>
     (function(){try{
       var p=new URLSearchParams(location.search);
       var src=((p.get('utm_source')||'')+' '+(p.get('ref')||'')).toLowerCase();
       if(src.indexOf('producthunt')===-1&&src.trim()!=='ph')return;
-      var b=document.getElementById('phBanner');
-      b.style.display='block';
-      function fit(){
-        var h=b.offsetHeight;
-        var nav=document.querySelector('nav');
-        if(nav)nav.style.top=h+'px';
-        document.body.style.paddingTop=h+'px';
-      }
-      fit();window.addEventListener('resize',fit);
+      var t=document.getElementById('phToast');
+      t.style.display='block';
+      setTimeout(function(){t.classList.add('on');},400);
     }catch(e){}})();
     </script>
 
