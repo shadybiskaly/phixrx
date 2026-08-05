@@ -404,32 +404,6 @@
 
             verifiedState.classList.remove('hidden');
 
-            /* ---------- Post-signup survey ---------- */
-            (function () {
-                const block = document.getElementById('surveyBlock');
-                if (!block || !refCode || WORKER_MISSING) return;
-                block.classList.remove('hidden');
-
-                document.getElementById('sSave').addEventListener('click', async function () {
-                    const btn = this;
-                    btn.disabled = true;
-                    btn.textContent = 'Saving...';
-                    const body = new URLSearchParams({
-                        code:          refCode,
-                        name:          document.getElementById('sName').value.trim(),
-                        useCase:       document.getElementById('sUse').value,
-                        priceReaction: document.getElementById('sPrice').value,
-                    });
-                    try {
-                        await fetch(WORKER + '/profile', { method: 'POST', body });
-                    } catch (err) {
-                        console.warn('profile save failed:', err);
-                    }
-                    document.getElementById('sDone').classList.remove('hidden');
-                    btn.textContent = 'Saved';
-                });
-            })();
-
             document.getElementById('pageEyebrow').textContent  = "You're On The List";
             document.getElementById('pageHeadline').textContent = 'Tell Your Friends.';
             document.getElementById('pageSubhead').textContent  =
@@ -609,40 +583,6 @@
         }
     });
     </script>
-
-        <!-- Post-signup survey: asked after the commitment, not before. -->
-        <div id="surveyBlock" class="hidden" style="margin:28px auto 0;max-width:520px;text-align:left;
-             background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:22px">
-          <p style="font-weight:700;margin:0 0 4px">Two quick questions</p>
-          <p style="opacity:.65;font-size:14px;margin:0 0 16px">Ten seconds. It shapes the first batch.</p>
-          <label style="display:block;font-size:12px;opacity:.7;margin-bottom:6px">First name</label>
-          <input id="sName" type="text" placeholder="Alex"
-                 style="width:100%;padding:11px;border-radius:9px;border:1px solid rgba(255,255,255,.18);
-                        background:rgba(0,0,0,.25);color:inherit;margin-bottom:14px">
-          <label style="display:block;font-size:12px;opacity:.7;margin-bottom:6px">What would you use it for?</label>
-          <select id="sUse" style="width:100%;padding:11px;border-radius:9px;border:1px solid rgba(255,255,255,.18);
-                        background:rgba(0,0,0,.25);color:inherit;margin-bottom:14px">
-            <option value="">Choose one</option>
-            <option>Presentations / public speaking</option>
-            <option>Job interviews</option>
-            <option>Networking events</option>
-            <option>First dates</option>
-            <option>Something else</option>
-          </select>
-          <label style="display:block;font-size:12px;opacity:.7;margin-bottom:6px">At $7 a bottle, this feels…</label>
-          <select id="sPrice" style="width:100%;padding:11px;border-radius:9px;border:1px solid rgba(255,255,255,.18);
-                        background:rgba(0,0,0,.25);color:inherit;margin-bottom:16px">
-            <option value="">Choose one</option>
-            <option>Cheap for what it is</option>
-            <option>About right</option>
-            <option>A bit steep</option>
-            <option>Too expensive</option>
-          </select>
-          <button id="sSave" type="button"
-                  style="width:100%;padding:12px;border-radius:9px;border:0;background:#ff5c1a;color:#fff;
-                         font-weight:700;cursor:pointer">Save</button>
-          <p id="sDone" class="hidden" style="margin:12px 0 0;opacity:.75;font-size:14px">Thanks — noted.</p>
-        </div>
 
 </body>
 </html>
