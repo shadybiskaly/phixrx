@@ -306,13 +306,11 @@
                 </p>
             </div>
             
-            <!-- The anchor compound, alone and centred. Same card width as the
-                 rest — it just gets its own row. -->
-            <!-- Width is inline on purpose. 31.25rem is exactly one grid
-                 column: (max-w-5xl 64rem - gap-6 1.5rem) / 2. Inline means
-                 it can't be broken by a stale cached stylesheet. -->
-            <div class="max-w-5xl mx-auto mb-6" style="display:flex;justify-content:center;">
-                <div style="width:100%;max-width:31.25rem;">
+            <!-- Four compounds, one 2x2 grid — same alignment as the
+                 "Four Rooms" protocol cards below. md:grid-cols-2 and
+                 items-stretch are both in socialphix.css; nothing new was
+                 introduced here, so no CSS rebuild is needed. -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12 items-stretch">
                 <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Alpha Hacker</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-4">Pure L-Theanine</h3>
@@ -331,14 +329,7 @@
                         </li>
                     </ul>
                 </div>
-                </div>
-            </div>
-
-            <!-- Three supporting compounds. sm:grid-cols-3 is used deliberately:
-                 md:grid-cols-3 is NOT in socialphix.css and would silently fail
-                 against the static stylesheet. Do not "fix" this to md:. -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12 items-stretch">
-                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100 flex flex-col">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Amygdala Dimmer</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-4">Sceletium Extract</h3>
                     <ul class="text-slate-400 text-sm leading-relaxed space-y-2.5">
@@ -356,7 +347,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-200 flex flex-col">
+                <div class="bg-brand-card p-6 sm:p-8 border border-slate-700 rounded-xl hover-lift reveal delay-100 flex flex-col">
                     <span class="text-[10px] font-bold tracking-[0.2em] text-accent-cyan block mb-3 uppercase">The Cortisol Brake</span>
                     <h3 class="font-heading text-2xl font-bold text-white mb-4">Saffron Extract</h3>
                     <ul class="text-slate-400 text-sm leading-relaxed space-y-2.5">
