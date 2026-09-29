@@ -24,7 +24,7 @@
 
   # Same policy as the meta tag, but as a header it also covers
   # frame-ancestors, which meta cannot
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://raw.githubusercontent.com https://placehold.co https://www.google-analytics.com; connect-src 'self' https://*.workers.dev https://www.google-analytics.com https://region1.google-analytics.com; frame-src https://challenges.cloudflare.com; form-action 'self' https://*.workers.dev; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://raw.githubusercontent.com https://placehold.co https://www.google-analytics.com https://www.facebook.com; connect-src 'self' https://*.workers.dev https://www.google-analytics.com https://region1.google-analytics.com https://www.facebook.com; frame-src https://challenges.cloudflare.com; form-action 'self' https://*.workers.dev; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
 
 # Long cache for the stylesheet — it's content-addressed by rebuild,
 # so bump the filename if you ever need to bust it
